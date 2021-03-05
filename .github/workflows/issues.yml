@@ -1,9 +1,9 @@
-name: Tackle Controls Issues Sync
+name: Tackle Application Inventory Issues Sync
 
 defaults:
   run:
     shell: bash
-    working-directory: src/main/resources/
+    working-directory: .github/scripts/
 
 on:
   issues:
