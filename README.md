@@ -62,6 +62,8 @@ at the end the report will be available opening in a browser the `target/site/ja
 
 ## Database management
 
+> :rotating_light: Backup and Restore instructions are provided for development purposed and **NOT for production** usage :rotating_light:
+
 ### Backup
 
 1. get the name of the PostgreSQL pod:
