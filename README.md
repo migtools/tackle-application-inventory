@@ -89,5 +89,5 @@ at the end the report will be available opening in a browser the `target/site/ja
    ```
 1. insert the values in the database using pod's name and database's user (e.g. `application-inventory-postgres-7cf456bdb9-lxhjv` and `application_inventory`):
    ```shell
-   $ cat 20210323195709_controls_db_data.sql | kubectl exec -i application-inventory-postgres-7cf456bdb9-lxhjv -n tackle -- psql -U application_inventory -d application_inventory_db
+   $ cat 20210323195709_application_inventory_db_data.sql | kubectl exec -i application-inventory-postgres-7cf456bdb9-lxhjv -n tackle -- psql -U application_inventory -d application_inventory_db
    ```
