@@ -59,3 +59,35 @@ $ ./mvnw verify -Pjacoco
 ```
 
 at the end the report will be available opening in a browser the `target/site/jacoco-ut/index.html` file.
+
+## Database management
+
+### Backup
+
+1. get the name of the PostgreSQL pod:
+   ```shell
+   $ kubectl get pods -l app.kubernetes.io/name=application-inventory-postgres -n tackle
+   ```
+1. retrieve the database's user using pod's name (e.g. `application-inventory-postgres-7cf456bdb9-lxhjv`):
+   ```shell
+   $ kubectl exec application-inventory-postgres-7cf456bdb9-lxhjv -n tackle -- printenv POSTGRES_USER
+   ```
+1. dump the database **data only** (excluding `flyway_schema_history` table) using pod's name and database's user (e.g. `application-inventory-postgres-7cf456bdb9-lxhjv` and `application_inventory`):
+   ```shell
+   $ kubectl exec application-inventory-postgres-7cf456bdb9-lxhjv -n tackle  -- /bin/bash -c "pg_dump -a -T flyway_schema_history -U application_inventory application_inventory_db" > $(date +%Y%m%d%H%M%S)_application_inventory_db_data.sql
+   ```
+
+### Restore
+
+1. get the name of the PostgreSQL pod:
+   ```shell
+   $ kubectl get pods -l app.kubernetes.io/name=application-inventory-postgres -n tackle
+   ```
+1. retrieve the database's user using pod's name (e.g. `application-inventory-postgres-7cf456bdb9-lxhjv`):
+   ```shell
+   $ kubectl exec application-inventory-postgres-7cf456bdb9-lxhjv -n tackle -- printenv POSTGRES_USER
+   ```
+1. insert the values in the database using pod's name and database's user (e.g. `application-inventory-postgres-7cf456bdb9-lxhjv` and `application_inventory`):
+   ```shell
+   $ cat 20210323195709_controls_db_data.sql | kubectl exec -i application-inventory-postgres-7cf456bdb9-lxhjv -n tackle -- psql -U application_inventory -d application_inventory_db
+   ```
