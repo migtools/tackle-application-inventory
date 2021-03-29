@@ -6,8 +6,11 @@ import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.ElementCollection;
 
 @Entity
 @Table(name = "application")
@@ -21,4 +24,6 @@ public class Application extends AbstractEntity {
     public String businessService;
     @Filterable
     public String comments;
+    @ElementCollection
+    public Set<String> tagIDs;
 }

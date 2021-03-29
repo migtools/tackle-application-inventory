@@ -43,4 +43,15 @@ public class ApplicationResourceTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application.comments[0].length()", is(1000));
     }
+
+    @Test
+    public void testTagIDs() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "-id")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application.tagIDs.size()", is(3));
+    }
 }
