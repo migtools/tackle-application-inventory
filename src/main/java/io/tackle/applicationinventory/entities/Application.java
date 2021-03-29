@@ -18,6 +18,7 @@ public class Application extends AbstractEntity {
     public String name;
     @Filterable
     public String description;
+    @Filterable
     public String businessService;
     @Filterable
     public String comments;
