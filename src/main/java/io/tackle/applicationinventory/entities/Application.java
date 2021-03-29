@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.util.Set;
+import java.util.HashSet;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -25,5 +26,6 @@ public class Application extends AbstractEntity {
     @Filterable
     public String comments;
     @ElementCollection
-    public Set<String> tagIDs;
+    @Filterable
+    public Set<String> tagIDs = new HashSet<>();
 }
