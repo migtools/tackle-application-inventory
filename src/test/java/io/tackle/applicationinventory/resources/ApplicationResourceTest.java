@@ -67,4 +67,16 @@ public class ApplicationResourceTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application[0].id", is(3));
     }
+
+    @Test
+    public void testTagIDFilteredSingleParamListHalEndpoint() {
+        given()
+                .accept("application/hal+json")
+                .queryParam(".tagIDs", "7")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application.size()", is(1),
+                        "_embedded.application[0].id", is(1));
+    }
 }
