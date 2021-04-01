@@ -45,6 +45,7 @@ public class ApplicationTest extends SecuredResourceTest {
     }
 
     @Test
+<<<<<<< HEAD
     public void testTagIDs() {
         given()
                 .accept("application/hal+json")
@@ -79,5 +80,17 @@ public class ApplicationTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application.size()", is(1),
                         "_embedded.application[0].id", is(1));
+=======
+    public void testBusinessServiceEqualFilter() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "id")
+                .queryParam("businessService", "2")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application.size", is(1),
+                        "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"));
+>>>>>>> b10b6cabf6d6d3649524c6f82bbe2a5a7feb1e5b
     }
 }

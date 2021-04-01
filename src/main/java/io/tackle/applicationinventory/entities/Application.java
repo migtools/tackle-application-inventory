@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.entities;
 
+import io.tackle.commons.annotations.CheckType;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -23,6 +24,7 @@ public class Application extends AbstractEntity {
     public String name;
     @Filterable
     public String description;
+    @Filterable(check = CheckType.EQUAL)
     public String businessService;
     @Filterable
     public String comments;
