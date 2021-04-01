@@ -28,7 +28,7 @@ public class Application extends AbstractEntity {
     public String comments;
 
     @ElementCollection
-    @Filterable
+    @Filterable(filterName = "tags.id")
     public Set<String> tagIDs = new HashSet<>();
 
     /**
