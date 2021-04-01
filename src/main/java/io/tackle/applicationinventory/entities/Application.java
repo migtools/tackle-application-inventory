@@ -29,7 +29,7 @@ public class Application extends AbstractEntity {
 
     @ElementCollection
     @Filterable(filterName = "tags.id")
-    public Set<String> tagIDs = new HashSet<>();
+    public Set<String> tags = new HashSet<>();
 
     /**
      * equals and hashCode methods overridden for being able to use this bean with the {@link org.jgrapht.Graph}
