@@ -72,7 +72,7 @@ public class ApplicationTest extends SecuredResourceTest {
     public void testTagIDFilteredSingleParamListHalEndpoint() {
         given()
                 .accept("application/hal+json")
-                .queryParam("tags.id", "7")
+                .queryParam("tags.tag", "7")
                 .when().get(PATH)
                 .then()
                 .log().all()
