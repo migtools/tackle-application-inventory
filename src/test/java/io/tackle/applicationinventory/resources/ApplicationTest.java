@@ -48,11 +48,11 @@ public class ApplicationTest extends SecuredResourceTest {
     public void testTagIDs() {
         given()
                 .accept("application/hal+json")
-                .queryParam("sort", "-id")
+                .queryParam("sort", "id")
                 .when().get(PATH)
                 .then()
                 .statusCode(200)
-                .body("_embedded.application.tagIDs.size()", is(3));
+                .body("_embedded.application[0].tags.size()", is(3));
     }
 
 
@@ -61,7 +61,7 @@ public class ApplicationTest extends SecuredResourceTest {
     public void testTagIDSort() {
         given()
                 .accept("application/hal+json")
-                .queryParam("sort", "tagIDs.size")
+                .queryParam("sort", "tags.size")
                 .when().get(PATH)
                 .then()
                 .statusCode(200)
@@ -72,9 +72,10 @@ public class ApplicationTest extends SecuredResourceTest {
     public void testTagIDFilteredSingleParamListHalEndpoint() {
         given()
                 .accept("application/hal+json")
-                .queryParam(".tagIDs", "7")
+                .queryParam("tags.id", "531")
                 .when().get(PATH)
                 .then()
+                .log().all()
                 .statusCode(200)
                 .body("_embedded.application.size()", is(1),
                         "_embedded.application[0].id", is(1));
