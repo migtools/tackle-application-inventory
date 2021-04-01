@@ -45,6 +45,43 @@ public class ApplicationTest extends SecuredResourceTest {
     }
 
     @Test
+    public void testTagIDs() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "id")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application[0].tags.size()", is(3));
+    }
+
+
+
+    @Test
+    public void testTagIDSort() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "tags.size")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application[0].id", is(3));
+    }
+
+    @Test
+    public void testTagIDFilteredSingleParamListHalEndpoint() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("tags.tag", "7")
+                .when().get(PATH)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("_embedded.application.size()", is(1),
+                        "_embedded.application[0].id", is(1));
+    }
+
+    @Test
     public void testBusinessServiceEqualFilter() {
         given()
                 .accept("application/hal+json")
