@@ -43,4 +43,17 @@ public class ApplicationTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application.comments[1].length()", is(1000));
     }
+
+    @Test
+    public void testBusinessServiceEqualFilter() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "id")
+                .queryParam("businessService", "2")
+                .when().get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application.size", is(1),
+                        "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"));
+    }
 }
