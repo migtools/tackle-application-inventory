@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationResourceTest extends SecuredResourceTest {
+public class ApplicationTest extends SecuredResourceTest {
 
     @BeforeAll
     public static void init() {
@@ -41,6 +41,6 @@ public class ApplicationResourceTest extends SecuredResourceTest {
                 .when().get(PATH)
                 .then()
                 .statusCode(200)
-                .body("_embedded.application.comments[0].length()", is(1000));
+                .body("_embedded.application.comments[1].length()", is(1000));
     }
 }
