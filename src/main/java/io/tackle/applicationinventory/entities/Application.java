@@ -10,9 +10,13 @@ import org.hibernate.annotations.Where;
 import java.util.Set;
 import java.util.HashSet;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.ElementCollection;
+import javax.persistence.UniqueConstraint;
 import java.util.Objects;
 
 @Entity
@@ -30,7 +34,13 @@ public class Application extends AbstractEntity {
     public String comments;
 
     @ElementCollection
-    @Filterable(filterName = "tags.id")
+    @CollectionTable(
+            name = "Application_tags",
+            joinColumns = @JoinColumn(name = "Application_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"Application_id", "tag"})
+    )
+    @Column(name = "tag")
+    @Filterable(filterName = "tags.tag", check = CheckType.EQUAL)
     public Set<String> tags = new HashSet<>();
 
     /**
