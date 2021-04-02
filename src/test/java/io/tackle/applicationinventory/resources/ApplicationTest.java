@@ -61,7 +61,7 @@ public class ApplicationTest extends SecuredResourceTest {
     public void testTagIDSort() {
         given()
                 .accept("application/hal+json")
-                .queryParam("sort", "tags.size")
+                .queryParam("sort", "tags.size()")
                 .when().get(PATH)
                 .then()
                 .statusCode(200)
@@ -90,7 +90,7 @@ public class ApplicationTest extends SecuredResourceTest {
                 .when().get(PATH)
                 .then()
                 .statusCode(200)
-                .body("_embedded.application.size", is(1),
+                .body("_embedded.application.size()", is(1),
                         "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"));
     }
 }
