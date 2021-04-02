@@ -3,6 +3,8 @@ package io.tackle.applicationinventory.resources;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.entities.Application;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
@@ -92,5 +94,19 @@ public class ApplicationTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application.size()", is(1),
                         "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"));
+    }
+
+    @Test
+    public void testAddBadPayload() {
+        Application application = new Application();
+        application.id = 1L;
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(application)
+                .when()
+                .post(PATH)
+                .then()
+                .statusCode(500);
     }
 }
