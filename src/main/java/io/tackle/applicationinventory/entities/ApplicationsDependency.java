@@ -1,6 +1,7 @@
 package io.tackle.applicationinventory.entities;
 
 import io.quarkus.panache.common.Sort;
+import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -19,9 +20,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,14 +52,14 @@ public class ApplicationsDependency extends AbstractEntity {
     @PreUpdate
     public void preChangesCheck() {
         // validate input data
-        if (from == null || to == null) throw new BadRequestException("Not valid application reference provided");
+        if (from == null || to == null) throw new ApplicationsInventoryException("Not valid application reference provided", Response.Status.BAD_REQUEST);
         // "self-loop" for dependencies is not allowed
-        if (from.equals(to)) throw new WebApplicationException("'from' and 'to' values are the same: an application can not be a dependency of itself", Response.Status.CONFLICT);
+        if (from.equals(to)) throw new ApplicationsInventoryException("'from' and 'to' values are the same: an application can not be a dependency of itself", Response.Status.CONFLICT);
         // applications must be already in the DB
         Application fromApplication = Application.findById(from.id);
-        if (fromApplication == null) throw new NotFoundException(String.format("Not found the application with id %s", from.id));
+        if (fromApplication == null) throw new ApplicationsInventoryException(String.format("Not found the application with id %s", from.id), Response.Status.NOT_FOUND);
         Application toApplication = Application.findById(to.id);
-        if (toApplication == null) throw new NotFoundException(String.format("Not found the application with id %s", to.id));
+        if (toApplication == null) throw new ApplicationsInventoryException(String.format("Not found the application with id %s", to.id), Response.Status.NOT_FOUND);
 
         // create the graph
         Graph<Application, DefaultEdge> graph = GraphTypeBuilder.<Application, DefaultEdge>
@@ -86,7 +84,7 @@ public class ApplicationsDependency extends AbstractEntity {
                     .stream()
                     .map(application -> application.name)
                     .collect(Collectors.joining("', '", "Dependencies cycle created from applications '", "'"));
-            throw new WebApplicationException(message, Response.Status.CONFLICT);
+            throw new ApplicationsInventoryException(message, Response.Status.CONFLICT);
         }
     }
 
