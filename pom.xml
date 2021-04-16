@@ -23,7 +23,7 @@
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus-plugin.version>1.13.1.Final</quarkus-plugin.version>
     <surefire-plugin.version>2.22.2</surefire-plugin.version>
-    <testcontainers.version>1.15.2</testcontainers.version>
+    <testcontainers.version>1.15.3</testcontainers.version>
     <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
     <jacoco.version>0.8.6</jacoco.version>
     <quarkus.package.type>jar</quarkus.package.type>
