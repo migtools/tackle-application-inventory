@@ -14,13 +14,11 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.ws.rs.core.Response;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
