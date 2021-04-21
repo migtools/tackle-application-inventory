@@ -200,7 +200,6 @@ public class ReviewTest extends SecuredResourceTest {
                         .accept(ContentType.JSON)
                         .body(review)
                         .when()
-                        .log().all()
                         .post(PATH)
                         .then()
                         .statusCode(201)
@@ -223,7 +222,6 @@ public class ReviewTest extends SecuredResourceTest {
                 .accept(ContentType.JSON)
                 .pathParam("id", review.id)
                 .when()
-                .log().all()
                 .delete(PATH + "/{id}")
                 .then()
                 .statusCode(204);
