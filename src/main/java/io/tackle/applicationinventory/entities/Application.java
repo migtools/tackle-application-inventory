@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.entities;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import io.tackle.commons.annotations.CheckType;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
@@ -7,17 +8,19 @@ import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.util.Set;
-import java.util.HashSet;
-
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
 import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "application")
@@ -42,6 +45,10 @@ public class Application extends AbstractEntity {
     @Column(name = "tag")
     @Filterable(filterName = "tags.tag", check = CheckType.EQUAL)
     public Set<String> tags = new HashSet<>();
+
+    @OneToOne(mappedBy = "application", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonIncludeProperties("id")
+    public Review review;
 
     /**
      * equals and hashCode methods overridden for being able to use this bean with the {@link org.jgrapht.Graph}

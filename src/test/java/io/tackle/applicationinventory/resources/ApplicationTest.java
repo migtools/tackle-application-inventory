@@ -93,7 +93,8 @@ public class ApplicationTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .body("_embedded.application.size()", is(1),
-                        "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"));
+                        "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"),
+                        "_embedded.application[0].review.id", is(7));
     }
 
     @Test

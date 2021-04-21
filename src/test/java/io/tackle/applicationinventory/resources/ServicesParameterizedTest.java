@@ -7,6 +7,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
+import io.tackle.applicationinventory.entities.Review;
 import io.tackle.commons.entities.AbstractEntity;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
@@ -23,6 +24,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
@@ -144,9 +146,20 @@ public class ServicesParameterizedTest extends SecuredResourceTest {
         db.id = 3L;
         dependency.to = db;
 
+        Review review = new Review();
+        review.proposedAction = "Retain";
+        review.effortEstimate = "Medium";
+        review.businessCriticality = 10;
+        review.workPriority = 10;
+        review.comments = "No comment!";
+        Application reviewed = new Application();
+        reviewed.id = 6L;
+        review.application = reviewed;
+
         return Stream.of(
                 Arguments.of(application, "/application"),
-                Arguments.of(dependency, "/applications-dependency")
+                Arguments.of(dependency, "/applications-dependency"),
+                Arguments.of(review, "/review")
         );
     }
 
