@@ -14,6 +14,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.builder.GraphTypeBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
@@ -26,8 +27,7 @@ import java.util.stream.Stream;
 
 @Entity
 @Table(
-        name = "applications_dependency",
-        uniqueConstraints = @UniqueConstraint( columnNames = { "from_id", "to_id" } )
+        name = "applications_dependency"
 )
 @SQLDelete(sql = "UPDATE applications_dependency SET deleted = true WHERE id = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted = false")

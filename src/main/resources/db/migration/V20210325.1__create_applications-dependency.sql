@@ -9,8 +9,9 @@ create table applications_dependency (
     to_id int8,
     primary key (id)
 );
-alter table if exists applications_dependency
-    add constraint UKlgwufxhgndoa6198mawite3fo unique (from_id, to_id);
+create unique INDEX UKlgwufxhgndoa6198mawite3fo
+on applications_dependency (from_id, to_id)
+where (deleted = false);
 alter table if exists applications_dependency
     add constraint FKfwaxbxio04nk2gj90ssf8p82f
     foreign key (from_id)
