@@ -1,6 +1,8 @@
 package io.tackle.applicationinventory.entities;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Parameters;
 import io.tackle.commons.annotations.CheckType;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
@@ -16,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.HashSet;
@@ -49,6 +52,18 @@ public class Application extends AbstractEntity {
     @OneToOne(mappedBy = "application", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JsonIncludeProperties("id")
     public Review review;
+
+    /**
+     * The unidirectional {@link javax.persistence.ManyToOne} associations from {@link ApplicationsDependency}
+     * and the soft delete approach adopted, prevents the "standard" 'on cascade delete' approach
+     * on the FK constraint definition from working.
+     * So the cascade has been implemented here as a pre-remove application task.
+     */
+    @PreRemove
+    public void preRemove() {
+        ApplicationsDependency.list("from_id = :id OR to_id = :id", Parameters.with("id", id))
+                .forEach(PanacheEntityBase::delete);
+    }
 
     /**
      * equals and hashCode methods overridden for being able to use this bean with the {@link org.jgrapht.Graph}

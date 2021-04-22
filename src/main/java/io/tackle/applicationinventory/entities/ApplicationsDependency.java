@@ -19,15 +19,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.ws.rs.core.Response;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Entity
 @Table(
-        name = "applications_dependency",
-        uniqueConstraints = @UniqueConstraint( columnNames = { "from_id", "to_id" } )
+        name = "applications_dependency"
 )
 @SQLDelete(sql = "UPDATE applications_dependency SET deleted = true WHERE id = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted = false")
