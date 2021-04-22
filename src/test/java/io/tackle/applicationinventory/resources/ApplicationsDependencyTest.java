@@ -559,5 +559,13 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .body("_embedded.applications-dependency.size()", is(0));
+
+        // delete 3rd application for not altering the other tests
+        given()
+                .pathParam("id", third.id)
+                .when()
+                .delete("/application/{id}")
+                .then()
+                .statusCode(204);
     }
 }
