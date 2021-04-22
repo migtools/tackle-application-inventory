@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
@@ -356,5 +357,59 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .put(PATH + "/{id}")
                 .then()
                 .statusCode(405);
+    }
+
+    @Test
+    // https://github.com/konveyor/tackle-application-inventory/issues/39
+    public void testDeletedDependencyCanBeAddedAgain() {
+        // create a new dependency
+        final ApplicationsDependency dependency = new ApplicationsDependency();
+        final Application from = new Application();
+        from.id = 6L;
+        dependency.from = from;
+        Application to = new Application();
+        to.id = 1L;
+        dependency.to = to;
+        final Integer firstId = given()
+                        .contentType(ContentType.JSON)
+                        .accept(ContentType.JSON)
+                        .body(dependency)
+                        .when()
+                        .post(PATH)
+                        .then()
+                        .statusCode(201)
+                        .extract()
+                        .path("id");
+
+        // delete the dependency
+        given()
+                .pathParam("id", firstId)
+                .when()
+                .delete(PATH + "/{id}")
+                .then()
+                .statusCode(204);
+
+        // add a dependency involving the same applications in the same order
+        final Integer secondId = given()
+                        .contentType(ContentType.JSON)
+                        .accept(ContentType.JSON)
+                        .body(dependency)
+                        .when()
+                        .post(PATH)
+                        .then()
+                        .statusCode(201)
+                        .extract()
+                        .path("id");
+
+        // check the first ID is strictly less then the second one
+        assertTrue(firstId < secondId);
+
+        // delete the second dependency as well to not alter other tests
+        given()
+                .pathParam("id", secondId)
+                .when()
+                .delete(PATH + "/{id}")
+                .then()
+                .statusCode(204);
     }
 }
