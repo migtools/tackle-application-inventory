@@ -412,4 +412,152 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .then()
                 .statusCode(204);
     }
+
+    @Test
+    // https://github.com/konveyor/tackle-application-inventory/issues/40
+    public void testDeletingApplicationsCascadeOnDeletingTheirDependencies() {
+        // create 3 applications
+        Application first = new Application();
+        first.name = "first";
+        first.id = Long.valueOf(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(first)
+                .when()
+                .post("/application")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id")
+                .toString());
+
+        Application second = new Application();
+        second.name = "second";
+        second.id = Long.valueOf(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(second)
+                .when()
+                .post("/application")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id")
+                .toString());
+
+        Application third = new Application();
+        third.name = "third";
+        third.id = Long.valueOf(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(third)
+                .when()
+                .post("/application")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id")
+                .toString());
+
+        // add dependencies 1st->2nd, 1st->3rd, 2nd->3rd
+        ApplicationsDependency firstToSecond = new ApplicationsDependency();
+        firstToSecond.from = first;
+        firstToSecond.to = second;
+        firstToSecond.id = Long.valueOf(
+                given()
+                        .contentType(ContentType.JSON)
+                        .accept(ContentType.JSON)
+                        .body(firstToSecond)
+                        .when()
+                        .post(PATH)
+                        .then()
+                        .statusCode(201)
+                        .extract()
+                        .path("id")
+                        .toString());
+
+        ApplicationsDependency firstToThird = new ApplicationsDependency();
+        firstToThird.from = first;
+        firstToThird.to = third;
+        firstToThird.id = Long.valueOf(
+                given()
+                        .contentType(ContentType.JSON)
+                        .accept(ContentType.JSON)
+                        .body(firstToThird)
+                        .when()
+                        .post(PATH)
+                        .then()
+                        .statusCode(201)
+                        .extract()
+                        .path("id")
+                        .toString());
+
+        ApplicationsDependency secondToThird = new ApplicationsDependency();
+        secondToThird.from = second;
+        secondToThird.to = third;
+        secondToThird.id = Long.valueOf(
+                given()
+                        .contentType(ContentType.JSON)
+                        .accept(ContentType.JSON)
+                        .body(secondToThird)
+                        .when()
+                        .post(PATH)
+                        .then()
+                        .statusCode(201)
+                        .extract()
+                        .path("id")
+                        .toString());
+
+        // check there are 3 applications dependencies
+        given()
+                .accept("application/hal+json")
+                .queryParam("from.id", first.id)
+                .queryParam("from.id", second.id)
+                .queryParam("sort", "id")
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.applications-dependency.size()", is(3));
+
+        // delete 1st application
+        given()
+                .pathParam("id", first.id)
+                .when()
+                .delete("/application/{id}")
+                .then()
+                .statusCode(204);
+
+        // check there's just one applications dependency
+        given()
+                .accept("application/hal+json")
+                .queryParam("from.id", first.id)
+                .queryParam("from.id", second.id)
+                .queryParam("sort", "id")
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.applications-dependency.size()", is(1));
+
+        // delete 2nd application
+        given()
+                .pathParam("id", second.id)
+                .when()
+                .delete("/application/{id}")
+                .then()
+                .statusCode(204);
+
+        // check there are no applications dependencies left
+        given()
+                .accept("application/hal+json")
+                .queryParam("from.id", first.id)
+                .queryParam("from.id", second.id)
+                .queryParam("sort", "id")
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.applications-dependency.size()", is(0));
+    }
 }
