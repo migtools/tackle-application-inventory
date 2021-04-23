@@ -319,4 +319,32 @@ public class ReviewTest extends SecuredResourceTest {
                 .then()
                 .statusCode(204);
     }
+
+    @Test
+    public void testDeleteNonExistingReview(){
+        given()
+                .pathParam("id", "0")
+                .when()
+                .delete(PATH + "/{id}")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testAddReviewToAnAlreadyReviewedApplication(){
+        Review review = new Review();
+        review.proposedAction = "Already reviewed";
+        review.businessCriticality = 42;
+        Application application = new Application();
+        application.id = 1L;
+        review.application = application;
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(review)
+                .when()
+                .post(PATH)
+                .then()
+                .statusCode(409);
+    }
 }
