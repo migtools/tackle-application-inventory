@@ -110,4 +110,21 @@ public class ApplicationTest extends SecuredResourceTest {
                 .then()
                 .statusCode(500);
     }
+
+    @Test
+    public void testFilterByTags() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "name")
+                .queryParam("tags.tag", "712")
+                .queryParam("tags.tag", "7")
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.application.size()", is(1),
+                        "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"),
+                        "_embedded.application[0].review.id", is(7));
+    }
 }
