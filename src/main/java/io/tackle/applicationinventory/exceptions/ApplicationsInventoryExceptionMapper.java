@@ -9,6 +9,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.util.Collections;
 
 /**
  * {@link ExceptionMapper} created to provide a customized message for {@link ApplicationsInventoryException}
@@ -25,7 +26,7 @@ public class ApplicationsInventoryExceptionMapper extends RestDataPanacheExcepti
         if (exception.getCause() instanceof ApplicationsInventoryException) {
             ApplicationsInventoryException adce = (ApplicationsInventoryException) exception.getCause();
             LOGGER.warnf(adce, "Mapping an %s", ApplicationsInventoryException.class.getSimpleName());
-            return Response.status(adce.getResponse().getStatus()).entity(adce.getMessage()).build();
+            return Response.status(adce.getResponse().getStatus()).entity(Collections.singletonMap("errorMessage", adce.getMessage())).build();
         } else {
             return super.toResponse(exception);
         }

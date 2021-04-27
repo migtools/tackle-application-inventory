@@ -163,7 +163,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(409)
-                .body(is("Dependencies cycle created from applications 'Credit Cards BS', 'Application Test 1', 'Test Application', 'Application Test 0', 'Home Banking BU', 'Online Investments service'"));
+                .body("errorMessage", is("Dependencies cycle created from applications 'Credit Cards BS', 'Application Test 1', 'Test Application', 'Application Test 0', 'Home Banking BU', 'Online Investments service'"));
 
         // now that the cycle detection has been tested successfully
         // it's fine to remove the 'firstDependency'
@@ -224,7 +224,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(409)
-                .body(is("Dependencies cycle created from applications 'Online Investments service', 'Home Banking BU'"));
+                .body("errorMessage", is("Dependencies cycle created from applications 'Online Investments service', 'Home Banking BU'"));
 
         db.id = 2L;
         given()
@@ -235,7 +235,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(409)
-                .body(is("'from' and 'to' values are the same: an application can not be a dependency of itself"));
+                .body("errorMessage", is("'from' and 'to' values are the same: an application can not be a dependency of itself"));
 
         db.id = 98765L;
         given()
@@ -246,7 +246,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(404)
-                .body(is("Not found the application with id 98765"));
+                .body("errorMessage", is("Not found the application with id 98765"));
 
         frontend.id = 12345L;
         given()
@@ -257,7 +257,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(404)
-                .body(is("Not found the application with id 12345"));
+                .body("errorMessage", is("Not found the application with id 12345"));
 
         dependency.to = null;
         given()
@@ -268,7 +268,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(400)
-                .body(is("Not valid application reference provided"));
+                .body("errorMessage", is("Not valid application reference provided"));
 
         dependency.from = null;
         given()
@@ -279,7 +279,7 @@ public class ApplicationsDependencyTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(400)
-                .body(is("Not valid application reference provided"));
+                .body("errorMessage", is("Not valid application reference provided"));
     }
 
     @Test
