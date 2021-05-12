@@ -88,3 +88,12 @@ To update the review with id `<review_id>` for an application with id `<applicat
 
 ### Delete a review
 To delete the review with id `<review_id>` do a `DELETE` call to the `/review/<review_id>` endpoint.
+
+### List reviews
+To list reviews and be able to filter by `review.id` do a `GET` call to the `/review` endpoint with the following query parameters : 
+```
+Filtering reviews ids : id=<id>&id=<id>&id=<id>
+Page : page=<page>
+Size of elements in each page : size=<size>
+Field to sort : sort=<field to sort>
+```

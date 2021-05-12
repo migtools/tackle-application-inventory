@@ -12,6 +12,8 @@ import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
@@ -46,11 +48,12 @@ public class ReviewTest extends SecuredResourceTest {
                 .get(PATH + "/{id}")
                 .then()
                 .statusCode(200)
+                .log().all()
                 .body("id", is(8),
                         "workPriority", is(21),
                         "comments.length()", is(445),
                         "application.id", is(2),
-                        "_links.size()", is(4));
+                        "_links.size()", is(5));
     }
 
     @Test
@@ -346,5 +349,20 @@ public class ReviewTest extends SecuredResourceTest {
                 .post(PATH)
                 .then()
                 .statusCode(409);
+    }
+
+    @Test
+    public void given_listOfApps_when_requestReview_then_resultIsListOfReviewsForThoseApps() {
+        given()
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .queryParam("id", List.of(7L,8L,20L))
+        .when()
+            .get(PATH)
+        .then()
+            .statusCode(200)
+            .body("size()", is(2))
+            .body("find{it.id == 8}.proposedAction", is("Rehost"))
+            .body("find{it.id == 7}.proposedAction", is("Retire"));
     }
 }
