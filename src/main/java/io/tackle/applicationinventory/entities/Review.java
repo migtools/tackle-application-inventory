@@ -1,6 +1,8 @@
 package io.tackle.applicationinventory.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.tackle.commons.annotations.CheckType;
+import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
@@ -23,6 +25,7 @@ public class Review extends AbstractEntity {
     public Integer workPriority;
     @Column(length = 1024)
     public String comments;
+    @Filterable(filterName = "application.id", check = CheckType.EQUAL)
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JsonIgnoreProperties(value = {"review"}, allowSetters = true)
     public Application application;
