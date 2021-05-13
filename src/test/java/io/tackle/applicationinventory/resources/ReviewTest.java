@@ -356,13 +356,14 @@ public class ReviewTest extends SecuredResourceTest {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .queryParam("id", List.of(7L,8L,20L))
+            .queryParam("application.id", List.of(1L,2L,20L))
         .when()
             .get(PATH)
         .then()
             .statusCode(200)
             .body("size()", is(2))
             .body("find{it.id == 8}.proposedAction", is("Rehost"))
+            .body("find{it.id == 8}.application.id", is(2))
             .body("find{it.id == 7}.proposedAction", is("Retire"));
     }
 }
