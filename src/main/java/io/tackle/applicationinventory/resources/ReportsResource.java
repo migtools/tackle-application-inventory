@@ -19,7 +19,7 @@ public class ReportsResource {
     @Path("plan")
     @Produces("application/json")
     @GET
-    public List<AdoptionPlanAppDto> getAdoptionPlanGantt(@NotNull @QueryParam("app") List<Long> applicationIds) {
+    public List<AdoptionPlanAppDto> getAdoptionPlanGantt(@NotNull @QueryParam("applicationId") List<Long> applicationIds) {
         return reportService.getAdoptionPlanAppDtos(applicationIds);
     }
 

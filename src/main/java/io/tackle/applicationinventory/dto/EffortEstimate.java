@@ -6,7 +6,7 @@ public enum EffortEstimate {
     SMALL(1),
     MEDIUM(2),
     LARGE(4),
-    XLARGE(8);
+    EXTRALARGE(8);
 
     private int effort;
 
@@ -19,6 +19,6 @@ public enum EffortEstimate {
     }
 
     public static EffortEstimate getEnum(String value) {
-        return valueOf(value.toUpperCase(Locale.ROOT));
+        return valueOf(value.replace(" ", "").toUpperCase(Locale.ROOT));
     }
 }
