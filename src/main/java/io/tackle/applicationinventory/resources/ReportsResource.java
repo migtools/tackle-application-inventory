@@ -16,7 +16,7 @@ public class ReportsResource {
     @Inject
     ReportService reportService;
 
-    @Path("plan")
+    @Path("adoptionplan")
     @Produces("application/json")
     @GET
     public List<AdoptionPlanAppDto> getAdoptionPlanGantt(@NotNull @QueryParam("applicationId") List<Long> applicationIds) {

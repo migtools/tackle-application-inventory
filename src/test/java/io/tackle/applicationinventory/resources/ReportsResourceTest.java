@@ -39,7 +39,7 @@ class ReportsResourceTest extends ReportTestUtil {
         given()
             .queryParam("applicationId", listApps)
         .when()
-            .get("/report/plan")
+            .get("/report/adoptionplan")
         .then()
             .log().all()
             .body("size()", is(10))
