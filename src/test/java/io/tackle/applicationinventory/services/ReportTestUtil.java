@@ -26,6 +26,7 @@ public abstract class ReportTestUtil extends SecuredResourceTest {
         createDependency(16, 18);
         createDependency(16, 19);
         createDependency(15, 17);
+        createDependency(15, 18);
         createDependency(17, 19);
     }
 
