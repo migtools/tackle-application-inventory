@@ -7,12 +7,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.tackle.applicationimporter.MultipartImportBody;
+import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.TagType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
+import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -22,12 +28,21 @@ import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static javax.transaction.Transactional.TxType.REQUIRED;
 
 @Path("/file")
 @ApplicationScoped
 public class ImportService {
+
+    @Inject
+    @RestClient
+    TagTypeService tagTypeService;
+
+    @Inject
+    @RestClient
+    BusinessServiceService businessServiceService;
 
     @POST
     @Path("/upload")
@@ -38,8 +53,20 @@ public class ImportService {
 
             System.out.println("File: " + data.getFile());
             System.out.println("FileName: " + data.getFileName());
+
+            Set<TagType> tagTypes =tagTypeService.getListOfTagTypes();
+            if (tagTypes == null)
+            {
+                throw new Exception("Unable to connect to remote resource to retrieve TagTypes");
+            }
+            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            if (businessServices == null)
+            {
+                throw new Exception("Unable to connect to remote resource to retrieve BusinessServices");
+            }
+
             List<ApplicationImport> importList = writeFile(data.getFile(), data.getFileName());
-            mapImportsToApplication(importList);
+            mapImportsToApplication(importList, tagTypes, businessServices);
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -105,9 +132,9 @@ public class ImportService {
         }
     }
 
-    public void mapImportsToApplication(List<ApplicationImport> importList)
+    public void mapImportsToApplication(List<ApplicationImport> importList, Set<TagType> tagTypes, Set<BusinessService> businessServices)
     {
-        ApplicationMapper mapper = new ApplicationInventoryAPIMapper();
+        ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tagTypes, businessServices);
         importList.forEach(importedApplication -> {
             System.out.println("Mapping :" + importedApplication.id);
             Response response = mapper.map(importedApplication);

@@ -4,21 +4,25 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.config.EncoderConfig;
+import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.TagType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
+import io.tackle.applicationinventory.service.BusinessServiceService;
 import io.tackle.applicationinventory.service.ImportService;
 import io.tackle.applicationimporter.MultipartImportBody;
+import io.tackle.applicationinventory.service.TagTypeService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -29,9 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static javax.transaction.Transactional.TxType.REQUIRED;
@@ -54,16 +56,16 @@ import static org.mockito.Mockito.*;
 )
 public class ImportServiceTest extends SecuredResourceTest {
 
-    //@InjectMocks
-    //@ApplicationScoped
-    //ApplicationInventoryAPIMapper apiMapper;
+    @InjectMock
+    TagTypeService mockTagTypeService;
+
+    @InjectMock
+    BusinessServiceService mockBusinessServiceService;
 
 
     @BeforeAll
     public static void init() {
         PATH = "/file/upload";
-
-
     }
 
 
@@ -86,6 +88,29 @@ public class ImportServiceTest extends SecuredResourceTest {
             ioe.printStackTrace();
         }
         importBody.setFilename("sample_application_import.csv");
+
+        //TagTypeService mockTagTypeService = Mockito.mock(TagTypeService.class);
+        Set<TagType> tagTypes = new HashSet<>() ;
+        TagType tagType1 = new TagType();
+        tagType1.id = "1";
+        tagType1.name = "Operating System";
+        TagType.Tag tag = new TagType.Tag();
+        tag.id = "1";
+        tag.name = "RHEL";
+        tagType1.tags = new ArrayList<>();
+        tagType1.tags.add(tag);
+        tagTypes.add(tagType1);
+        Mockito.when(mockTagTypeService.getListOfTagTypes()).thenReturn(tagTypes);
+        QuarkusMock.installMockForInstance(mockTagTypeService, TagTypeService.class);
+
+        //BusinessServiceService mockBusinessServiceService = Mockito.mock(BusinessServiceService.class);
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "Food2Go";
+        businessServices.add(businessService);
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        QuarkusMock.installMockForInstance(mockBusinessServiceService, BusinessServiceService.class);
 
         Response response = given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
@@ -130,11 +155,9 @@ public class ImportServiceTest extends SecuredResourceTest {
         Long id = appImport1.id;
         System.out.println("appImport1.id= " + id);
 
-        ApplicationInventoryAPIMapper
-                apiMapper = Mockito.mock(ApplicationInventoryAPIMapper.class);
-        Mockito.when(apiMapper.map(appImport1)).thenReturn(javax.ws.rs.core.Response.serverError().build());
-        QuarkusMock.installMockForInstance(apiMapper, ApplicationInventoryAPIMapper.class);
-        svc.mapImportsToApplication(appList);
+        Set<TagType> tagTypes = new HashSet<>();
+        Set<BusinessService> businessServices = new HashSet<>();
+        svc.mapImportsToApplication(appList, tagTypes, businessServices);
 
         ApplicationImport refusedImport = ApplicationImport.findById(id);
         assertEquals(Boolean.FALSE, refusedImport.getValid());
