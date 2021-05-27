@@ -6,39 +6,40 @@ import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
+import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.config.EncoderConfig;
 import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.TagType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
-import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.service.BusinessServiceService;
 import io.tackle.applicationinventory.service.ImportService;
-import io.tackle.applicationimporter.MultipartImportBody;
 import io.tackle.applicationinventory.service.TagTypeService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static javax.transaction.Transactional.TxType.REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
@@ -57,11 +58,12 @@ import static org.mockito.Mockito.*;
 public class ImportServiceTest extends SecuredResourceTest {
 
     @InjectMock
+    @RestClient
     TagTypeService mockTagTypeService;
 
     @InjectMock
+    @RestClient
     BusinessServiceService mockBusinessServiceService;
-
 
     @BeforeAll
     public static void init() {
@@ -101,7 +103,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         tagType1.tags.add(tag);
         tagTypes.add(tagType1);
         Mockito.when(mockTagTypeService.getListOfTagTypes()).thenReturn(tagTypes);
-        QuarkusMock.installMockForInstance(mockTagTypeService, TagTypeService.class);
+//        QuarkusMock.installMockForInstance(mockTagTypeService, TagTypeService.class);
 
         //BusinessServiceService mockBusinessServiceService = Mockito.mock(BusinessServiceService.class);
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -110,7 +112,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.name = "Food2Go";
         businessServices.add(businessService);
         Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
-        QuarkusMock.installMockForInstance(mockBusinessServiceService, BusinessServiceService.class);
+//        QuarkusMock.installMockForInstance(mockBusinessServiceService, BusinessServiceService.class);
 
         Response response = given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))

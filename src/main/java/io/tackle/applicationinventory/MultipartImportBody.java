@@ -1,4 +1,4 @@
-package io.tackle.applicationimporter;
+package io.tackle.applicationinventory;
 
 import java.io.InputStream;
 
