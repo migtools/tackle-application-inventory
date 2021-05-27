@@ -56,11 +56,11 @@ import static org.mockito.Mockito.*;
 )
 public class ImportServiceTest extends SecuredResourceTest {
 
-    @InjectMock
+    /**@InjectMock
     TagTypeService mockTagTypeService;
 
     @InjectMock
-    BusinessServiceService mockBusinessServiceService;
+    BusinessServiceService mockBusinessServiceService;*/
 
 
     @BeforeAll
@@ -89,7 +89,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         }
         importBody.setFilename("sample_application_import.csv");
 
-        //TagTypeService mockTagTypeService = Mockito.mock(TagTypeService.class);
+        TagTypeService mockTagTypeService = Mockito.mock(TagTypeService.class);
         Set<TagType> tagTypes = new HashSet<>() ;
         TagType tagType1 = new TagType();
         tagType1.id = "1";
@@ -103,7 +103,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         Mockito.when(mockTagTypeService.getListOfTagTypes()).thenReturn(tagTypes);
         QuarkusMock.installMockForInstance(mockTagTypeService, TagTypeService.class);
 
-        //BusinessServiceService mockBusinessServiceService = Mockito.mock(BusinessServiceService.class);
+        BusinessServiceService mockBusinessServiceService = Mockito.mock(BusinessServiceService.class);
         Set<BusinessService> businessServices = new HashSet<>() ;
         BusinessService businessService = new BusinessService();
         businessService.id = "1";
