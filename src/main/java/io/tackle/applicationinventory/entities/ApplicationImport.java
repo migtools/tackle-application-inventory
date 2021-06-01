@@ -11,6 +11,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.ws.rs.DefaultValue;
 
 @Entity
 @Table(name = "application_import")
@@ -30,7 +31,7 @@ public class ApplicationImport extends AbstractEntity {
     private String tag4;
     private String errorMessage;
     @Filterable(check = CheckType.EQUAL)
-    public Boolean isValid;
+    public Boolean isValid = true;
 
     public ApplicationImport()
     {

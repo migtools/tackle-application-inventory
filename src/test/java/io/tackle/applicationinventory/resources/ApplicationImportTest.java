@@ -38,7 +38,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
         given()
                 .accept("application/json")
                 .queryParam("sort", "name")
-                .queryParam("isValid", Boolean.FALSE)
+                .queryParam("isValid", false)
                 .when()
                 .get(PATH)
                 .then()
