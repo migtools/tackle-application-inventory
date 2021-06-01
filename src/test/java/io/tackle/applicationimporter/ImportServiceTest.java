@@ -21,8 +21,7 @@ import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
@@ -55,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ImportServiceTest extends SecuredResourceTest {
 
     @InjectMock
@@ -72,6 +72,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
     @Test
+    @Order(1)
     protected void testImportServicePost() {
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -131,6 +132,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     }
 
     @Test
+    @Order(2)
     @Transactional(REQUIRED)
     protected void testMapToApplicationRejected()
     {

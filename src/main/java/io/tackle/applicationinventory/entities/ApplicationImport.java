@@ -1,6 +1,8 @@
 package io.tackle.applicationinventory.entities;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import io.tackle.commons.annotations.CheckType;
+import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
@@ -27,7 +29,8 @@ public class ApplicationImport extends AbstractEntity {
     private String tagType4;
     private String tag4;
     private String errorMessage;
-    private Boolean isValid;
+    @Filterable(check = CheckType.EQUAL)
+    public Boolean isValid;
 
     public ApplicationImport()
     {
