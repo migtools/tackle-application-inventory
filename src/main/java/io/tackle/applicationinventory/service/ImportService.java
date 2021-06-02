@@ -10,14 +10,12 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.TagType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
-import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -26,9 +24,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static javax.transaction.Transactional.TxType.REQUIRED;
 
@@ -79,12 +75,16 @@ public class ImportService {
 
     private List<ApplicationImport> writeFile(String content, String filename) throws IOException {
 
-        MappingIterator<ApplicationImport> iter = decode(content);
+        String fileContent = getFilePortionOfMessage(content);
+
+
+        MappingIterator<ApplicationImport> iter = decode(fileContent);
         List<ApplicationImport> importList = new ArrayList();
         System.out.println("Printing csv fields");
         while (iter.hasNext())
         {
             ApplicationImport importedApplication = iter.next();
+            importedApplication.setFilename(filename);
             System.out.println(importedApplication);
             importList.add(importedApplication);
             importedApplication.persistAndFlush();
@@ -94,9 +94,9 @@ public class ImportService {
 
 
 
-    private MappingIterator<ApplicationImport> decode(String inputContent) {
+    private MappingIterator<ApplicationImport> decode(String inputFileContent) {
         try {
-           String inputFileContent = getFilePortionOfMessage(inputContent);
+
 
             CsvMapper mapper = new CsvMapper();
 
@@ -126,6 +126,7 @@ public class ImportService {
             String fileContent = node.get("file").asText();
 
             System.out.println("File Portion Of Message:" + fileContent);
+
             return fileContent;
         } catch (IOException e) {
             throw new RuntimeException(e);

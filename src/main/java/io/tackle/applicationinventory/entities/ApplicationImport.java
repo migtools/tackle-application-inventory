@@ -26,6 +26,8 @@ public class ApplicationImport extends AbstractEntity {
     private String errorMessage;
     @Filterable(check = CheckType.EQUAL)
     public Boolean isValid;
+    @Filterable
+    public String filename;
 
     public ApplicationImport()
     {
@@ -162,7 +164,8 @@ public class ApplicationImport extends AbstractEntity {
                 ", Tag Type 3="+ tagType3 +
                 ", Tag 3="+ tag3 +
                 ", Tag Type 4="+ tagType4 +
-                ", Tag 4="+ tag4 +"]";
+                ", Tag 4="+ tag4 +
+                ", Filename="+ filename +"]";
     }
 
 
@@ -181,6 +184,14 @@ public class ApplicationImport extends AbstractEntity {
 
     public void setValid(Boolean valid) {
         isValid = valid;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
 
