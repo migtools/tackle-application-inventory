@@ -122,7 +122,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(7, ApplicationImport.listAll().size());
+        assertEquals(10, ApplicationImport.listAll().size());
 
     }
 
