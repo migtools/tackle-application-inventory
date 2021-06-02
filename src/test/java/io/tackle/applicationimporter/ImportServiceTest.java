@@ -2,7 +2,6 @@ package io.tackle.applicationimporter;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
-import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -24,14 +23,12 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -92,7 +89,6 @@ public class ImportServiceTest extends SecuredResourceTest {
         }
         importBody.setFilename("sample_application_import.csv");
 
-        //TagTypeService mockTagTypeService = Mockito.mock(TagTypeService.class);
         Set<TagType> tagTypes = new HashSet<>() ;
         TagType tagType1 = new TagType();
         tagType1.id = "1";
@@ -104,16 +100,15 @@ public class ImportServiceTest extends SecuredResourceTest {
         tagType1.tags.add(tag);
         tagTypes.add(tagType1);
         Mockito.when(mockTagTypeService.getListOfTagTypes()).thenReturn(tagTypes);
-//        QuarkusMock.installMockForInstance(mockTagTypeService, TagTypeService.class);
 
-        //BusinessServiceService mockBusinessServiceService = Mockito.mock(BusinessServiceService.class);
+
         Set<BusinessService> businessServices = new HashSet<>() ;
         BusinessService businessService = new BusinessService();
         businessService.id = "1";
         businessService.name = "Food2Go";
         businessServices.add(businessService);
         Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
-//        QuarkusMock.installMockForInstance(mockBusinessServiceService, BusinessServiceService.class);
+
 
         Response response = given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
