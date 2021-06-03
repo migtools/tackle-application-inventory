@@ -146,7 +146,8 @@ public class ServicesParameterizedTest extends SecuredResourceTest {
                 .when()
                 .post(resource)
                 .then()
-                .statusCode(409);
+                .statusCode(409)
+                .body("errorMessage", is("ERROR: duplicate key value violates unique constraint"));
 
         // remove the initial entity
         given()
