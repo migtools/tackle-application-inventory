@@ -148,6 +148,8 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
+        appImport2.setTag1("tag 1");
+        appImport2.setTagType1("tag type 1");
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
         appImport3.setBusinessService("BS 3");
@@ -178,6 +180,66 @@ public class ImportServiceTest extends SecuredResourceTest {
         ApplicationImport.deleteAll();
         userTransaction.commit();
 
+    }
+
+
+    @Test
+    @Order(3)
+    protected void testImportServiceNoMatchingTag() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
+        MultipartImportBody importBody = new MultipartImportBody();
+        try {
+            System.out.println("construct File begin");
+            byte [] fileBytes = FileUtils.readFileToByteArray(importFile);
+            Arrays.asList(fileBytes).forEach(b -> System.out.println(":" + b));
+            String fileString = new String(fileBytes, StandardCharsets.UTF_8);
+            importBody.setFile(fileString);
+            System.out.println("File body: " + fileString);
+            System.out.println("construct File complete");
+        }
+        catch(Exception ioe){
+            ioe.printStackTrace();
+        }
+        importBody.setFilename("sample_application_import.csv");
+
+        Set<TagType> tagTypes = new HashSet<>() ;
+        TagType tagType1 = new TagType();
+        tagType1.id = "1";
+        tagType1.name = "Unknown tag type";
+        TagType.Tag tag = new TagType.Tag();
+        tag.id = "1";
+        tag.name = "Unknown OS";
+        tagType1.tags = new ArrayList<>();
+        tagType1.tags.add(tag);
+        tagTypes.add(tagType1);
+        Mockito.when(mockTagTypeService.getListOfTagTypes()).thenReturn(tagTypes);
+
+
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "Food2Go";
+        businessServices.add(businessService);
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importBody)
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
     }
 
 }

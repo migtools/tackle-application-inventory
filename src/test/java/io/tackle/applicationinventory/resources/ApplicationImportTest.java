@@ -59,6 +59,8 @@ public class ApplicationImportTest extends SecuredResourceTest {
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
         appImport2.setFilename("File1");
+        appImport2.setTag1("tag 1");
+        appImport2.setTagType1("tag type 1");
         appImport2.setValid(Boolean.FALSE);
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
@@ -79,7 +81,8 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .statusCode(200)
                 .log().body()
                 .body("_embedded.'application-import'.size()", is(1))
-                .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"));
+                .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"))
+                .body("_embedded.'application-import'[0].'Tag Type 1'", is("tag type 1"));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
