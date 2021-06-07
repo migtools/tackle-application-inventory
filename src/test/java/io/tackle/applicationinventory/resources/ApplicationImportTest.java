@@ -80,5 +80,9 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'application-import'.size()", is(1))
                 .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"));
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
     }
 }

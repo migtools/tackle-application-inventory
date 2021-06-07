@@ -23,7 +23,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
-import javax.transaction.Transactional;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +55,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ImportServiceTest extends SecuredResourceTest {
+    @Inject
+    EntityManager entityManager;
+
+    @Inject
+    UserTransaction userTransaction;
 
     @InjectMock
     @RestClient
@@ -70,7 +77,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(1)
-    protected void testImportServicePost() {
+    protected void testImportServicePost() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
@@ -122,15 +129,18 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(10, ApplicationImport.listAll().size());
+        assertEquals(7, ApplicationImport.listAll().size());
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
 
     }
 
     @Test
     @Order(2)
-    @Transactional(REQUIRED)
-    protected void testMapToApplicationRejected()
-    {
+    protected void testMapToApplicationRejected() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+        userTransaction.begin();
         ImportService svc = new ImportService();
 
         ApplicationImport appImport1 = new ApplicationImport();
@@ -158,8 +168,15 @@ public class ImportServiceTest extends SecuredResourceTest {
         Set<BusinessService> businessServices = new HashSet<>();
         svc.mapImportsToApplication(appList, tagTypes, businessServices);
 
+
+        userTransaction.commit();
+
         ApplicationImport refusedImport = ApplicationImport.findById(id);
         assertEquals(Boolean.FALSE, refusedImport.getValid());
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
 
     }
 
