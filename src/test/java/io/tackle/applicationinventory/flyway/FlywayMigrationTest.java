@@ -20,7 +20,7 @@ public class FlywayMigrationTest {
     @Test
     public void testMigration() {
         // check the number of migrations applied equals the number of files in resources/db/migration folder
-        assertEquals(8, flyway.info().applied().length);
+        assertEquals(9, flyway.info().applied().length);
         // check the current migration version is the one from the last file in resources/db/migration folder
         assertEquals("20210603", flyway.info().current().getVersion().toString());
         // just a basic test to double check the application started
