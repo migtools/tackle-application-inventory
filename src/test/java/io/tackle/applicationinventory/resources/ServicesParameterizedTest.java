@@ -121,6 +121,65 @@ public class ServicesParameterizedTest extends SecuredResourceTest {
                 .statusCode(404);
     }
 
+    @ParameterizedTest
+    @MethodSource("testEntityUniquenessArguments")
+    // https://github.com/konveyor/tackle-application-inventory/issues/65
+    public void testEntityUniqueness(AbstractEntity entity, String resource) {
+        // create the entity
+        Long firstId = Long.valueOf(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(entity)
+                .when()
+                .post(resource)
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id")
+                .toString());
+
+        // try to add another time the same entity
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(entity)
+                .when()
+                .post(resource)
+                .then()
+                .statusCode(409)
+                .body("errorMessage", is("ERROR: duplicate key value violates unique constraint"));
+
+        // remove the initial entity
+        given()
+                .pathParam("id", firstId)
+                .when()
+                .delete(resource + "/{id}")
+                .then()
+                .statusCode(204);
+
+        // and check the 'duplicated' entity now will be added
+        // proving the partial unique index is working properly with soft-delete
+        Long secondId = Long.valueOf(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(entity)
+                .when()
+                .post(resource)
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id")
+                .toString());
+
+        // remove 'duplicated' entity to not alter other tests
+        given()
+                .pathParam("id", secondId)
+                .when()
+                .delete(resource + "/{id}")
+                .then()
+                .statusCode(204);
+    }
+
     public static class CSVtoArray extends SimpleArgumentConverter {
         @Override
         protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
@@ -162,4 +221,12 @@ public class ServicesParameterizedTest extends SecuredResourceTest {
         );
     }
 
+    private static Stream<Arguments> testEntityUniquenessArguments() {
+        Application application = new Application();
+        application.name = "application";
+
+        return Stream.of(
+                Arguments.of(application, "/application")
+        );
+    }
 }
