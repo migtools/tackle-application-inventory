@@ -26,27 +26,46 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
 
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
+
         try {
             newApp.businessService = addBusinessService(importApp.getBusinessService());
-            newApp.comments = importApp.getComments();
-            newApp.description = importApp.getDescription();
-            newApp.name = importApp.getApplicationName();
+        }
+        catch(NoSuchElementException nsee1){
+            nsee1.printStackTrace();
+            importApp.setErrorMessage("Invalid Business service: " + importApp.getBusinessService());
+            return Response.serverError().build();
+        }
+        newApp.comments = importApp.getComments();
+        newApp.description = importApp.getDescription();
+        newApp.name = importApp.getApplicationName();
+        String currentTag = importApp.getTag1();
+        String currentTagType = importApp.getTagType1();
+        try{
             if (importApp.getTagType1() != null && importApp.getTag1() != null) {
                 tags.add(addTag(importApp.getTag1(), importApp.getTagType1()));
             }
+            //increment so potential error message refers to correct tag
+            currentTag = importApp.getTag2();
+            currentTagType = importApp.getTagType2();
             if (importApp.getTagType2() != null && importApp.getTag2() != null) {
                 tags.add(addTag(importApp.getTag2(), importApp.getTagType2()));
             }
+            currentTag = importApp.getTag3();
+            currentTagType = importApp.getTagType3();
             if (importApp.getTagType3() != null && importApp.getTag3() != null) {
+
                 tags.add(addTag(importApp.getTag3(), importApp.getTagType3()));
             }
+            currentTag = importApp.getTag4();
+            currentTagType = importApp.getTagType4();
             if (importApp.getTagType4() != null && importApp.getTag4() != null) {
                 tags.add(addTag(importApp.getTag4(), importApp.getTagType4()));
             }
         }
-        catch(NoSuchElementException nsee)
+        catch(NoSuchElementException nsee2)
         {
-            nsee.printStackTrace();
+            nsee2.printStackTrace();
+            importApp.setErrorMessage("Invalid tag/tagtype combination: " + currentTag + "/" + currentTagType);
             return Response.serverError().build();
         }
 
@@ -71,10 +90,7 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     {
         Optional<TagType> tagTypeOptional = tagTypes.stream().filter(tagTypeControls -> tagTypeControls.name.equals(tagTypeName))
                 .findFirst();
-        if(!tagTypeOptional.isPresent())
-        {
-            return null;
-        }
+        tagTypeOptional.orElseThrow();
         Optional<TagType.Tag> tagOptional = tagTypeOptional.get().tags.stream().filter(tagControls -> tagControls.name.equals(tagName))
                 .findFirst();
 

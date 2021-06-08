@@ -37,6 +37,7 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static javax.transaction.Transactional.TxType.REQUIRED;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
@@ -220,8 +221,13 @@ public class ImportServiceTest extends SecuredResourceTest {
         Set<BusinessService> businessServices = new HashSet<>() ;
         BusinessService businessService = new BusinessService();
         businessService.id = "1";
-        businessService.name = "Food2Go";
+        businessService.name = "Foot2Go";
         businessServices.add(businessService);
+
+        BusinessService businessService2 = new BusinessService();
+        businessService2.id = "2";
+        businessService2.name = "Food2Go";
+        businessServices.add(businessService2);
         Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
 
@@ -236,6 +242,16 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .statusCode(200).extract().response();
 
         assertEquals(200, response.getStatusCode());
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.FALSE)
+                .when()
+                .get("/applicationimport")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'[0].'errorMessage'", is("Invalid tag/tagtype combination: RHEL 8/Operating System"));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();

@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static javax.transaction.Transactional.TxType.REQUIRED;
 
@@ -44,7 +45,7 @@ public class ImportService {
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional(REQUIRED)
-    public Response importFile(@MultipartForm MultipartImportBody data) throws Exception {
+    public Response importFile(@MultipartForm MultipartImportBody data) {
         try {
 
             System.out.println("File: " + data.getFile());
@@ -53,15 +54,32 @@ public class ImportService {
             Set<TagType> tagTypes =tagTypeService.getListOfTagTypes();
             if (tagTypes == null)
             {
-                throw new Exception("Unable to connect to remote resource to retrieve TagTypes");
+                throw new Exception("Unable to retrieve TagTypes from remote resource");
             }
             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
             if (businessServices == null)
             {
-                throw new Exception("Unable to connect to remote resource to retrieve BusinessServices");
+                throw new Exception("Unable to retrieve BusinessServices from remote resource");
             }
 
             List<ApplicationImport> importList = writeFile(data.getFile(), data.getFileName());
+            //we're not allowed duplicate application names within the file
+            Set<String> discreteAppNames = new HashSet();
+            //make a list of all the duplicate app names
+            List<ApplicationImport> duplicateAppNames = importList.stream().filter(importApp ->
+                    !discreteAppNames.add(importApp.getApplicationName())).collect(Collectors.toList());
+            if(duplicateAppNames != null && !duplicateAppNames.isEmpty())
+            {
+                //find all the imported apps with a duplicate name and set appropriate error message
+                duplicateAppNames.forEach(app -> { importList.stream().filter(importApp -> importApp.getApplicationName().equals(app.getApplicationName())).forEach(
+                    duplicateApp -> {
+                        duplicateApp.setErrorMessage("Duplicate Application Name within file: " + app.getApplicationName());
+                        markFailedImportAsInvalid(duplicateApp);
+                    });
+
+                });
+                throw new Exception("Duplicate Application Names in " + data.getFileName());
+            }
             mapImportsToApplication(importList, tagTypes, businessServices);
         } catch (Exception e) {
 
