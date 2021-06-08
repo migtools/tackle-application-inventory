@@ -15,6 +15,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,10 @@ public class ReportService {
 
         EdgeReversedGraph<Application, DefaultEdge> reversedGraph = new EdgeReversedGraph<>(graph);
         List<AdoptionPlanAppDto> sortedList = applicationIds.stream()
-            .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, e))
+            .map(a -> Application.findById(a))
+            .filter(Objects::nonNull)
+            .filter(a -> ((Application) a).review != null)
+            .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
             .sorted(Comparator.comparing(e -> String.format("%06d", e.positionY) + e.applicationName))
             .collect(Collectors.toList());
 
@@ -62,8 +66,8 @@ public class ReportService {
     }
 
     @Transactional
-    private AdoptionPlanAppDto buildAdoptionPlanAppDto(List<Long> applicationIds, EdgeReversedGraph<Application, DefaultEdge> graph, Long e) {
-        Application application = (Application) Application.findByIdOptional(e).orElseThrow();
+    private AdoptionPlanAppDto buildAdoptionPlanAppDto(List<Long> applicationIds, EdgeReversedGraph<Application, DefaultEdge> graph, Application application) {
+        if (application.review == null) return null;
 
         AdoptionPlanAppDto planAppDto = new AdoptionPlanAppDto();
         planAppDto.applicationName = application.name;

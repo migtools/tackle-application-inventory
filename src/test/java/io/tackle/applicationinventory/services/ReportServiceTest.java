@@ -158,6 +158,28 @@ class ReportServiceTest extends ReportTestUtil {
         }
     }
 
+    @Test
+    public void given_SeveralApplicationsWithReviewButOneWithout_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
+        List<Long> applicationList = new ArrayList<>();
+
+        transaction.begin();
+        Application app50 = new Application(); // application without review
+        app50.name = "App" + 50;
+        app50.businessService = "";
+        app50.comments = "";
+        app50.description = "";
+        app50.persistAndFlush();
+        transaction.commit();
+
+        for (int i=10; i < 20; i++) {
+           applicationList.add(((Application) Application.find("name", "App" + i).firstResult()).id);
+        }
+        applicationList.add(app50.id);
+
+        List<AdoptionPlanAppDto> applicationPlanDtoList = reportService.getAdoptionPlanAppDtos(applicationList);
+        assertThat(applicationPlanDtoList).hasSize(10);
+    }
+
     private void assertPlanDto(List<AdoptionPlanAppDto> applicationPlanDtoList, String app, int expected_positionX, int expected_effort, String expected_decision, int expected_posy) {
         assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionX).isEqualTo(expected_positionX);
         assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().effort).isEqualTo(expected_effort);
