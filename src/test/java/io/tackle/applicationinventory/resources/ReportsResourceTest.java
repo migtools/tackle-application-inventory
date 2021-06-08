@@ -3,6 +3,8 @@ package io.tackle.applicationinventory.resources;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.dto.ApplicationDto;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.services.ReportTestUtil;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
@@ -37,9 +39,10 @@ class ReportsResourceTest extends ReportTestUtil {
     public void given_10appsWithDependencies_when_calltoadoptionplan_result_isexpectedjson() {
         List<Long> listApps = Application.find("name like 'App%'").stream().map(e -> ((Application) e).id).collect(Collectors.toList());
         given()
-            .queryParam("applicationId", listApps)
+            .contentType(ContentType.JSON)
+            .body(listApps.stream().map(ApplicationDto::new).collect(Collectors.toList()))
         .when()
-            .get("/report/adoptionplan")
+            .post("/report/adoptionplan")
         .then()
             .log().all()
             .body("size()", is(10))

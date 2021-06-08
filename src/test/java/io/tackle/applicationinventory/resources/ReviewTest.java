@@ -46,7 +46,6 @@ public class ReviewTest extends SecuredResourceTest {
                 .get(PATH + "/{id}")
                 .then()
                 .statusCode(200)
-                .log().all()
                 .body("id", is(8),
                         "workPriority", is(21),
                         "comments.length()", is(445),
