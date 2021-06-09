@@ -180,6 +180,20 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(10);
     }
 
+    @Test
+    @Transactional
+    public void given_SeveralApplicationsWithReviewButOneWithWrongEffortValue_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
+        List<Long> applicationList = new ArrayList<>();
+        for (int i=10; i < 20; i++) {
+           applicationList.add(((Application) Application.find("name", "App" + i).firstResult()).id);
+        }
+        Application app = Application.findById(applicationList.get(0));
+        app.review.effortEstimate="NotExistingValue";
+
+        List<AdoptionPlanAppDto> applicationPlanDtoList = reportService.getAdoptionPlanAppDtos(applicationList);
+        assertThat(applicationPlanDtoList).hasSize(9);
+    }
+
     private void assertPlanDto(List<AdoptionPlanAppDto> applicationPlanDtoList, String app, int expected_positionX, int expected_effort, String expected_decision, int expected_posy) {
         assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionX).isEqualTo(expected_positionX);
         assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().effort).isEqualTo(expected_effort);

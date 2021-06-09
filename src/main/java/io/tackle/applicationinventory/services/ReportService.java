@@ -5,6 +5,7 @@ import io.tackle.applicationinventory.dto.AdoptionPlanAppDto;
 import io.tackle.applicationinventory.dto.EffortEstimate;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
+import org.jboss.logging.Logger;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
@@ -21,6 +22,8 @@ import java.util.stream.Stream;
 
 @ApplicationScoped
 public class ReportService {
+    private static final Logger LOGGER = Logger.getLogger(ReportService.class);
+
     /*
         Considering ALL the applications in the system , it will create a Graph
         and traverse it considering the parent and child dependencies
@@ -33,8 +36,9 @@ public class ReportService {
         EdgeReversedGraph<Application, DefaultEdge> reversedGraph = new EdgeReversedGraph<>(graph);
         List<AdoptionPlanAppDto> sortedList = applicationIds.stream()
             .map(a -> Application.findById(a))
-            .filter(Objects::nonNull)
-            .filter(a -> ((Application) a).review != null)
+            .filter(Objects::nonNull) // Application exists
+            .filter(a -> ((Application) a).review != null) // Application has a review
+            .filter(a -> EffortEstimate.isExists(((Application) a).review.effortEstimate)) // The review has a valid Effort
             .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
             .sorted(Comparator.comparing(e -> String.format("%06d", e.positionY) + e.applicationName))
             .collect(Collectors.toList());
@@ -77,10 +81,10 @@ public class ReportService {
         planAppDto.positionY = application.review.workPriority;
 
         // Obtain the numeric effort from the String stored
-        try {
+        if (EffortEstimate.isExists(application.review.effortEstimate)) {
             planAppDto.effort = EffortEstimate.getEnum(application.review.effortEstimate).getEffort();
-        } catch (IllegalArgumentException e) {
-            planAppDto.effort = 0;
+        } else {
+            LOGGER.warn("Effort mapping not found for : " + application.review.effortEstimate);
         }
 
         // Calculate recursively which is the start X position for this Application depending on its dependencies
@@ -96,11 +100,11 @@ public class ReportService {
                 // recursively we'll find the position calculating previous positions + lengths of the ancestors
                 Integer pos = startPositionNode(graph, e, selectedApps);
                 // if the parent is an application selected to appear in the list then we use its effort, otherwise is like we are hiding it with effort = 0
-                Integer effort = null;
-                try {
+                Integer effort;
+                if (EffortEstimate.isExists(e.review.effortEstimate))  {
                     effort = (selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
-                } catch (IllegalArgumentException exception) {
-                    effort = 0;
+                } else {
+                    effort = 0; // to not affect the PositionX
                 }
                 return pos + effort;
             })
