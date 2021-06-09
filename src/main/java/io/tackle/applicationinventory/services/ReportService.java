@@ -38,6 +38,11 @@ public class ReportService {
             .map(a -> Application.findById(a))
             .filter(Objects::nonNull) // Application exists
             .filter(a -> ((Application) a).review != null) // Application has a review
+            .peek(a -> {
+                if (!EffortEstimate.isExists(((Application) a).review.effortEstimate)) {
+                    LOGGER.warn("Application discarded by missing Effort mapping for : " + ((Application) a).review.effortEstimate);
+                }
+            })
             .filter(a -> EffortEstimate.isExists(((Application) a).review.effortEstimate)) // The review has a valid Effort
             .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
             .sorted(Comparator.comparing(e -> String.format("%06d", e.positionY) + e.applicationName))
