@@ -48,7 +48,7 @@ class ReportsResourceTest extends ReportTestUtil {
             .body("size()", is(10))
             .body("find{it.applicationName=='App19'}.positionX", is(16))
             .body("find{it.applicationName=='App19'}.decision", is("Refactor"))
-            .body("find{it.applicationName=='App19'}.effortEstimate", is("Extra Large"))
+            .body("find{it.applicationName=='App19'}.effortEstimate", is("Extra_Large"))
             .body("find{it.applicationName=='App19'}.positionY", is(9))
             .body("find{it.applicationName=='App19'}.effort", is(8))
             .body("find{it.applicationName=='App16'}.positionX", is(1))

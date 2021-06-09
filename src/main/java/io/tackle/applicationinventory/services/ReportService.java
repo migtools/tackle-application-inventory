@@ -77,7 +77,11 @@ public class ReportService {
         planAppDto.positionY = application.review.workPriority;
 
         // Obtain the numeric effort from the String stored
-        planAppDto.effort = EffortEstimate.getEnum(application.review.effortEstimate).getEffort();
+        try {
+            planAppDto.effort = EffortEstimate.getEnum(application.review.effortEstimate).getEffort();
+        } catch (IllegalArgumentException e) {
+            planAppDto.effort = 0;
+        }
 
         // Calculate recursively which is the start X position for this Application depending on its dependencies
         planAppDto.positionX = startPositionNode(graph, application, applicationIds);
@@ -92,7 +96,12 @@ public class ReportService {
                 // recursively we'll find the position calculating previous positions + lengths of the ancestors
                 Integer pos = startPositionNode(graph, e, selectedApps);
                 // if the parent is an application selected to appear in the list then we use its effort, otherwise is like we are hiding it with effort = 0
-                Integer effort = (selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
+                Integer effort = null;
+                try {
+                    effort = (selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
+                } catch (IllegalArgumentException exception) {
+                    effort = 0;
+                }
                 return pos + effort;
             })
                 .max(Integer::compare).get();

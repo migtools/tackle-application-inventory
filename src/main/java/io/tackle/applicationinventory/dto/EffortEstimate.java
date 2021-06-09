@@ -6,7 +6,7 @@ public enum EffortEstimate {
     SMALL(1),
     MEDIUM(2),
     LARGE(4),
-    EXTRALARGE(8);
+    EXTRA_LARGE(8);
 
     private int effort;
 

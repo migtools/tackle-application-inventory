@@ -57,7 +57,7 @@ public abstract class ReportTestUtil extends SecuredResourceTest {
         Review review = new Review();
 
         // 10 Small , 11, XLarge, 12 Small, 13 Medium , 14 Small, 15 Large, 16 Large, 17 XLarge, 18 XLarge, 19 XLarge
-        review.effortEstimate = ( List.of(10,12,14).contains(i) ? "Small" : (i == 13 ? "Medium" : (List.of(15,16).contains(i) ? "Large" : "Extra Large")));
+        review.effortEstimate = ( List.of(10,12,14).contains(i) ? "Small" : (i == 13 ? "Medium" : (List.of(15,16).contains(i) ? "Large" : "Extra_Large")));
 
         // 10 Rehost, 11 Refactor, 12 Replatform, 13 Refactor, 14 Rehost, 15 Replatform, 16 Refactor, 17 Rehost, 18 Replatform, 19 Refactor
         review.proposedAction = ( List.of(10,14,17).contains(i) ? "Rehost" : (List.of(15,12, 18).contains(i) ? "Replatform" : "Refactor"));
