@@ -28,15 +28,29 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         Set<String> tags = new HashSet<>();
 
         try {
-            newApp.businessService = addBusinessService(importApp.getBusinessService());
+            if (importApp.getBusinessService() != null && !importApp.getBusinessService().isEmpty()) {
+                newApp.businessService = addBusinessService(importApp.getBusinessService());
+            } else {
+                importApp.setErrorMessage("Business Service is Mandatory");
+                return Response.serverError().build();
+            }
+
         }
         catch(NoSuchElementException nsee1){
             nsee1.printStackTrace();
-            importApp.setErrorMessage("Invalid Business service: " + importApp.getBusinessService());
+            importApp.setErrorMessage("Business Service: " + importApp.getBusinessService() + " does not exist");
             return Response.serverError().build();
         }
         newApp.comments = importApp.getComments();
-        newApp.description = importApp.getDescription();
+
+        if (importApp.getDescription() != null && !importApp.getDescription().isEmpty()) {
+            newApp.description = importApp.getDescription();
+        } else {
+            importApp.setErrorMessage("Description is Mandatory");
+            return Response.serverError().build();
+        }
+
+
         newApp.name = importApp.getApplicationName();
         String currentTag = importApp.getTag1();
         String currentTagType = importApp.getTagType1();
@@ -62,10 +76,10 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
                 tags.add(addTag(importApp.getTag4(), importApp.getTagType4()));
             }
         }
-        catch(NoSuchElementException nsee2)
+        catch(NoSuchElementException nsee3)
         {
-            nsee2.printStackTrace();
-            importApp.setErrorMessage("Invalid tag/tagtype combination: " + currentTag + "/" + currentTagType);
+            nsee3.printStackTrace();
+            importApp.setErrorMessage("Tag Type " + currentTagType + " and Tag " + currentTag + " combination does not exist");
             return Response.serverError().build();
         }
 
@@ -84,7 +98,6 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         return businessServiceOptional.orElseThrow().id;
 
     }
-
 
     private String addTag(String tagName, String tagTypeName) throws NoSuchElementException
     {

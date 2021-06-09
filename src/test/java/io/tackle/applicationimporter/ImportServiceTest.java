@@ -251,7 +251,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'[0].'errorMessage'", is("Invalid tag/tagtype combination: RHEL 8/Operating System"));
+                .body("_embedded.'application-import'[0].'errorMessage'", is("Tag Type Operating System and Tag RHEL 8 combination does not exist"));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
