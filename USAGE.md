@@ -88,3 +88,38 @@ To update the review with id `<review_id>` for an application with id `<applicat
 
 ### Delete a review
 To delete the review with id `<review_id>` do a `DELETE` call to the `/review/<review_id>` endpoint.
+
+### Adoption Plan report
+To obtain the elements for the Adoption Plan report do a POST call to `report/adoptionplan` endpoint with the following filter : 
+
+Filtering application ids (body): 
+```json
+[
+  {"applicationId" :  1000},
+  {"applicationId" :  2000}
+]
+```
+the payload obtained will look like this : 
+```json
+[
+  {
+    "positionY": 8,
+    "decision": "Replatform",
+    "effort": 8,
+    "effortEstimate": "Extra Large",
+    "positionX": 5,
+    "applicationId": 95,
+    "applicationName": "App18"
+  },
+  {
+    "positionY": 9,
+    "decision": "Refactor",
+    "effort": 8,
+    "effortEstimate": "Extra Large",
+    "positionX": 16,
+    "applicationId": 97,
+    "applicationName": "App19"
+  }
+]
+```
+
