@@ -182,7 +182,7 @@ class ReportServiceTest extends ReportTestUtil {
 
     @Test
     @Transactional
-    public void given_SeveralApplicationsWithReviewButOneWithWrongEffortValue_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
+    public void given_SeveralApplicationsWithReviewButOneWithWrongEffortValue_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() {
         List<Long> applicationList = new ArrayList<>();
         for (int i=10; i < 20; i++) {
            applicationList.add(((Application) Application.find("name", "App" + i).firstResult()).id);
@@ -192,6 +192,33 @@ class ReportServiceTest extends ReportTestUtil {
 
         List<AdoptionPlanAppDto> applicationPlanDtoList = reportService.getAdoptionPlanAppDtos(applicationList);
         assertThat(applicationPlanDtoList).hasSize(9);
+    }
+
+    @Test
+    public void given_SeveralApplicationsWithReviewButOneParentWithoutReview_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+        transaction.begin();
+        Application application15 = Application.find("name", "App15").firstResult();
+        application15.review.delete();
+        application15.review = null;
+        transaction.commit();
+
+        List<Long> applicationList = new ArrayList<>();
+        for (int i=10; i < 20; i++) {
+            applicationList.add(((Application) Application.find("name", "App" + i).firstResult()).id);
+        }
+
+        List<AdoptionPlanAppDto> applicationPlanDtoList = reportService.getAdoptionPlanAppDtos(applicationList);
+        assertThat(applicationPlanDtoList).hasSize(9);
+
+        // checking first app App15 has not sum its effort as it doesnt have review
+        assertPlanDto(applicationPlanDtoList, "App10", 19, 1, "Rehost", 3);
+        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
+
+        // App15 doesnt appear in the output as it doesnt have review
+        assertThat(applicationPlanDtoList.stream().filter(a -> a.applicationName.equalsIgnoreCase("App15")).count()).isEqualTo(0);
+
+        // checking last app
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 8);
     }
 
     private void assertPlanDto(List<AdoptionPlanAppDto> applicationPlanDtoList, String app, int expected_positionX, int expected_effort, String expected_decision, int expected_posy) {
