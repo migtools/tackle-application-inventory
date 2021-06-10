@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-@Path("applicationimport")
+@Path("application-import")
 public class ApplicationImportListFilteredResource implements ListFilteredResource<ApplicationImport> {
 
     @Override

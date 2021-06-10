@@ -43,7 +43,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     @BeforeAll
     public static void init() {
 
-        PATH = "/applicationimport";
+        PATH = "/application-import";
 
     }
 

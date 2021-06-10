@@ -247,7 +247,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
                 .when()
-                .get("/applicationimport")
+                .get("/application-import")
                 .then()
                 .statusCode(200)
                 .log().body()
