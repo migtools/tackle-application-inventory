@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
@@ -56,8 +58,6 @@ public class ApplicationTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("_embedded.application[0].tags.size()", is(3));
     }
-
-
 
     @Test
     public void testTagIDSort() {
@@ -127,4 +127,20 @@ public class ApplicationTest extends SecuredResourceTest {
                         "_embedded.application[0].description", is("Important service to let private customer use their home banking accounts"),
                         "_embedded.application[0].review.id", is(7));
     }
+
+    @Test
+    public void testSortByReview() {
+        given()
+                .accept("application/hal+json")
+                .queryParam("sort", "-review.deleted,-id")
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .body("_embedded.application.size()", is(4),
+                        "_embedded.application.id", containsInRelativeOrder(6, 3, 2, 1),
+                        "_embedded.application[0].review", is(emptyOrNullString()),
+                        "_embedded.application[3].review.id", is(7));
+    }
+
 }
