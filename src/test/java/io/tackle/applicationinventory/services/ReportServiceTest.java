@@ -46,13 +46,13 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(10);
 
         // checking first app
-        assertPlanDto(applicationPlanDtoList, "App10", 0, 1, "Rehost", 3);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 3);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
         // checking intermediate app
-        assertPlanDto(applicationPlanDtoList, "App15", 4, 4, "Replatform", 6);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 6);
 
         // checking last app
-        assertPlanDto(applicationPlanDtoList, "App19", 16, 8, "Refactor", 9);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 9);
     }
 
     @Test
@@ -69,12 +69,12 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(9);
 
         // checking first apps
-        assertPlanDto(applicationPlanDtoList, "App10", 0, 1, "Rehost", 2);
+        assertPlanDto(applicationPlanDtoList, "App10", 22, 1, "Rehost", 2);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 3);
         // checking intermediate app
-        assertPlanDto(applicationPlanDtoList, "App15", 3, 4, "Replatform", 5);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 5);
         // checking last app
-        assertPlanDto(applicationPlanDtoList, "App19", 15, 8, "Refactor", 8);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 8);
     }
 
     @Test
@@ -88,7 +88,7 @@ class ReportServiceTest extends ReportTestUtil {
             .collect(Collectors.toList());
         appList.addAll(initialApps);
 
-        Application app19 = Application.find("name", "App19").firstResult();
+        Application app10 = Application.find("name", "App10").firstResult();
         int totalApplications = 2000;
         for (int i = 20; i < totalApplications; i++) {
             Application app = new Application();
@@ -111,8 +111,8 @@ class ReportServiceTest extends ReportTestUtil {
             app.review = review;
 
             ApplicationsDependency dependency = new ApplicationsDependency();
-            dependency.from = app19;
-            dependency.to = app;
+            dependency.to = app10;
+            dependency.from = app;
             dependency.persistAndFlush();
             appList.add(app.id);
         }
@@ -126,13 +126,13 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(totalApplications-10);
 
         // checking 10,14 apps
-        assertPlanDto(applicationPlanDtoList, "App10", 0, 1, "Rehost", 3);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 3);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
 
         // checking 15 app
-        assertPlanDto(applicationPlanDtoList, "App15", 4, 4, "Replatform", 6);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 6);
         // checking 19 app
-        assertPlanDto(applicationPlanDtoList, "App19", 16, 8, "Refactor", 9);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 9);
 
         // checking 20 app
         assertPlanDto(applicationPlanDtoList, "App20", 24, 1, "Replatform", 10);

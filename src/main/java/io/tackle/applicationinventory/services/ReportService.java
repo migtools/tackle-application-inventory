@@ -99,22 +99,17 @@ public class ReportService {
     }
 
     private Integer startPositionNode(EdgeReversedGraph<Application, DefaultEdge> graph, Application application, List<Long> selectedApps) {
-        List<Application> parents = Graphs.successorListOf(graph, application);
+        List<Application> parents = Graphs.predecessorListOf(graph, application);
         if (parents.size() > 0) {
             return parents.stream().map(e -> {
                 // recursively we'll find the position calculating previous positions + lengths of the ancestors
                 Integer pos = startPositionNode(graph, e, selectedApps);
                 // if the parent is an application selected to appear in the list then we use its effort, otherwise is like we are hiding it with effort = 0
-                Integer effort;
-                if (EffortEstimate.isExists(e.review.effortEstimate))  {
-                    effort = (selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
-                } else {
-                    effort = 0; // to not affect the PositionX
-                }
+                Integer effort = (e.review != null && EffortEstimate.isExists(e.review.effortEstimate) && selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
                 return pos + effort;
             })
-                .max(Integer::compare).get();
-            // Selecting the largest position from its ancestors
+            .max(Integer::compare).get();
+            // Selecting the largest position from its predecessors
         } else {
             // point of return for the recursivity on Top nodes
             return 0;
