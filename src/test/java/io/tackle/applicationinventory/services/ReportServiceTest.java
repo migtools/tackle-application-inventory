@@ -46,13 +46,13 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(10);
 
         // checking first app
-        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 3);
-        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 6);
+        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
         // checking intermediate app
-        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 6);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 3);
 
         // checking last app
-        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 9);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 0);
     }
 
     @Test
@@ -69,12 +69,13 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(9);
 
         // checking first apps
-        assertPlanDto(applicationPlanDtoList, "App10", 22, 1, "Rehost", 2);
-        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 3);
+        assertPlanDto(applicationPlanDtoList, "App10", 22, 1, "Rehost", 6);
+        assertPlanDto(applicationPlanDtoList, "App11", 0, 8, "Refactor", 8);
+        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
         // checking intermediate app
-        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 5);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 3);
         // checking last app
-        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 8);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 0);
     }
 
     @Test
@@ -104,7 +105,7 @@ class ReportServiceTest extends ReportTestUtil {
             review.businessCriticality = 1;
             review.comments = "";
             review.proposedAction = "Replatform";
-            review.workPriority = i;
+            review.workPriority = 0;
             review.application = app;
             review.persistAndFlush();
 
@@ -126,35 +127,35 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(totalApplications-10);
 
         // checking 10,14 apps
-        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 3);
-        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 6);
+        assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
 
         // checking 15 app
-        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 6);
+        assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 3);
         // checking 19 app
-        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 9);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 0);
 
         // checking 20 app
-        assertPlanDto(applicationPlanDtoList, "App20", 24, 1, "Replatform", 10);
+        assertPlanDto(applicationPlanDtoList, "App20", 24, 1, "Replatform", null);
 
         // checking 100 app
         if (totalApplications > 100) {
-            assertPlanDto(applicationPlanDtoList, "App100", 24, 1, "Replatform", 90);
+            assertPlanDto(applicationPlanDtoList, "App100", 24, 1, "Replatform", null);
         }
 
         // checking 500 app
         if (totalApplications > 500) {
-            assertPlanDto(applicationPlanDtoList, "App500", 24, 1, "Replatform", 490);
+            assertPlanDto(applicationPlanDtoList, "App500", 24, 1, "Replatform", null);
         }
 
         // checking 1000 app
         if (totalApplications > 1000) {
-            assertPlanDto(applicationPlanDtoList, "App1000", 24, 1, "Replatform", 990);
+            assertPlanDto(applicationPlanDtoList, "App1000", 24, 1, "Replatform", null);
         }
 
         // checking 1500 app
         if (totalApplications > 1500) {
-            assertPlanDto(applicationPlanDtoList, "App1500", 24, 1, "Replatform", 1490);
+            assertPlanDto(applicationPlanDtoList, "App1500", 24, 1, "Replatform", null);
         }
     }
 
@@ -211,20 +212,28 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(9);
 
         // checking first app App15 has not sum its effort as it doesnt have review
-        assertPlanDto(applicationPlanDtoList, "App10", 19, 1, "Rehost", 3);
+        assertPlanDto(applicationPlanDtoList, "App10", 19, 1, "Rehost", 5);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
 
         // App15 doesnt appear in the output as it doesnt have review
         assertThat(applicationPlanDtoList.stream().filter(a -> a.applicationName.equalsIgnoreCase("App15")).count()).isEqualTo(0);
 
         // checking last app
-        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 8);
+        assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 0);
     }
 
-    private void assertPlanDto(List<AdoptionPlanAppDto> applicationPlanDtoList, String app, int expected_positionX, int expected_effort, String expected_decision, int expected_posy) {
-        assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionX).isEqualTo(expected_positionX);
-        assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().effort).isEqualTo(expected_effort);
-        assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().decision).isEqualTo(expected_decision);
-        assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionY).isEqualTo(expected_posy);
+    private void assertPlanDto(List<AdoptionPlanAppDto> applicationPlanDtoList, String app, Integer expected_positionX, Integer expected_effort, String expected_decision, Integer expected_posy) {
+        if (expected_positionX != null ) {
+            assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionX).isEqualTo(expected_positionX);
+        }
+        if (expected_effort != null) {
+            assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().effort).isEqualTo(expected_effort);
+        }
+        if (expected_decision != null) {
+            assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().decision).isEqualTo(expected_decision);
+        }
+        if (expected_posy != null) {
+            assertThat(applicationPlanDtoList.stream().filter(e -> e.applicationName.equalsIgnoreCase(app)).findFirst().get().positionY).isEqualTo(expected_posy);
+        }
     }
 }

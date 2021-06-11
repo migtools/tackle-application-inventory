@@ -45,7 +45,7 @@ public class ReportService {
             })
             .filter(a -> EffortEstimate.isExists(((Application) a).review.effortEstimate)) // The review has a valid Effort
             .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
-            .sorted(Comparator.comparing(e -> String.format("%06d", e.positionY) + e.applicationName))
+            .sorted(Comparator.comparing(e -> String.format("%06d", ((AdoptionPlanAppDto) e).positionY) + ((AdoptionPlanAppDto) e).applicationName).reversed())
             .collect(Collectors.toList());
 
         // adjusting the positionY value to it's real order
