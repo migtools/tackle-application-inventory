@@ -10,8 +10,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import java.util.Set;
 
 
-@Path("/controls/business-service")
-@RegisterRestClient
+
+@RegisterRestClient()
 @ApplicationScoped
 public interface BusinessServiceService {
 

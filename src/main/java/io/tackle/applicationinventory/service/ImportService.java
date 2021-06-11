@@ -51,7 +51,7 @@ public class ImportService {
             System.out.println("File: " + data.getFile());
             System.out.println("FileName: " + data.getFileName());
 
-            Set<TagType> tagTypes =tagTypeService.getListOfTagTypes();
+            Set<TagType> tagTypes = tagTypeService.getListOfTagTypes();
             if (tagTypes == null)
             {
                 throw new Exception("Unable to retrieve TagTypes from remote resource");

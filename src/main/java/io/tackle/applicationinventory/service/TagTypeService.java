@@ -6,12 +6,14 @@ import javax.ws.rs.Path;
 
 import io.tackle.applicationinventory.TagType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import io.quarkus.oidc.token.propagation.AccessToken;
 
 import java.util.Set;
 
 
-@Path("/controls/tag-type")
-@RegisterRestClient
+
+@RegisterRestClient()
+@AccessToken
 @ApplicationScoped
 public interface TagTypeService {
 
