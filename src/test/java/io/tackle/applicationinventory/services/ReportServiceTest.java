@@ -46,10 +46,11 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(10);
 
         // checking first app
-        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 6);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 4);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
         // checking intermediate app
         assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 3);
+        assertPlanDto(applicationPlanDtoList, "App13", 21, 2, "Refactor", 9);
 
         // checking last app
         assertPlanDto(applicationPlanDtoList, "App19", 0, 8, "Refactor", 0);
@@ -69,8 +70,9 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(9);
 
         // checking first apps
-        assertPlanDto(applicationPlanDtoList, "App10", 22, 1, "Rehost", 6);
-        assertPlanDto(applicationPlanDtoList, "App11", 0, 8, "Refactor", 8);
+        assertPlanDto(applicationPlanDtoList, "App10", 22, 1, "Rehost", 4);
+        assertPlanDto(applicationPlanDtoList, "App11", 0, 8, "Refactor", 7);
+        assertPlanDto(applicationPlanDtoList, "App13", 20, 2, "Refactor", 8);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
         // checking intermediate app
         assertPlanDto(applicationPlanDtoList, "App15", 16, 4, "Replatform", 3);
@@ -127,7 +129,7 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(totalApplications-10);
 
         // checking 10,14 apps
-        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 6);
+        assertPlanDto(applicationPlanDtoList, "App10", 23, 1, "Rehost", 4);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 5);
 
         // checking 15 app
@@ -212,7 +214,7 @@ class ReportServiceTest extends ReportTestUtil {
         assertThat(applicationPlanDtoList).hasSize(9);
 
         // checking first app App15 has not sum its effort as it doesnt have review
-        assertPlanDto(applicationPlanDtoList, "App10", 19, 1, "Rehost", 5);
+        assertPlanDto(applicationPlanDtoList, "App10", 19, 1, "Rehost", 3);
         assertPlanDto(applicationPlanDtoList, "App14", 0, 1, "Rehost", 4);
 
         // App15 doesnt appear in the output as it doesnt have review

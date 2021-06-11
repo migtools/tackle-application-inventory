@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
+
 @ApplicationScoped
 public class ReportService {
     private static final Logger LOGGER = Logger.getLogger(ReportService.class);
@@ -33,6 +35,9 @@ public class ReportService {
     public List<AdoptionPlanAppDto> getAdoptionPlanAppDtos(List<Long> applicationIds) {
         Graph<Application, DefaultEdge> graph = getApplicationsGraphFromDependencies();
 
+        // Sorting DESC by Priority and ASC by Name
+        Comparator<Object> sortAdoptionPlan = comparing(e -> ((AdoptionPlanAppDto) e).positionY, Comparator.reverseOrder()).thenComparing(e -> ((AdoptionPlanAppDto) e).applicationName);
+
         EdgeReversedGraph<Application, DefaultEdge> reversedGraph = new EdgeReversedGraph<>(graph);
         List<AdoptionPlanAppDto> sortedList = applicationIds.stream()
             .map(a -> Application.findById(a))
@@ -45,7 +50,7 @@ public class ReportService {
             })
             .filter(a -> EffortEstimate.isExists(((Application) a).review.effortEstimate)) // The review has a valid Effort
             .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
-            .sorted(Comparator.comparing(e -> String.format("%06d", ((AdoptionPlanAppDto) e).positionY) + ((AdoptionPlanAppDto) e).applicationName).reversed())
+            .sorted(sortAdoptionPlan)
             .collect(Collectors.toList());
 
         // adjusting the positionY value to it's real order
