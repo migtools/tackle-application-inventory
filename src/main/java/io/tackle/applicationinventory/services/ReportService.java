@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
+
 @ApplicationScoped
 public class ReportService {
     private static final Logger LOGGER = Logger.getLogger(ReportService.class);
@@ -33,6 +35,9 @@ public class ReportService {
     public List<AdoptionPlanAppDto> getAdoptionPlanAppDtos(List<Long> applicationIds) {
         Graph<Application, DefaultEdge> graph = getApplicationsGraphFromDependencies();
 
+        // Sorting DESC by Priority and ASC by Name
+        Comparator<Object> sortAdoptionPlan = comparing(e -> ((AdoptionPlanAppDto) e).positionY, Comparator.reverseOrder()).thenComparing(e -> ((AdoptionPlanAppDto) e).applicationName);
+
         EdgeReversedGraph<Application, DefaultEdge> reversedGraph = new EdgeReversedGraph<>(graph);
         List<AdoptionPlanAppDto> sortedList = applicationIds.stream()
             .map(a -> Application.findById(a))
@@ -45,7 +50,7 @@ public class ReportService {
             })
             .filter(a -> EffortEstimate.isExists(((Application) a).review.effortEstimate)) // The review has a valid Effort
             .map(e -> buildAdoptionPlanAppDto(applicationIds, reversedGraph, (Application) e))
-            .sorted(Comparator.comparing(e -> String.format("%06d", e.positionY) + e.applicationName))
+            .sorted(sortAdoptionPlan)
             .collect(Collectors.toList());
 
         // adjusting the positionY value to it's real order
@@ -99,22 +104,17 @@ public class ReportService {
     }
 
     private Integer startPositionNode(EdgeReversedGraph<Application, DefaultEdge> graph, Application application, List<Long> selectedApps) {
-        List<Application> parents = Graphs.successorListOf(graph, application);
+        List<Application> parents = Graphs.predecessorListOf(graph, application);
         if (parents.size() > 0) {
             return parents.stream().map(e -> {
                 // recursively we'll find the position calculating previous positions + lengths of the ancestors
                 Integer pos = startPositionNode(graph, e, selectedApps);
                 // if the parent is an application selected to appear in the list then we use its effort, otherwise is like we are hiding it with effort = 0
-                Integer effort;
-                if (EffortEstimate.isExists(e.review.effortEstimate))  {
-                    effort = (selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
-                } else {
-                    effort = 0; // to not affect the PositionX
-                }
+                Integer effort = (e.review != null && EffortEstimate.isExists(e.review.effortEstimate) && selectedApps.contains(e.id)) ? EffortEstimate.getEnum(e.review.effortEstimate).getEffort() : 0;
                 return pos + effort;
             })
-                .max(Integer::compare).get();
-            // Selecting the largest position from its ancestors
+            .max(Integer::compare).get();
+            // Selecting the largest position from its predecessors
         } else {
             // point of return for the recursivity on Top nodes
             return 0;
