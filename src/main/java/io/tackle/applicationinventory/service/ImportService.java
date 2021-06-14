@@ -1,14 +1,12 @@
 package io.tackle.applicationinventory.service;
 
 import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.MultipartImportBody;
-import io.tackle.applicationinventory.TagType;
+import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
@@ -35,7 +33,7 @@ public class ImportService {
 
     @Inject
     @RestClient
-    TagTypeService tagTypeService;
+    TagService tagService;
 
     @Inject
     @RestClient
@@ -51,11 +49,12 @@ public class ImportService {
             System.out.println("File: " + data.getFile());
             System.out.println("FileName: " + data.getFileName());
 
-            Set<TagType> tagTypes = tagTypeService.getListOfTagTypes();
-            if (tagTypes == null)
+            Set<Tag> tags = tagService.getListOfTags();
+            if (tags == null)
             {
                 throw new Exception("Unable to retrieve TagTypes from remote resource");
             }
+            tags.forEach(tag -> System.out.println("tag.id:" + tag.id + ", tag.name:" + tag.name + ", tag.tagType.name:" + tag.tagType.name));
             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
             if (businessServices == null)
             {
@@ -80,7 +79,7 @@ public class ImportService {
                 });
                 throw new Exception("Duplicate Application Names in " + data.getFileName());
             }
-            mapImportsToApplication(importList, tagTypes, businessServices);
+            mapImportsToApplication(importList, tags, businessServices);
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -93,10 +92,10 @@ public class ImportService {
 
     private List<ApplicationImport> writeFile(String content, String filename) throws IOException {
 
-        String fileContent = getFilePortionOfMessage(content);
+        //String fileContent = getFilePortionOfMessage(content);
 
 
-        MappingIterator<ApplicationImport> iter = decode(fileContent);
+        MappingIterator<ApplicationImport> iter = decode(content);
         List<ApplicationImport> importList = new ArrayList();
         System.out.println("Printing csv fields");
         while (iter.hasNext())
@@ -134,7 +133,7 @@ public class ImportService {
         }
     }
 
-    private String getFilePortionOfMessage(String content)
+  /**  private String getFilePortionOfMessage(String content)
     {
         try
         {
@@ -149,11 +148,11 @@ public class ImportService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
-    public void mapImportsToApplication(List<ApplicationImport> importList, Set<TagType> tagTypes, Set<BusinessService> businessServices)
+    public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices)
     {
-        ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tagTypes, businessServices);
+        ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tags, businessServices);
         importList.forEach(importedApplication -> {
             System.out.println("Mapping :" + importedApplication.id);
             Response response = mapper.map(importedApplication);

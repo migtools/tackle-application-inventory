@@ -1,7 +1,7 @@
 package io.tackle.applicationinventory.mapper;
 
 import io.tackle.applicationinventory.BusinessService;
-import io.tackle.applicationinventory.TagType;
+import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,13 +10,13 @@ import java.util.Set;
 
 public abstract class ApplicationMapper {
     @ApplicationScoped
-    Set<TagType> tagTypes;
+    Set<Tag> tags;
     @ApplicationScoped
     Set<BusinessService> businessServices;
 
-    public ApplicationMapper(Set<TagType> tagTypes, Set<BusinessService> businessServices)
+    public ApplicationMapper(Set<Tag> tags, Set<BusinessService> businessServices)
     {
-        this.tagTypes = tagTypes;
+        this.tags = tags;
         this.businessServices = businessServices;
     }
 
