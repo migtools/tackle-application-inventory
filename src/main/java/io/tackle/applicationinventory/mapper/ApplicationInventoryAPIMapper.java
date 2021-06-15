@@ -4,13 +4,10 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -56,7 +53,7 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         String currentTag = importApp.getTag1();
         String currentTagType = importApp.getTagType1();
         try{
-            if (importApp.getTagType1() != null && !importApp.getTagType1().isEmpty()
+           if (importApp.getTagType1() != null && !importApp.getTagType1().isEmpty()
                     && importApp.getTag1() != null && !importApp.getTag1().isEmpty()) {
                 tags.add(addTag(importApp.getTag1(), importApp.getTagType1()));
             }
@@ -80,6 +77,22 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
                     && importApp.getTag4() != null && !importApp.getTag4().isEmpty()) {
                 tags.add(addTag(importApp.getTag4(), importApp.getTagType4()));
             }
+      /**      importApp.getTag().keySet().forEach(columnName ->
+            {
+                System.out.println(columnName);
+                Map<String,String> importTags = importApp.getTag();
+                if (columnName.contains("Type"))
+                {
+                    currentTagType.set(importTags.get(columnName));
+                    currentTag.set(importTags.get(columnName.replace(" Type", "")));
+
+                        if (currentTagType.get() != null && !currentTagType.get().isEmpty()
+                                && currentTag.get() != null && !currentTag.get().isEmpty()) {
+                            tags.add(addTag(currentTag.get(), currentTagType.get()));
+                        }
+
+                }
+            });*/
         }
         catch(NoSuchElementException nsee3)
         {

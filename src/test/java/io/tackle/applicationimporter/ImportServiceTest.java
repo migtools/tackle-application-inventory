@@ -113,16 +113,6 @@ public class ImportServiceTest extends SecuredResourceTest {
         //check the correct number of application imports have been persisted
         assertEquals(7, ApplicationImport.listAll().size());
 
-        given()
-                .accept("application/hal+json")
-                .queryParam("isValid", Boolean.TRUE)
-                .when()
-                .get("/application-import")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.'application-import'.size()", is(1));
-
         userTransaction.begin();
         ApplicationImport.deleteAll();
         userTransaction.commit();
