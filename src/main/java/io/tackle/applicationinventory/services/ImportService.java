@@ -63,7 +63,7 @@ public class ImportService {
             //make a list of all the duplicate app names
             List<ApplicationImport> duplicateAppNames = importList.stream().filter(importApp ->
                     !discreteAppNames.add(importApp.getApplicationName())).collect(Collectors.toList());
-            if(duplicateAppNames != null && !duplicateAppNames.isEmpty())
+            if( !duplicateAppNames.isEmpty())
             {
                 //find all the imported apps with a duplicate name and set appropriate error message
                 duplicateAppNames.forEach(app -> { importList.stream().filter(importApp -> importApp.getApplicationName().equals(app.getApplicationName())).forEach(
@@ -88,16 +88,12 @@ public class ImportService {
 
     private List<ApplicationImport> writeFile(String content, String filename) throws IOException {
 
-        //String fileContent = getFilePortionOfMessage(content);
-
-
         MappingIterator<ApplicationImport> iter = decode(content);
         List<ApplicationImport> importList = new ArrayList();
         while (iter.hasNext())
         {
             ApplicationImport importedApplication = iter.next();
             importedApplication.setFilename(filename);
-            System.out.println(importedApplication);
             importList.add(importedApplication);
             importedApplication.persistAndFlush();
         }

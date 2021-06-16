@@ -469,26 +469,6 @@ public class ApplicationImport extends AbstractEntity {
         this.tag20 = tag20;
     }
 
-    @Override
-    public String toString() {
-        return "ApplicationImport [Record Type 1=" + recordType1 +
-                ", Application Name=" + applicationName +
-                ", Description="+ description +
-                ", Comments="+ comments +
-                ", Business Service="+ businessService +
-                ", Tag Type 1="+ tagType1 +
-                ", Tag 1="+ tag1 +
-                ", Tag Type 2="+ tagType2 +
-                ", Tag 2="+ tag2 +
-                ", Tag Type 3="+ tagType3 +
-                ", Tag 3="+ tag3 +
-                ", Tag Type 4="+ tagType4 +
-                ", Tag 4="+ tag4 +
-                ", Filename="+ filename +"]";
-    }
-
-
-
     public String getErrorMessage() {
         return errorMessage;
     }

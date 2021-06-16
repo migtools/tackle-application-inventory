@@ -9,6 +9,7 @@ import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.services.BusinessServiceService;
@@ -75,15 +76,40 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(1)
     protected void testImportServicePost() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
+        userTransaction.begin();
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
         tagType1.id = "1";
         tagType1.name = "Operating System";
         Tag tag = new Tag();
         tag.id = "1";
-        tag.name = "RHEL";
+        tag.name = "RHEL 8";
         tag.tagType = tagType1;
         tags.add(tag);
+        Tag.TagType tagType2 = new Tag.TagType();
+        tagType2.id = "2";
+        tagType2.name = "Database";
+        Tag tag1 = new Tag();
+        tag1.id = "2";
+        tag1.name = "Oracle";
+        tag1.tagType = tagType2;
+        tags.add(tag1);
+        Tag.TagType tagType3 = new Tag.TagType();
+        tagType3.id = "3";
+        tagType3.name = "Language";
+        Tag tag2 = new Tag();
+        tag2.id = "3";
+        tag2.name = "Java EE";
+        tag2.tagType = tagType3;
+        tags.add(tag2);
+        Tag.TagType tagType4 = new Tag.TagType();
+        tagType4.id = "4";
+        tagType4.name = "Runtime";
+        Tag tag3 = new Tag();
+        tag3.id = "3";
+        tag3.name = "Tomcat";
+        tag3.tagType = tagType4;
+        tags.add(tag3);
         Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
 
@@ -112,6 +138,17 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
         assertEquals(7, ApplicationImport.listAll().size());
+        userTransaction.commit();
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
@@ -130,11 +167,50 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
-        appImport2.setTag1("tag 1");
-        appImport2.setTagType1("tag type 1");
+        appImport2.setTag5("tag 1");
+        appImport2.setTagType5("tag type 1");
+        appImport2.setTag6("tag 1");
+        appImport2.setTagType6("tag type 1");
+        appImport2.setTag7("tag 1");
+        appImport2.setTagType7("tag type 1");
+        appImport2.setTag8("tag 1");
+        appImport2.setTagType8("tag type 1");
+        appImport2.setTag9("tag 1");
+        appImport2.setTagType9("tag type 1");
+        appImport2.setTag10("tag 1");
+        appImport2.setTagType10("tag type 1");
+        appImport2.setTag11("tag 1");
+        appImport2.setTagType11("tag type 1");
+        appImport2.setTag12("tag 1");
+        appImport2.setTagType12("tag type 1");
+        appImport2.setTag13("tag 1");
+        appImport2.setTagType13("tag type 1");
+        appImport2.setTag14("tag 1");
+        appImport2.setTagType14("tag type 1");
+        appImport2.setTag15("tag 1");
+        appImport2.setTagType15("tag type 1");
+        appImport2.setTag16("tag 1");
+        appImport2.setTagType16("tag type 1");
+        appImport2.setTag17("tag 1");
+        appImport2.setTagType17("tag type 1");
+        appImport2.setTag18("tag 1");
+        appImport2.setTagType18("tag type 1");
+        appImport2.setTag19("tag 1");
+        appImport2.setTagType19("tag type 1");
+        appImport2.setTag20("tag 1");
+        appImport2.setTagType20("tag type 1");
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
         appImport3.setBusinessService("BS 3");
+        appImport3.setTag1("");
+        appImport3.setTag2("a tag");
+        appImport3.setTag3("a tag");
+        appImport3.setTagType3("");
+        appImport3.setTag4("");
+        appImport3.setTagType4("");
+        appImport3.setTag5("");
+        appImport3.setTagType5("a tag type");
+        appImport3.setTagType6("a tag type");
         appImport3.persistAndFlush();
 
         List<ApplicationImport> appList = new ArrayList();
@@ -145,8 +221,9 @@ public class ImportServiceTest extends SecuredResourceTest {
         appList.add(appImport3);
 
 
-        Long id = appImport1.id;
-        System.out.println("appImport1.id= " + id);
+        Long id1 = appImport1.id;
+        Long id2 = appImport2.id;
+        Long id3 = appImport3.id;
 
         Set<Tag> tags = new HashSet<>();
         Set<BusinessService> businessServices = new HashSet<>();
@@ -155,8 +232,12 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.commit();
 
-        ApplicationImport refusedImport = ApplicationImport.findById(id);
+        ApplicationImport refusedImport = ApplicationImport.findById(id1);
         assertEquals(Boolean.FALSE, refusedImport.getValid());
+        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
+        assertEquals(Boolean.FALSE, refusedImport2.getValid());
+        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
+        assertEquals(Boolean.FALSE, refusedImport3.getValid());
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
@@ -164,6 +245,104 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     }
 
+    @Test
+    @Order(2)
+    protected void testMultipartImport() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+        userTransaction.begin();
+        ImportService svc = new ImportService();
+        MultipartImportBody multipartImport = new MultipartImportBody();
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
+        multipartImport.setFilename("testImport");
+        multipartImport.setFile(importFile.toString());
+
+        javax.ws.rs.core.Response response = svc.importFile(multipartImport);
+        assertEquals(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),response.getStatus());
+
+
+
+
+
+        userTransaction.commit();
+
+
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
+
+    }
+
+    @Test
+    @Order(2)
+    protected void testMapToApplicationMissingFields() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+        userTransaction.begin();
+        ImportService svc = new ImportService();
+
+        ApplicationImport appImport1 = new ApplicationImport();
+        appImport1.setApplicationName("Test App 1");
+        appImport1.persistAndFlush();
+        ApplicationImport appImport2 = new ApplicationImport();
+        appImport2.setApplicationName("Test App 2");
+        appImport2.setBusinessService((""));
+        appImport2.persistAndFlush();
+        ApplicationImport appImport3= new ApplicationImport();
+        appImport3.setApplicationName("Test App 3");
+        appImport3.setBusinessService(("BS 2"));
+        appImport3.persistAndFlush();
+        ApplicationImport appImport4= new ApplicationImport();
+        appImport4.setApplicationName("Test App 4");
+        appImport4.setBusinessService(("BS 2"));
+        appImport4.setDescription("");
+        appImport4.persistAndFlush();
+
+
+        List<ApplicationImport> appList = new ArrayList();
+
+
+        appList.add(appImport1);
+        appList.add(appImport2);
+        appList.add(appImport3);
+        appList.add(appImport4);
+
+
+        Long id = appImport1.id;
+        Long id2 = appImport2.id;
+        Long id3 = appImport3.id;
+        Long id4 = appImport4.id;
+
+        Set<Tag> tags = new HashSet<>();
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "BS 2";
+        businessServices.add(businessService);
+        svc.mapImportsToApplication(appList, tags, businessServices);
+
+
+        userTransaction.commit();
+
+        ApplicationImport refusedImport1 = ApplicationImport.findById(id);
+        assertEquals(Boolean.FALSE, refusedImport1.getValid());
+        assertEquals("Business Service is Mandatory",refusedImport1.getErrorMessage());
+
+        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
+        assertEquals(Boolean.FALSE, refusedImport2.getValid());
+        assertEquals("Business Service is Mandatory",refusedImport2.getErrorMessage());
+
+        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
+        assertEquals(Boolean.FALSE, refusedImport3.getValid());
+        assertEquals("Description is Mandatory",refusedImport3.getErrorMessage());
+
+        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
+        assertEquals(Boolean.FALSE, refusedImport4.getValid());
+        assertEquals("Description is Mandatory",refusedImport4.getErrorMessage());
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        userTransaction.commit();
+
+    }
 
     @Test
     @Order(3)
