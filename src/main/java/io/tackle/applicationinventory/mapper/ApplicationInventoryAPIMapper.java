@@ -66,8 +66,11 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
                         tagTypeMethod = importApp.getClass().getMethod(tagTypeMethodName);
                         currentTag = (String)tagMethod.invoke(importApp);
                         currentTagType = (String)tagTypeMethod.invoke(importApp);
-                        if (currentTag != null && !currentTag.isEmpty()
-                                && currentTagType != null && !currentTagType.isEmpty()) {
+                        if ((currentTag == null || currentTag.isEmpty())
+                                && (currentTagType == null || currentTagType.isEmpty())) {
+                            //don't validate and add tag/tagtype if both aren't present
+                        }
+                        else{
                             tags.add(addTag(currentTag, currentTagType));
                         }
 

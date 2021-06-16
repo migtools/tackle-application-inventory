@@ -164,9 +164,11 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setBusinessService("BS 1");
+        appImport1.setDescription("hello");
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
+        appImport2.setDescription("this");
         appImport2.setTag5("tag 1");
         appImport2.setTagType5("tag type 1");
         appImport2.setTag6("tag 1");
@@ -201,17 +203,27 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport2.setTagType20("tag type 1");
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
-        appImport3.setBusinessService("BS 3");
+        appImport3.setBusinessService("BS 2");
+        appImport3.setDescription("and this");
         appImport3.setTag1("");
-        appImport3.setTag2("a tag");
-        appImport3.setTag3("a tag");
+        appImport3.setTag2("");
+        appImport3.setTagType2("");
+        appImport3.setTag3("mystery tag");
         appImport3.setTagType3("");
         appImport3.setTag4("");
         appImport3.setTagType4("");
-        appImport3.setTag5("");
-        appImport3.setTagType5("a tag type");
-        appImport3.setTagType6("a tag type");
         appImport3.persistAndFlush();
+        ApplicationImport appImport4 = new ApplicationImport();
+        appImport4.setBusinessService("BS 2");
+        appImport4.setDescription("and this");
+        appImport4.setTagType1("");
+        appImport4.setTagType2("mystery tag type");
+        appImport4.persistAndFlush();
+        ApplicationImport appImport5 = new ApplicationImport();
+        appImport5.setBusinessService("BS 2");
+        appImport5.setDescription("and this");
+        appImport5.setTag1("yes");
+        appImport5.persistAndFlush();
 
         List<ApplicationImport> appList = new ArrayList();
 
@@ -219,14 +231,31 @@ public class ImportServiceTest extends SecuredResourceTest {
         appList.add(appImport1);
         appList.add(appImport2);
         appList.add(appImport3);
+        appList.add(appImport4);
+        appList.add(appImport5);
 
 
         Long id1 = appImport1.id;
         Long id2 = appImport2.id;
         Long id3 = appImport3.id;
+        Long id4 = appImport4.id;
+        Long id5 = appImport5.id;
 
-        Set<Tag> tags = new HashSet<>();
-        Set<BusinessService> businessServices = new HashSet<>();
+        Set<Tag> tags = new HashSet<>() ;
+        Tag.TagType tagType1 = new Tag.TagType();
+        tagType1.id = "1";
+        tagType1.name = "Unknown tag type";
+        Tag tag = new Tag();
+        tag.id = "1";
+        tag.name = "Unknown OS";
+        tag.tagType = tagType1;
+        tags.add(tag);
+
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "BS 2";
+        businessServices.add(businessService);
         svc.mapImportsToApplication(appList, tags, businessServices);
 
 
@@ -238,6 +267,10 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(Boolean.FALSE, refusedImport2.getValid());
         ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
         assertEquals(Boolean.FALSE, refusedImport3.getValid());
+        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
+        assertEquals(Boolean.FALSE, refusedImport4.getValid());
+        ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
+        assertEquals(Boolean.FALSE, refusedImport4.getValid());
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
