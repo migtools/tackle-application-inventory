@@ -1,4 +1,4 @@
-package io.tackle.applicationinventory.service;
+package io.tackle.applicationinventory.services;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;

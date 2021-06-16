@@ -1,8 +1,7 @@
-package io.tackle.applicationinventory.service;
+package io.tackle.applicationinventory.services;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 
 import io.quarkus.oidc.token.propagation.AccessToken;
 import io.tackle.applicationinventory.BusinessService;

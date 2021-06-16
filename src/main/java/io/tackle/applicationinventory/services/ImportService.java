@@ -1,4 +1,4 @@
-package io.tackle.applicationinventory.service;
+package io.tackle.applicationinventory.services;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -46,16 +46,12 @@ public class ImportService {
     public Response importFile(@MultipartForm MultipartImportBody data) {
         try {
 
-            System.out.println("File: " + data.getFile());
-            System.out.println("FileName: " + data.getFileName());
-
             Set<Tag> tags = tagService.getListOfTags();
             if (tags == null)
             {
                 throw new Exception("Unable to retrieve TagTypes from remote resource");
             }
-            tags.forEach(tag -> System.out.println("tag.id:" + tag.id + ", tag.name:" + tag.name + ", tag.tagType.name:" + tag.tagType.name));
-            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
             if (businessServices == null)
             {
                 throw new Exception("Unable to retrieve BusinessServices from remote resource");
@@ -97,7 +93,6 @@ public class ImportService {
 
         MappingIterator<ApplicationImport> iter = decode(content);
         List<ApplicationImport> importList = new ArrayList();
-        System.out.println("Printing csv fields");
         while (iter.hasNext())
         {
             ApplicationImport importedApplication = iter.next();
@@ -133,34 +128,14 @@ public class ImportService {
         }
     }
 
-  /**  private String getFilePortionOfMessage(String content)
-    {
-        try
-        {
-            System.out.println("Input Message:" + content);
-
-            ObjectNode node = new ObjectMapper().readValue(content, ObjectNode.class);
-            String fileContent = node.get("file").asText();
-
-            System.out.println("File Portion Of Message:" + fileContent);
-
-            return fileContent;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
     public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices)
     {
         ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tags, businessServices);
         importList.forEach(importedApplication -> {
-            System.out.println("Mapping :" + importedApplication.id);
             Response response = mapper.map(importedApplication);
-            System.out.println("Response Status :" + response.getStatus());
             if (response.getStatus() != Response.Status.OK.getStatusCode())
             {
                 markFailedImportAsInvalid(importedApplication);
-                System.out.println(importedApplication.id + " Import Mapping Failed");
             }
         });
     }

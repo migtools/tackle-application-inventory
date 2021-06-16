@@ -6,8 +6,12 @@ import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 
 import javax.ws.rs.core.Response;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +24,6 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     @Override
     public Response map(ApplicationImport importApp)
     {
-        System.out.println("Call to Mapper");
 
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
@@ -50,54 +53,37 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
 
 
         newApp.name = importApp.getApplicationName();
-        String currentTag = importApp.getTag1();
-        String currentTagType = importApp.getTagType1();
+        String currentTag = "";
+        String currentTagType = "";
         try{
-           if (importApp.getTagType1() != null && !importApp.getTagType1().isEmpty()
-                    && importApp.getTag1() != null && !importApp.getTag1().isEmpty()) {
-                tags.add(addTag(importApp.getTag1(), importApp.getTagType1()));
-            }
-            //update so potential error message refers to correct tag
-            currentTag = importApp.getTag2();
-            currentTagType = importApp.getTagType2();
-            if (importApp.getTagType2() != null && !importApp.getTagType2().isEmpty()
-                    && importApp.getTag2() != null && !importApp.getTag2().isEmpty()) {
-                tags.add(addTag(importApp.getTag2(), importApp.getTagType2()));
-            }
-            currentTag = importApp.getTag3();
-            currentTagType = importApp.getTagType3();
-            if (importApp.getTagType3() != null && !importApp.getTagType3().isEmpty()
-                    && importApp.getTag3() != null && !importApp.getTag3().isEmpty()) {
-
-                tags.add(addTag(importApp.getTag3(), importApp.getTagType3()));
-            }
-            currentTag = importApp.getTag4();
-            currentTagType = importApp.getTagType4();
-            if (importApp.getTagType4() != null && !importApp.getTagType4().isEmpty()
-                    && importApp.getTag4() != null && !importApp.getTag4().isEmpty()) {
-                tags.add(addTag(importApp.getTag4(), importApp.getTagType4()));
-            }
-      /**      importApp.getTag().keySet().forEach(columnName ->
-            {
-                System.out.println(columnName);
-                Map<String,String> importTags = importApp.getTag();
-                if (columnName.contains("Type"))
+                for(int i=1;i<=20;i++)
                 {
-                    currentTagType.set(importTags.get(columnName));
-                    currentTag.set(importTags.get(columnName.replace(" Type", "")));
-
-                        if (currentTagType.get() != null && !currentTagType.get().isEmpty()
-                                && currentTag.get() != null && !currentTag.get().isEmpty()) {
-                            tags.add(addTag(currentTag.get(), currentTagType.get()));
+                    String tagMethodName = "getTag" + i;
+                    String tagTypeMethodName = "getTagType" + i;
+                    java.lang.reflect.Method tagMethod;
+                    java.lang.reflect.Method tagTypeMethod;
+                        tagMethod = importApp.getClass().getMethod(tagMethodName);
+                        tagTypeMethod = importApp.getClass().getMethod(tagTypeMethodName);
+                        currentTag = (String)tagMethod.invoke(importApp);
+                        currentTagType = (String)tagTypeMethod.invoke(importApp);
+                        if (currentTag != null && !currentTag.isEmpty()
+                                && currentTagType != null && !currentTagType.isEmpty()) {
+                            tags.add(addTag(currentTag, currentTagType));
                         }
 
                 }
-            });*/
+
         }
         catch(NoSuchElementException nsee3)
         {
             nsee3.printStackTrace();
             importApp.setErrorMessage("Tag Type " + currentTagType + " and Tag " + currentTag + " combination does not exist");
+            return Response.serverError().build();
+        }
+        catch (SecurityException |NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
+        {
+            e.printStackTrace();
+            importApp.setErrorMessage("Tag Type " + currentTagType + " and Tag " + currentTag + " unable to perform validation");
             return Response.serverError().build();
         }
 

@@ -1,6 +1,5 @@
 package io.tackle.applicationinventory.resources;
 
-import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.commons.resources.ListFilteredResource;
 import org.jboss.resteasy.links.LinkResource;
