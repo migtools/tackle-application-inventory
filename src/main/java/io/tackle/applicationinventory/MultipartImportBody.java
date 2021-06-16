@@ -1,7 +1,5 @@
 package io.tackle.applicationinventory;
 
-import java.io.InputStream;
-
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
 
