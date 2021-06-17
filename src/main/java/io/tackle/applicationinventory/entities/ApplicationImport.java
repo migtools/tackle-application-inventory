@@ -1,13 +1,28 @@
 package io.tackle.applicationinventory.entities;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import io.tackle.applicationinventory.dto.ImportSummaryDto;
 import io.tackle.commons.annotations.CheckType;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.hibernate.annotations.NamedNativeQuery;
+
+import javax.persistence.*;
 
 @Entity
+@SqlResultSetMapping(
+        name="ImportSummaryDtoMapping",
+        classes=@ConstructorResult(
+                targetClass=ImportSummaryDto.class,
+                columns={@ColumnResult(name="filename"),
+                        @ColumnResult(name="createUser"),
+                        @ColumnResult(name="createTime"),
+                        @ColumnResult(name="validCount"),
+                        @ColumnResult(name="invalidCount")}))
+@NamedNativeQuery(name = "ApplicationImport.getSummary",
+        query = "SELECT i.filename, min(i.createUser) as createuser, min(i.createTime) as createtime, sum(case when i.isValid = true then 1 else 0 end) AS validCount, " +
+                "sum(case when i.isValid = false then 1 else 0 end) AS invalidCount  FROM Application_Import i GROUP BY i.filename",
+        resultSetMapping = "ImportSummaryDtoMapping")
 @Table(name = "application_import")
 public class ApplicationImport extends AbstractEntity {
     private String recordType1;
@@ -492,6 +507,7 @@ public class ApplicationImport extends AbstractEntity {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+
 }
 
 
