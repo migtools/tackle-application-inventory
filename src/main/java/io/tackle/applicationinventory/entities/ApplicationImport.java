@@ -16,6 +16,8 @@ import java.util.Date;
         classes=@ConstructorResult(
                 targetClass=ImportSummaryDto.class,
                 columns={@ColumnResult(name="filename", type = String.class),
+                        @ColumnResult(name="parentid", type = Long.class),
+                        @ColumnResult(name="status", type = String.class),
                         @ColumnResult(name="createUser", type = String.class),
                         @ColumnResult(name="createTime", type = Date.class),
                         @ColumnResult(name="validCount", type = Integer.class),
@@ -76,6 +78,9 @@ public class ApplicationImport extends AbstractEntity {
     public Boolean isValid = true;
     @Filterable
     public String filename;
+
+    private String status;
+    private Long parentId;
 
     public ApplicationImport()
     {
@@ -509,6 +514,21 @@ public class ApplicationImport extends AbstractEntity {
         this.filename = filename;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 }
 
 

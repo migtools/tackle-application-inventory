@@ -137,7 +137,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(7, ApplicationImport.listAll().size());
+        assertEquals(8, ApplicationImport.listAll().size());
         userTransaction.commit();
 
         given()
@@ -148,7 +148,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'.size()", is(1));
+                .body("_embedded.'application-import'.size()", is(2));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
@@ -161,6 +161,11 @@ public class ImportServiceTest extends SecuredResourceTest {
     protected void testMapToApplicationRejected() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         userTransaction.begin();
         ImportService svc = new ImportService();
+        ApplicationImport appImportParent = new ApplicationImport();
+        appImportParent.setBusinessService("BS 1");
+        appImportParent.setDescription("hello");
+        appImportParent.persistAndFlush();
+        Long parentId = appImportParent.id;
 
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setBusinessService("BS 1");
@@ -256,7 +261,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "BS 2";
         businessServices.add(businessService);
-        svc.mapImportsToApplication(appList, tags, businessServices);
+        svc.mapImportsToApplication(appList, tags, businessServices, parentId);
 
 
         userTransaction.commit();
@@ -290,7 +295,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         multipartImport.setFile(importFile.toString());
 
         javax.ws.rs.core.Response response = svc.importFile(multipartImport);
-        assertEquals(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),response.getStatus());
+        assertEquals(javax.ws.rs.core.Response.Status.OK.getStatusCode(),response.getStatus());
 
 
 
@@ -311,6 +316,12 @@ public class ImportServiceTest extends SecuredResourceTest {
     protected void testMapToApplicationMissingFields() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         userTransaction.begin();
         ImportService svc = new ImportService();
+
+        ApplicationImport appImportParent = new ApplicationImport();
+        appImportParent.setBusinessService("BS 1");
+        appImportParent.setDescription("hello");
+        appImportParent.persistAndFlush();
+        Long parentId = appImportParent.id;
 
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setApplicationName("Test App 1");
@@ -350,7 +361,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "BS 2";
         businessServices.add(businessService);
-        svc.mapImportsToApplication(appList, tags, businessServices);
+        svc.mapImportsToApplication(appList, tags, businessServices, parentId);
 
 
         userTransaction.commit();
@@ -464,9 +475,9 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .when().post(PATH)
                 .then()
                 .log().all()
-                .statusCode(500).extract().response();
+                .statusCode(200).extract().response();
 
-        assertEquals(500, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
         given()
                 .accept("application/hal+json")
@@ -512,9 +523,9 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .when().post(PATH)
                 .then()
                 .log().all()
-                .statusCode(500).extract().response();
+                .statusCode(200).extract().response();
 
-        assertEquals(500, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
 
 
@@ -557,9 +568,9 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .when().post(PATH)
                 .then()
                 .log().all()
-                .statusCode(500).extract().response();
+                .statusCode(200).extract().response();
 
-        assertEquals(500, response.getStatusCode());
+        assertEquals(200, response.getStatusCode());
 
 
 

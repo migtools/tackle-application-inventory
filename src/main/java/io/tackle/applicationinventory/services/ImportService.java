@@ -15,7 +15,9 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import javax.transaction.UserTransaction;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,6 +33,16 @@ import static javax.transaction.Transactional.TxType.REQUIRED;
 @ApplicationScoped
 public class ImportService {
 
+    public static final String COMPLETED_STATUS = "Completed";
+    public static final String IN_PROGRESS_STATUS = "In Progress";
+    public static final String FAILED_STATUS = "Failed";
+
+    @Inject
+    EntityManager entityManager;
+
+    @Inject
+    UserTransaction usrTransaction;
+
     @Inject
     @RestClient
     TagService tagService;
@@ -44,17 +56,25 @@ public class ImportService {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional(REQUIRED)
     public Response importFile(@MultipartForm MultipartImportBody data) {
-        try {
+        ApplicationImport parentRecord = new ApplicationImport();
 
+        try {
+            parentRecord.setFilename(data.getFileName());
+            parentRecord.setStatus(IN_PROGRESS_STATUS);
+            parentRecord.persistAndFlush();
             Set<Tag> tags = tagService.getListOfTags();
             if (tags == null)
             {
-                throw new Exception("Unable to retrieve TagTypes from remote resource");
+                String msg = "Unable to retrieve TagTypes from remote resource";
+                parentRecord.setErrorMessage(msg);
+                throw new Exception(msg);
             }
              Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
             if (businessServices == null)
             {
-                throw new Exception("Unable to retrieve BusinessServices from remote resource");
+                String msg = "Unable to retrieve BusinessServices from remote resource";
+                parentRecord.setErrorMessage(msg);
+                throw new Exception(msg);
             }
 
             List<ApplicationImport> importList = writeFile(data.getFile(), data.getFileName());
@@ -75,14 +95,22 @@ public class ImportService {
                 });
                 throw new Exception("Duplicate Application Names in " + data.getFileName());
             }
-            mapImportsToApplication(importList, tags, businessServices);
+            mapImportsToApplication(importList, tags, businessServices, parentRecord.id);
+            parentRecord.setStatus(COMPLETED_STATUS);
+
         } catch (Exception e) {
 
             e.printStackTrace();
-            return Response.serverError().build();
-        }
+            parentRecord.setStatus(FAILED_STATUS);
 
-        return Response.ok().build();
+        }
+        finally{
+            parentRecord.persistAndFlush();
+        }
+            return Response.ok().build();
+
+
+
     }
 
 
@@ -124,11 +152,11 @@ public class ImportService {
         }
     }
 
-    public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices)
+    public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices, Long parentId)
     {
         ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tags, businessServices);
         importList.forEach(importedApplication -> {
-            Response response = mapper.map(importedApplication);
+            Response response = mapper.map(importedApplication, parentId);
             if (response.getStatus() != Response.Status.OK.getStatusCode())
             {
                 markFailedImportAsInvalid(importedApplication);

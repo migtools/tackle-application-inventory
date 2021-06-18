@@ -7,6 +7,7 @@ import io.tackle.applicationinventory.entities.ApplicationImport;
 
 import javax.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -22,9 +23,9 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     }
 
     @Override
-    public Response map(ApplicationImport importApp)
+    public Response map(ApplicationImport importApp, Long parentId)
     {
-
+        importApp.setParentId(parentId);
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
 
@@ -89,9 +90,14 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
             importApp.setErrorMessage("Tag Type " + currentTagType + " and Tag " + currentTag + " unable to perform validation");
             return Response.serverError().build();
         }
-
-        newApp.tags = tags;
-        newApp.persistAndFlush();
+        try {
+            newApp.tags = tags;
+            newApp.persistAndFlush();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
+        }
         return Response.ok().build();
     }
 

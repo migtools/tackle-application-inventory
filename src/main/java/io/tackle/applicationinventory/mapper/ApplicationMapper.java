@@ -20,5 +20,5 @@ public abstract class ApplicationMapper {
         this.businessServices = businessServices;
     }
 
-    public abstract Response map(ApplicationImport importApp);
+    public abstract Response map(ApplicationImport importApp, Long parentId);
 }
