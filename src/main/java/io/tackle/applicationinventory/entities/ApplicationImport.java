@@ -8,17 +8,18 @@ import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.NamedNativeQuery;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @SqlResultSetMapping(
         name="ImportSummaryDtoMapping",
         classes=@ConstructorResult(
                 targetClass=ImportSummaryDto.class,
-                columns={@ColumnResult(name="filename"),
-                        @ColumnResult(name="createUser"),
-                        @ColumnResult(name="createTime"),
-                        @ColumnResult(name="validCount"),
-                        @ColumnResult(name="invalidCount")}))
+                columns={@ColumnResult(name="filename", type = String.class),
+                        @ColumnResult(name="createUser", type = String.class),
+                        @ColumnResult(name="createTime", type = Date.class),
+                        @ColumnResult(name="validCount", type = Integer.class),
+                        @ColumnResult(name="invalidCount", type = Integer.class)}))
 @NamedNativeQuery(name = "ApplicationImport.getSummary",
         query = "SELECT i.filename, min(i.createUser) as createuser, min(i.createTime) as createtime, sum(case when i.isValid = true then 1 else 0 end) AS validCount, " +
                 "sum(case when i.isValid = false then 1 else 0 end) AS invalidCount  FROM Application_Import i GROUP BY i.filename",

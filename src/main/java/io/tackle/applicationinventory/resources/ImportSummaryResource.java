@@ -16,7 +16,7 @@ public class ImportSummaryResource {
     @Path("summary")
     @Produces("application/json")
     @GET
-    public List getImportSummary() {
+    public List<ImportSummaryDto> getImportSummary() {
         return svc.getSummary();
     }
 }

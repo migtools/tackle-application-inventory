@@ -13,8 +13,11 @@ public class ImportSummaryService {
     @Inject
     EntityManager em;
 
-    public List getSummary() {
-        Query query = em.createNativeQuery("ApplicationImport.getSummary");
-        return  query.getResultList();
+    public List<ImportSummaryDto> getSummary() {
+        Query query = em.createNativeQuery("SELECT i.filename, min(i.createUser) as createuser, min(i.createTime) as createtime, sum(case when i.isValid = true then 1 else 0 end) AS validCount, " +
+                "sum(case when i.isValid = false then 1 else 0 end) AS invalidCount  FROM Application_Import i GROUP BY i.filename", "ImportSummaryDtoMapping");
+        @SuppressWarnings("unchecked")
+        List<ImportSummaryDto> results = query.getResultList();
+        return  results;
     }
 }

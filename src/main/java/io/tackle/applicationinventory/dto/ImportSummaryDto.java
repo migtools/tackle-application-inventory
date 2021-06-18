@@ -1,13 +1,16 @@
 package io.tackle.applicationinventory.dto;
 
+
+import java.util.Date;
+
 public class ImportSummaryDto {
     public String filename;
     public String createUser;
-    public String createTime;
-    public String validCount;
-    public String invalidCount;
+    public Date createTime;
+    public int validCount;
+    public int invalidCount;
 
-    public ImportSummaryDto(String filename, String createUser, String createTime, String validCount, String invalidCount)
+    public ImportSummaryDto(String filename, String createUser, Date createTime, int validCount, int invalidCount)
     {
         this.filename = filename;
         this.createUser = createUser;
@@ -24,15 +27,15 @@ public class ImportSummaryDto {
         return createUser;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public String getValidCount() {
+    public int getValidCount() {
         return validCount;
     }
 
-    public String getInvalidCount() {
+    public int getInvalidCount() {
         return invalidCount;
     }
 }
