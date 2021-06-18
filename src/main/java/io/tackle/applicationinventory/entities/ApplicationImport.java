@@ -80,6 +80,7 @@ public class ApplicationImport extends AbstractEntity {
     public String filename;
 
     private String status;
+    @Filterable
     private Long parentId;
 
     public ApplicationImport()
