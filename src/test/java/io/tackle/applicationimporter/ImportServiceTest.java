@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -275,7 +276,17 @@ public class ImportServiceTest extends SecuredResourceTest {
         ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
         assertEquals(Boolean.FALSE, refusedImport4.getValid());
         ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
-        assertEquals(Boolean.FALSE, refusedImport4.getValid());
+        assertEquals(Boolean.FALSE, refusedImport5.getValid());
+
+        given()
+                .accept("application/hal+json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .body("_embedded.import-summary.size()", is(1),
+                "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
+                        "total_count", is(1));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
