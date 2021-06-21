@@ -1,41 +1,16 @@
 package io.tackle.applicationinventory.resources;
 
-import io.tackle.applicationinventory.dto.ImportSummaryDto;
-import io.tackle.applicationinventory.services.ImportSummaryService;
-import io.tackle.commons.resources.hal.HalCollectionEnrichedWrapper;
-import org.jboss.resteasy.links.LinkResource;
+import io.quarkus.hibernate.orm.rest.data.panache.PanacheEntityResource;
+import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.rest.data.panache.MethodProperties;
+import io.quarkus.rest.data.panache.ResourceProperties;
+import io.tackle.applicationinventory.entities.ImportSummary;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.List;
 
-@Path("import-summary")
-public class ImportSummaryResource {
-    @Inject
-    ImportSummaryService svc;
-
-    @Path("summary")
-    @Produces("application/json")
-    @GET
-    public List<ImportSummaryDto> getImportSummary() {
-        return svc.getSummary();
-    }
-
-    @Produces("application/hal+json")
-    @GET
-    @LinkResource(
-            entityClassName = "io.tackle.applicationinventory.dto.ImportSummaryDto",
-            rel = "list"
-    )
-    public Response getImportSummaryHal() {
-        final List<ImportSummaryDto> importSummaryDtoList = svc.getSummary();
-        final HalCollectionEnrichedWrapper halCollectionEnrichedWrapper =
-                new HalCollectionEnrichedWrapper(Collections.unmodifiableCollection(importSummaryDtoList),
-                        ImportSummaryDto.class, "import-summary", importSummaryDtoList.size());
-        return Response.ok(halCollectionEnrichedWrapper).build();
-    }
+@ResourceProperties(hal = true)
+public interface ImportSummaryResource  extends PanacheEntityResource<ImportSummary, Long> {
+    @MethodProperties(exposed = false)
+    List<ImportSummary> list(Page page, Sort sort);
 }

@@ -72,7 +72,7 @@ public class ApplicationImport extends AbstractEntity {
     private String tagType19;
     private String tag19;
     private String tagType20;
-    private String tag20; 
+    private String tag20;
     private String errorMessage;
     @Filterable(check = CheckType.EQUAL)
     public Boolean isValid = true;
@@ -80,17 +80,17 @@ public class ApplicationImport extends AbstractEntity {
     public String filename;
 
     private String status;
-    @Filterable
-    private Long parentId;
+    @ManyToOne(optional = false)
+    public ImportSummary importSummary;
 
-    public ApplicationImport()
-    {
+    public ApplicationImport() {
 
     }
 
     public String getRecordType1() {
         return recordType1;
     }
+
     @JsonSetter("Record Type 1")
     public void setRecordType1(String recordType1) {
         this.recordType1 = recordType1;
@@ -203,6 +203,7 @@ public class ApplicationImport extends AbstractEntity {
     public void setTag4(String tag4) {
         this.tag4 = tag4;
     }
+
     public String getTagType5() {
         return tagType5;
     }
@@ -346,7 +347,7 @@ public class ApplicationImport extends AbstractEntity {
     public void setTag12(String tag12) {
         this.tag12 = tag12;
     }
-    
+
     public String getTagType13() {
         return tagType13;
     }
@@ -523,13 +524,6 @@ public class ApplicationImport extends AbstractEntity {
         this.status = status;
     }
 
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
-    }
 }
 
 

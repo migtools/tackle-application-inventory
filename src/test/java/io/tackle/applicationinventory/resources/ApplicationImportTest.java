@@ -4,6 +4,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.tackle.applicationinventory.entities.ApplicationImport;
+import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
@@ -52,12 +53,17 @@ public class ApplicationImportTest extends SecuredResourceTest {
 
         userTransaction.begin();
 
+        ImportSummary appImportParent = new ImportSummary();
+        appImportParent.persistAndFlush();
+
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setBusinessService("BS 1");
+        appImport1.importSummary = appImportParent;
         appImport1.setFilename("File1");
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
+        appImport2.importSummary = appImportParent;
         appImport2.setFilename("File1");
         appImport2.setTag1("tag 1");
         appImport2.setTagType1("tag type 1");
@@ -65,6 +71,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
         appImport3.setBusinessService("BS 3");
+        appImport3.importSummary = appImportParent;
         appImport3.setFilename("File2");
         appImport3.setValid(Boolean.FALSE);
         appImport3.persistAndFlush();

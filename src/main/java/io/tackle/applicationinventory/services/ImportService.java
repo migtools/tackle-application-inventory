@@ -8,6 +8,7 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
+import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -56,28 +57,28 @@ public class ImportService {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional(REQUIRED)
     public Response importFile(@MultipartForm MultipartImportBody data) {
-        ApplicationImport parentRecord = new ApplicationImport();
+        ImportSummary parentRecord = new ImportSummary();
 
         try {
-            parentRecord.setFilename(data.getFileName());
-            parentRecord.setStatus(IN_PROGRESS_STATUS);
+            parentRecord.filename = data.getFileName();
+            parentRecord.importStatus = IN_PROGRESS_STATUS;
             parentRecord.persistAndFlush();
             Set<Tag> tags = tagService.getListOfTags();
             if (tags == null)
             {
                 String msg = "Unable to retrieve TagTypes from remote resource";
-                parentRecord.setErrorMessage(msg);
+                parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
              Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
             if (businessServices == null)
             {
                 String msg = "Unable to retrieve BusinessServices from remote resource";
-                parentRecord.setErrorMessage(msg);
+                parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
 
-            List<ApplicationImport> importList = writeFile(data.getFile(), data.getFileName());
+            List<ApplicationImport> importList = writeFile(data.getFile(), data.getFileName(), parentRecord);
             //we're not allowed duplicate application names within the file
             Set<String> discreteAppNames = new HashSet();
             //make a list of all the duplicate app names
@@ -95,17 +96,16 @@ public class ImportService {
                 });
                 throw new Exception("Duplicate Application Names in " + data.getFileName());
             }
-            mapImportsToApplication(importList, tags, businessServices, parentRecord.id);
-            parentRecord.setStatus(COMPLETED_STATUS);
+            mapImportsToApplication(importList, tags, businessServices, parentRecord);
+            parentRecord.importStatus = COMPLETED_STATUS;
+            parentRecord.flush();
 
         } catch (Exception e) {
 
             e.printStackTrace();
-            parentRecord.setStatus(FAILED_STATUS);
+            parentRecord.importStatus = FAILED_STATUS;
+            parentRecord.flush();
 
-        }
-        finally{
-            parentRecord.persistAndFlush();
         }
             return Response.ok().build();
 
@@ -114,7 +114,7 @@ public class ImportService {
     }
 
 
-    private List<ApplicationImport> writeFile(String content, String filename) throws IOException {
+    private List<ApplicationImport> writeFile(String content, String filename, ImportSummary parentObject) throws IOException {
 
         MappingIterator<ApplicationImport> iter = decode(content);
         List<ApplicationImport> importList = new ArrayList();
@@ -122,6 +122,8 @@ public class ImportService {
         {
             ApplicationImport importedApplication = iter.next();
             importedApplication.setFilename(filename);
+            //parentObject.applicationImports.add(importedApplication);
+            importedApplication.importSummary = parentObject;
             importList.add(importedApplication);
             importedApplication.persistAndFlush();
         }
@@ -152,22 +154,23 @@ public class ImportService {
         }
     }
 
-    public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices, Long parentId)
+    public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices, ImportSummary parentRecord)
     {
         ApplicationMapper mapper = new ApplicationInventoryAPIMapper(tags, businessServices);
         importList.forEach(importedApplication -> {
-            Response response = mapper.map(importedApplication, parentId);
+            Response response = mapper.map(importedApplication, parentRecord.id);
             if (response.getStatus() != Response.Status.OK.getStatusCode())
             {
                 markFailedImportAsInvalid(importedApplication);
             }
+
         });
     }
 
     private void markFailedImportAsInvalid(ApplicationImport importFile)
     {
         importFile.setValid(Boolean.FALSE);
-        importFile.persistAndFlush();
+        importFile.flush();
     }
 
 
