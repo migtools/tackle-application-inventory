@@ -7,6 +7,7 @@ import io.tackle.commons.entities.AbstractEntity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(
@@ -21,6 +22,19 @@ public class ImportSummary extends AbstractEntity {
     @OneToMany(mappedBy = "importSummary", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JsonBackReference
     public List<ApplicationImport> applicationImports = new ArrayList<>();
+
+    @Transient
+    public int invalidCount;
+
+    @Transient
+    public int validCount;
+
+    @PostLoad
+    private void setCounts()
+    {
+        invalidCount = applicationImports.stream().filter(applicationImport -> applicationImport.isValid.equals(Boolean.FALSE)).collect(Collectors.toList()).size();
+        validCount = applicationImports.stream().filter(applicationImport -> applicationImport.isValid.equals(Boolean.TRUE)).collect(Collectors.toList()).size();
+    }
 
 
 
