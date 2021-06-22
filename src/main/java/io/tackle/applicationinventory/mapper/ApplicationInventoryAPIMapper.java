@@ -51,7 +51,13 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
             return Response.serverError().build();
         }
 
-
+        // check for duplicates on table
+        long count = Application.count("name",importApp.getApplicationName());
+        if(count>0)
+        {
+            importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
+            return Response.serverError().build();
+        }
         newApp.name = importApp.getApplicationName();
         String currentTag = "";
         String currentTagType = "";
@@ -96,6 +102,7 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         catch(Exception e){
             e.printStackTrace();
             importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
+            return Response.serverError().build();
         }
         return Response.ok().build();
     }

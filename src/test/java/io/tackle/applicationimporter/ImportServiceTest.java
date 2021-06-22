@@ -153,6 +153,34 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .body("_embedded.'application-import'.size()", is(1));
 
         userTransaction.begin();
+
+        Response response2 = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","sample_application_import.csv")
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response2.getStatusCode());
+        //check the correct number of application imports have been persisted
+        assertEquals(14, ApplicationImport.listAll().size());
+        userTransaction.commit();
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1));
+
+        userTransaction.begin();
         ApplicationImport.deleteAll();
         userTransaction.commit();
 
@@ -275,7 +303,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         System.out.println("IMPORT1 ID: " + id1);
         System.out.println("IMPORT1 ID: " + appImport1.id);
 
-    /**    ApplicationImport refusedImport = ApplicationImport.findById(id1);
+        ApplicationImport refusedImport = ApplicationImport.findById(id1);
         System.out.println("IMPORT IS NULL: " + (refusedImport == null));
         assertEquals(Boolean.FALSE, refusedImport.getValid());
         ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
@@ -285,7 +313,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
         assertEquals(Boolean.FALSE, refusedImport4.getValid());
         ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
-        assertEquals(Boolean.FALSE, refusedImport5.getValid());**/
+        assertEquals(Boolean.FALSE, refusedImport5.getValid());
 
         given()
                 .accept("application/hal+json")
@@ -389,7 +417,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.commit();
 
-  /**      ApplicationImport refusedImport1 = ApplicationImport.findById(id);
+        ApplicationImport refusedImport1 = ApplicationImport.findById(id);
         assertEquals(Boolean.FALSE, refusedImport1.getValid());
         assertEquals("Business Service is Mandatory",refusedImport1.getErrorMessage());
 
@@ -403,7 +431,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
         assertEquals(Boolean.FALSE, refusedImport4.getValid());
-        assertEquals("Description is Mandatory",refusedImport4.getErrorMessage());**/
+        assertEquals("Description is Mandatory",refusedImport4.getErrorMessage());
 
         userTransaction.begin();
         ApplicationImport.deleteAll();

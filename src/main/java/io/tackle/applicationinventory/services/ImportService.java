@@ -122,7 +122,6 @@ public class ImportService {
         {
             ApplicationImport importedApplication = iter.next();
             importedApplication.setFilename(filename);
-            //parentObject.applicationImports.add(importedApplication);
             importedApplication.importSummary = parentObject;
             importList.add(importedApplication);
             importedApplication.persistAndFlush();
