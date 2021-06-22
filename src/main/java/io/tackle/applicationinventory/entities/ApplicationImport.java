@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import io.tackle.applicationinventory.dto.ImportSummaryDto;
 import io.tackle.commons.annotations.CheckType;
@@ -81,6 +82,7 @@ public class ApplicationImport extends AbstractEntity {
 
     private String status;
     @ManyToOne(optional = false)
+    @JsonIgnore
     public ImportSummary importSummary;
 
     public ApplicationImport() {
