@@ -3,8 +3,11 @@ package io.tackle.applicationinventory.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.ws.rs.DefaultValue;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +23,9 @@ public class ImportSummary extends AbstractEntity {
     @Filterable
     public String importStatus;
     public String errorMessage;
-    public Date importtime;
+    @CreationTimestamp
+    @Column(updatable=false)
+    public Timestamp importtime;
     @OneToMany(mappedBy = "importSummary", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JsonBackReference
     public List<ApplicationImport> applicationImports = new ArrayList<>();
