@@ -6,6 +6,7 @@ import io.tackle.commons.entities.AbstractEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ public class ImportSummary extends AbstractEntity {
     @Filterable
     public String importStatus;
     public String errorMessage;
+    public Date importtime;
     @OneToMany(mappedBy = "importSummary", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JsonBackReference
     public List<ApplicationImport> applicationImports = new ArrayList<>();
