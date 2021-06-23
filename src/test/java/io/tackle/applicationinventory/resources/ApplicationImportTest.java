@@ -93,6 +93,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
     }
 }

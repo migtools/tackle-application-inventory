@@ -82,21 +82,24 @@ public class ImportService {
             //we're not allowed duplicate application names within the file
             Set<String> discreteAppNames = new HashSet();
             //make a list of all the duplicate app names
+            List<ApplicationImport> importListMinusDuplicates = importList;
             List<ApplicationImport> duplicateAppNames = importList.stream().filter(importApp ->
                     !discreteAppNames.add(importApp.getApplicationName())).collect(Collectors.toList());
             if( !duplicateAppNames.isEmpty())
             {
                 //find all the imported apps with a duplicate name and set appropriate error message
-                duplicateAppNames.forEach(app -> { importList.stream().filter(importApp -> importApp.getApplicationName().equals(app.getApplicationName())).forEach(
-                    duplicateApp -> {
-                        importList.remove(duplicateApp);
-                        duplicateApp.setErrorMessage("Duplicate Application Name within file: " + app.getApplicationName());
-                        markFailedImportAsInvalid(duplicateApp);
-                    });
+                duplicateAppNames.forEach(app -> {
+                    importList.stream().filter(importApp ->
+                            app.getApplicationName().equals(importApp.getApplicationName())).collect(Collectors.toList())
+                            .forEach(duplicateApp -> {
+                                        importListMinusDuplicates.remove(duplicateApp);
+                                        duplicateApp.setErrorMessage("Duplicate Application Name within file: " + duplicateApp.getApplicationName());
+                                        markFailedImportAsInvalid(duplicateApp);
+                            });
 
                 });
             }
-            mapImportsToApplication(importList, tags, businessServices, parentRecord);
+            mapImportsToApplication(importListMinusDuplicates, tags, businessServices, parentRecord);
             parentRecord.importStatus = COMPLETED_STATUS;
             parentRecord.flush();
 

@@ -11,6 +11,7 @@ import io.restassured.response.Response;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.Tag;
+import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.services.BusinessServiceService;
@@ -298,22 +299,25 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.commit();
 
-        System.out.println("IMPORT COUNT: " + ApplicationImport.count());
+        Long summaryId = appImportParent.id;
 
-        System.out.println("IMPORT1 ID: " + id1);
-        System.out.println("IMPORT1 ID: " + appImport1.id);
+
 
         ApplicationImport refusedImport = ApplicationImport.findById(id1);
-        System.out.println("IMPORT IS NULL: " + (refusedImport == null));
         assertEquals(Boolean.FALSE, refusedImport.getValid());
+        assertEquals(summaryId, refusedImport.importSummary.id);
         ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
         assertEquals(Boolean.FALSE, refusedImport2.getValid());
+        assertEquals(summaryId, refusedImport2.importSummary.id);
         ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
         assertEquals(Boolean.FALSE, refusedImport3.getValid());
+        assertEquals(summaryId, refusedImport3.importSummary.id);
         ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
         assertEquals(Boolean.FALSE, refusedImport4.getValid());
+        assertEquals(summaryId, refusedImport4.importSummary.id);
         ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
         assertEquals(Boolean.FALSE, refusedImport5.getValid());
+        assertEquals(summaryId, refusedImport5.importSummary.id);
 
         given()
                 .accept("application/hal+json")
@@ -321,13 +325,14 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .get("/import-summary")
                 .then()
                 .statusCode(200)
-         /**       .body("_embedded.import-summary.size()", is(1),
+                .body("_embedded.import-summary.size()", is(1),
                 "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
-                        "total_count", is(1))*/
-        ;
+                        "total_count", is(1));
+
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
@@ -356,6 +361,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
@@ -435,6 +441,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
@@ -487,6 +494,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
     }
 
@@ -530,6 +538,8 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
 
+        assertEquals(5,Application.count());
+
         given()
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
@@ -540,8 +550,18 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'application-import'[0].'errorMessage'", is("Duplicate Application Name within file: OrderHub"));
 
+        given()
+                .accept("application/hal+json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
+
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
@@ -582,6 +602,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
@@ -627,6 +648,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
         userTransaction.commit();
 
     }
