@@ -26,7 +26,6 @@ public class ImportSummary extends AbstractEntity {
     @Column(updatable=false)
     public Timestamp importTime;
     @OneToMany(mappedBy = "importSummary", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    //@JsonBackReference
     @JsonIgnore
     public List<ApplicationImport> applicationImports = new ArrayList<>();
 

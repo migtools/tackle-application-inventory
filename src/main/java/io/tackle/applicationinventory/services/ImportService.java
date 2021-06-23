@@ -89,12 +89,12 @@ public class ImportService {
                 //find all the imported apps with a duplicate name and set appropriate error message
                 duplicateAppNames.forEach(app -> { importList.stream().filter(importApp -> importApp.getApplicationName().equals(app.getApplicationName())).forEach(
                     duplicateApp -> {
+                        importList.remove(duplicateApp);
                         duplicateApp.setErrorMessage("Duplicate Application Name within file: " + app.getApplicationName());
                         markFailedImportAsInvalid(duplicateApp);
                     });
 
                 });
-                throw new Exception("Duplicate Application Names in " + data.getFileName());
             }
             mapImportsToApplication(importList, tags, businessServices, parentRecord);
             parentRecord.importStatus = COMPLETED_STATUS;
