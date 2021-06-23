@@ -83,6 +83,7 @@ public class ApplicationImport extends AbstractEntity {
     private String status;
     @ManyToOne(optional = false)
     @JsonIgnore
+    @Filterable(filterName = "importSummary.id")
     public ImportSummary importSummary;
 
     public ApplicationImport() {
