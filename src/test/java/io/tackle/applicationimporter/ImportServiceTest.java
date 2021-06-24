@@ -181,8 +181,13 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'application-import'.size()", is(1));
 
+        ApplicationImport successful = ApplicationImport.find("isValid",true).firstResult();
+        Application newOne = Application.find("name",successful.getApplicationName()).firstResult();
+
         userTransaction.begin();
         ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
+        Application.deleteById(newOne.id);
         userTransaction.commit();
 
     }
@@ -537,8 +542,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .statusCode(200).extract().response();
 
         assertEquals(200, response.getStatusCode());
-
-        assertEquals(5,Application.count());
 
         given()
                 .accept("application/hal+json")
