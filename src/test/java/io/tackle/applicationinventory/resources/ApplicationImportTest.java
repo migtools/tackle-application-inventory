@@ -91,6 +91,16 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"))
                 .body("_embedded.'application-import'[0].'Tag Type 1'", is("tag type 1"));
 
+        given()
+                .accept("application/json")
+                .queryParam("isValid", Boolean.FALSE)
+                .when()
+                .get(PATH)
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("size()", is(2));
+
         userTransaction.begin();
         ApplicationImport.deleteAll();
         ImportSummary.deleteAll();

@@ -562,6 +562,27 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
 
+        given()
+                .accept("application/json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("size()", is(1));
+
+        ImportSummary summary = ImportSummary.findAll().firstResult();
+
+        given()
+                .accept("text/csv")
+                .when()
+                .get("/csv-export?importSummaryId=" + summary.id)
+                .then()
+                .statusCode(200)
+                .log().body();
+              //  .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
+
+
         userTransaction.begin();
         ApplicationImport.deleteAll();
         ImportSummary.deleteAll();
