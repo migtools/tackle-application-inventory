@@ -29,10 +29,8 @@ import javax.persistence.EntityManager;
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
@@ -573,14 +571,22 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         ImportSummary summary = ImportSummary.findAll().firstResult();
 
-        given()
+        Response r =
+                given()
                 .accept("text/csv")
                 .when()
-                .get("/csv-export?importSummaryId=" + summary.id)
-                .then()
+                .get("/csv-export?importSummaryId=" + summary.id);
+            /**    .then()
                 .statusCode(200)
                 .log().body();
-              //  .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
+                .body("", is("Completed"));*/
+
+
+        String csv = r.body().print();
+        System.out.println(csv);
+        String[] csvFields = csv.split(",");
+        List<String> found = Arrays.stream(csvFields).filter("Comments"::equals).collect(Collectors.toList());
+        assertEquals(1,found.size());
 
 
         userTransaction.begin();

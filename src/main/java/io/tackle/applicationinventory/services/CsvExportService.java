@@ -13,7 +13,7 @@ public class CsvExportService {
 
     public String getCsvExportForImportSummaryId(Long importSummaryId)
     {
-        List<ApplicationImport> importList = ApplicationImport.list("importSummary_id", importSummaryId);
+        List<ApplicationImport> importList = ApplicationImport.list("importSummary_id=?1 and isValid=?2", importSummaryId, false);
         final CsvMapper mapper = new CsvMapper();
         final CsvSchema schema = mapper.schemaFor(ApplicationImport.class);
 

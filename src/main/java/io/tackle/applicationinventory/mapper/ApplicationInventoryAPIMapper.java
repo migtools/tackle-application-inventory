@@ -95,15 +95,15 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
             importApp.setErrorMessage("Tag Type " + currentTagType + " and Tag " + currentTag + " unable to perform validation");
             return Response.serverError().build();
         }
-        try {
+  //      try {
             newApp.tags = tags;
             newApp.persistAndFlush();
-        }
+  /**      }
         catch(Exception e){
             e.printStackTrace();
             importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
             return Response.serverError().build();
-        }
+        }*/
         return Response.ok().build();
     }
 
