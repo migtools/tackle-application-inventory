@@ -1,0 +1,8 @@
+Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3,Tag Type 4,Tag 4
+1,OrderHub,"Create, amend and cancel food orders",,Food2Go,Operating System,RHEL 8,Database,Oracle,Language,Java EE,Runtime,Tomcat
+1,MenuManager,Food vendors maintain their menu and price data which is curated and presented to customers via Orderhub,,Food2Go,Operating System,Windows Server 2016,Database,SQL Server,Language,C# ASP .Net,,
+1,HeadChef,Allocation of orders to restaurants for fulfillment then despatch,,Foot2Go,Operating System,RHEL 8,Database,Postgresql,Language,Java EE,Runtime,Spring Boot
+1,OrderHub,Delivery service,,Foot2Go,Operating System,RHEL 8,Database,Postgresql,Language,Python,,
+1,PocketMoney,Payment service,Incoming from orders and outgoing to delivery drivers,Payment Management,Operating System,Z/OS,Database,DB2,Language,COBOL,,
+1,BeanCounter,Accounting Service,COTS ERP system,Accounting,Operating System,RHEL 8,Database,Oracle,Language,Java EE,Application Type,COTS
+1,SmokeSignal,Notification Service,Updates customers regarding the progress of their orders. Allocates deliveries to despatch drivers,Foot2Go,Operating System,RHEL 8,Language,Python,DataCentre,London (UK),,

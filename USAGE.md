@@ -123,3 +123,19 @@ the payload obtained will look like this :
 ]
 ```
 
+## `/file/upload` endpoint
+This endpoint will upload a csv file of the format of this file:
+`src/test/resources/sample_application_import.csv`
+
+The upload process stores each row from the file as an ApplicationImport entity.
+Each ApplicationImport is then used to attempt to create a new Application. 
+
+The endpoint expects a Multipart Form with these params:
+`file`: the file to be imported, in json format.
+`fileName`: A text identifier for the file to be stored under.
+
+## `/application-import` endpoint
+This endpoint can be used to retrieve ApplicationImports. The results retrieved can be filtered by
+`isValid=false` or `isValid=true`  to view those imports which have either failed or succeeded,
+and by `filename=your_filename` to view results for a specific import attempt.
+
