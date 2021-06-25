@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.tackle.applicationinventory.entities.ApplicationImport;
+import io.tackle.applicationinventory.entities.ApplicationImportForCsv;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -17,7 +18,8 @@ public class CsvExportService {
         List<ApplicationImport> importList = ApplicationImport.list("importSummary_id=?1 and isValid=?2", importSummaryId, false);
         final CsvMapper mapper = new CsvMapper();
         mapper.disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
-        final CsvSchema schema = mapper.schemaFor(ApplicationImport.class);
+        final CsvSchema schema = mapper.schemaFor(ApplicationImportForCsv.class);
+        mapper.addMixIn(ApplicationImport.class, ApplicationImportForCsv.class);
 
         String csv = null;
         try {

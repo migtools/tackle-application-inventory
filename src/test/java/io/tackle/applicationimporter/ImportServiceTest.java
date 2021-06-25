@@ -583,7 +583,6 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
         String csv = r.body().print();
-        System.out.println(csv);
         String[] csvFields = csv.split(",");
         List<String> found = Arrays.stream(csvFields).filter("Comments"::equals).collect(Collectors.toList());
         assertEquals(1,found.size());
