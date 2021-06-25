@@ -134,26 +134,21 @@ public class ImportService {
 
 
 
-    private MappingIterator<ApplicationImport> decode(String inputFileContent) {
-        try {
+    private MappingIterator<ApplicationImport> decode(String inputFileContent) throws IOException{
+        CsvMapper mapper = new CsvMapper();
 
+        CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
+        String columnSeparator = ",";
 
-            CsvMapper mapper = new CsvMapper();
+        csvSchema = csvSchema.withColumnSeparator(columnSeparator.charAt(0))
+                .withLineSeparator("\r\n")
+                .withUseHeader(true);
 
-            CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
-            String columnSeparator = ",";
+        ObjectReader reader = mapper.readerFor(ApplicationImport.class)
+                .with(csvSchema);
 
-            csvSchema = csvSchema.withColumnSeparator(columnSeparator.charAt(0))
-                                .withLineSeparator("\r\n")
-                                .withUseHeader(true);
+        return reader.readValues(inputFileContent);
 
-            ObjectReader reader = mapper.readerFor(ApplicationImport.class)
-                    .with(csvSchema);
-
-            return reader.readValues(inputFileContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void mapImportsToApplication(List<ApplicationImport> importList, Set<Tag> tags, Set<BusinessService> businessServices, ImportSummary parentRecord)
