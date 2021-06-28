@@ -550,7 +550,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'[0].'errorMessage'", is("Duplicate Application Name within file: OrderHub"));
+                .body("_embedded.'application-import'[0].'errorMessage'", is("Duplicate Application Name within file: Order  Hub "));
 
         given()
                 .accept("application/hal+json")
