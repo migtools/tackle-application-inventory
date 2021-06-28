@@ -84,13 +84,13 @@ public class ImportService {
             //make a list of all the duplicate app names
             List<ApplicationImport> importListMinusDuplicates = importList;
             List<ApplicationImport> duplicateAppNames = importList.stream().filter(importApp ->
-                    !discreteAppNames.add(importApp.getApplicationName())).collect(Collectors.toList());
+                    !discreteAppNames.add(importApp.getApplicationName().strip())).collect(Collectors.toList());
             if( !duplicateAppNames.isEmpty())
             {
                 //find all the imported apps with a duplicate name and set appropriate error message
                 duplicateAppNames.forEach(app -> {
                     importList.stream().filter(importApp ->
-                            app.getApplicationName().equals(importApp.getApplicationName())).collect(Collectors.toList())
+                            app.getApplicationName().strip().equals(importApp.getApplicationName().strip())).collect(Collectors.toList())
                             .forEach(duplicateApp -> {
                                         importListMinusDuplicates.remove(duplicateApp);
                                         duplicateApp.setErrorMessage("Duplicate Application Name within file: " + duplicateApp.getApplicationName());

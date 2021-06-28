@@ -24,9 +24,13 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     @Override
     public Response map(ApplicationImport importApp, Long parentId)
     {
-        //importApp.setParentId(parentId);
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
+
+        if (importApp.getApplicationName() == null || importApp.getApplicationName().isEmpty()) {
+            importApp.setErrorMessage("Application Name is mandatory");
+            return Response.serverError().build();
+        }
 
         try {
             if (importApp.getBusinessService() != null && !importApp.getBusinessService().isEmpty()) {
@@ -46,13 +50,13 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         }
 
         // check for duplicates on table
-        long count = Application.count("name",importApp.getApplicationName());
+        long count = Application.count("name",importApp.getApplicationName().strip());
         if(count>0)
         {
             importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
             return Response.serverError().build();
         }
-        newApp.name = importApp.getApplicationName();
+        newApp.name = importApp.getApplicationName().strip();
         String currentTag = "";
         String currentTagType = "";
         try{

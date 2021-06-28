@@ -205,6 +205,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
+        appImport2.setApplicationName("Name 2");
         appImport2.importSummary = appImportParent;
         appImport2.setDescription("this");
         appImport2.setTag5("tag 1");
@@ -242,6 +243,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
         appImport3.setBusinessService("BS 2");
+        appImport3.setApplicationName("Name 3");
         appImport3.importSummary = appImportParent;
         appImport3.setDescription("and this");
         appImport3.setTag1("");
@@ -254,6 +256,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport3.persistAndFlush();
         ApplicationImport appImport4 = new ApplicationImport();
         appImport4.setBusinessService("BS 2");
+        appImport4.setApplicationName("Name 4");
         appImport4.importSummary = appImportParent;
         appImport4.setDescription("and this");
         appImport4.setTagType1("");
@@ -261,6 +264,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport4.persistAndFlush();
         ApplicationImport appImport5 = new ApplicationImport();
         appImport5.setBusinessService("BS 2");
+        appImport5.setApplicationName("Name 5");
         appImport5.importSummary = appImportParent;
         appImport5.setDescription("and this");
         appImport5.setTag1("yes");
@@ -540,6 +544,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         given()
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
+                .queryParam("filename", "duplicate_application_names.csv")
                 .when()
                 .get("/application-import")
                 .then()
@@ -572,10 +577,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .accept("text/csv")
                 .when()
                 .get("/csv-export?importSummaryId=" + summary.id);
-            /**    .then()
-                .statusCode(200)
-                .log().body();
-                .body("", is("Completed"));*/
+
 
 
         String csv = r.body().print();
