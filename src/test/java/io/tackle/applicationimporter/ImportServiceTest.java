@@ -427,20 +427,16 @@ public class ImportServiceTest extends SecuredResourceTest {
         userTransaction.commit();
 
         ApplicationImport refusedImport1 = ApplicationImport.findById(id);
-        assertEquals(Boolean.FALSE, refusedImport1.getValid());
-        assertEquals("Business Service is Mandatory",refusedImport1.getErrorMessage());
+        assertEquals(Boolean.TRUE, refusedImport1.getValid());;
 
         ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
-        assertEquals(Boolean.FALSE, refusedImport2.getValid());
-        assertEquals("Business Service is Mandatory",refusedImport2.getErrorMessage());
+        assertEquals(Boolean.TRUE, refusedImport2.getValid());
 
         ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
-        assertEquals(Boolean.FALSE, refusedImport3.getValid());
-        assertEquals("Description is Mandatory",refusedImport3.getErrorMessage());
+        assertEquals(Boolean.TRUE, refusedImport3.getValid());
 
         ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
-        assertEquals(Boolean.FALSE, refusedImport4.getValid());
-        assertEquals("Description is Mandatory",refusedImport4.getErrorMessage());
+        assertEquals(Boolean.TRUE, refusedImport4.getValid());
 
         userTransaction.begin();
         ApplicationImport.deleteAll();

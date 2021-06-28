@@ -31,9 +31,6 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         try {
             if (importApp.getBusinessService() != null && !importApp.getBusinessService().isEmpty()) {
                 newApp.businessService = addBusinessService(importApp.getBusinessService());
-            } else {
-                importApp.setErrorMessage("Business Service is Mandatory");
-                return Response.serverError().build();
             }
 
         }
@@ -46,9 +43,6 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
 
         if (importApp.getDescription() != null && !importApp.getDescription().isEmpty()) {
             newApp.description = importApp.getDescription();
-        } else {
-            importApp.setErrorMessage("Description is Mandatory");
-            return Response.serverError().build();
         }
 
         // check for duplicates on table
