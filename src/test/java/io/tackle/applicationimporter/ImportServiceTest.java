@@ -205,7 +205,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
-        appImport2.setApplicationName("Name 2");
+        appImport2.setApplicationName("");
         appImport2.importSummary = appImportParent;
         appImport2.setDescription("this");
         appImport2.setTag5("tag 1");
