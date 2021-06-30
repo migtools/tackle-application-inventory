@@ -138,7 +138,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(7, ApplicationImport.listAll().size());
+        assertEquals(8, ApplicationImport.listAll().size());
         userTransaction.commit();
 
         given()
@@ -166,7 +166,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response2.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(14, ApplicationImport.listAll().size());
+        assertEquals(16, ApplicationImport.listAll().size());
         userTransaction.commit();
 
         given()
@@ -205,6 +205,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport1.persistAndFlush();
         ApplicationImport appImport2 = new ApplicationImport();
         appImport2.setBusinessService("BS 2");
+        appImport2.setApplicationName("");
         appImport2.importSummary = appImportParent;
         appImport2.setDescription("this");
         appImport2.setTag5("tag 1");
@@ -242,6 +243,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport2.persistAndFlush();
         ApplicationImport appImport3 = new ApplicationImport();
         appImport3.setBusinessService("BS 2");
+        appImport3.setApplicationName("name 1");
         appImport3.importSummary = appImportParent;
         appImport3.setDescription("and this");
         appImport3.setTag1("");
@@ -254,6 +256,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport3.persistAndFlush();
         ApplicationImport appImport4 = new ApplicationImport();
         appImport4.setBusinessService("BS 2");
+        appImport4.setApplicationName("name 4");
         appImport4.importSummary = appImportParent;
         appImport4.setDescription("and this");
         appImport4.setTagType1("");
@@ -261,6 +264,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport4.persistAndFlush();
         ApplicationImport appImport5 = new ApplicationImport();
         appImport5.setBusinessService("BS 2");
+        appImport5.setApplicationName("name 5");
         appImport5.importSummary = appImportParent;
         appImport5.setDescription("and this");
         appImport5.setTag1("yes");

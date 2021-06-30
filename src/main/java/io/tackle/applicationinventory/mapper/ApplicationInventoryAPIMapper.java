@@ -28,6 +28,11 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
 
+        if (importApp.getApplicationName() == null || importApp.getApplicationName().strip().isEmpty()) {
+            importApp.setErrorMessage("Application Name is mandatory");
+            return Response.serverError().build();
+        }
+
         try {
             if (importApp.getBusinessService() != null && !importApp.getBusinessService().isEmpty()) {
                 newApp.businessService = addBusinessService(importApp.getBusinessService());
