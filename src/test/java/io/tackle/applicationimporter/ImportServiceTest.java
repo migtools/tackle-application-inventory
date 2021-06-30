@@ -138,7 +138,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(7, ApplicationImport.listAll().size());
+        assertEquals(8, ApplicationImport.listAll().size());
         userTransaction.commit();
 
         given()
@@ -166,7 +166,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response2.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(14, ApplicationImport.listAll().size());
+        assertEquals(16, ApplicationImport.listAll().size());
         userTransaction.commit();
 
         given()
