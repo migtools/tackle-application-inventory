@@ -50,7 +50,6 @@ public class Application extends AbstractEntity {
     public Set<String> tags = new HashSet<>();
 
     @OneToOne(mappedBy = "application", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JsonIncludeProperties("id")
     public Review review;
 
     /**
