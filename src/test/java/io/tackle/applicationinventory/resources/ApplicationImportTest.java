@@ -3,6 +3,7 @@ package io.tackle.applicationinventory.resources;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.*;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static javax.transaction.Transactional.TxType.REQUIRED;
@@ -34,11 +37,7 @@ import static org.hamcrest.Matchers.is;
         }
 )
 public class ApplicationImportTest extends SecuredResourceTest {
-    @Inject
-    EntityManager entityManager;
 
-    @Inject
-    UserTransaction userTransaction;
 
 
     @BeforeAll
@@ -51,33 +50,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     @Test
     public void testFilterByIsValid() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
 
-        userTransaction.begin();
-
-        ImportSummary appImportParent = new ImportSummary();
-        appImportParent.persistAndFlush();
-
-        ApplicationImport appImport1 = new ApplicationImport();
-        appImport1.setBusinessService("BS 1");
-        appImport1.importSummary = appImportParent;
-        appImport1.setFilename("File1");
-        appImport1.persistAndFlush();
-        ApplicationImport appImport2 = new ApplicationImport();
-        appImport2.setBusinessService("BS 2");
-        appImport2.importSummary = appImportParent;
-        appImport2.setFilename("File1");
-        appImport2.setTag1("tag 1");
-        appImport2.setTagType1("tag type 1");
-        appImport2.setValid(Boolean.FALSE);
-        appImport2.persistAndFlush();
-        ApplicationImport appImport3 = new ApplicationImport();
-        appImport3.setBusinessService("BS 3");
-        appImport3.importSummary = appImportParent;
-        appImport3.setFilename("File2");
-        appImport3.setValid(Boolean.FALSE);
-        appImport3.persistAndFlush();
-
-        userTransaction.commit();
-
+        createTestData();
         given()
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
@@ -101,9 +74,51 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .log().body()
                 .body("size()", is(2));
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+        List<ImportSummary> summaryList = ImportSummary.listAll();
+        summaryList.forEach(summary ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", summary.id)
+                        .when()
+                        .delete("/import-summary/{id}")
+                        .then()
+                        .statusCode(204));
+
+        List<ApplicationImport> importList = ApplicationImport.listAll();
+        importList.forEach(thisImport ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", thisImport.id)
+                        .when()
+                        .delete("/application-import/{id}")
+                        .then()
+                        .statusCode(204));
+    }
+
+    @Transactional
+    protected void createTestData()
+    {
+        ImportSummary appImportParent = new ImportSummary();
+        appImportParent.persistAndFlush();
+
+        ApplicationImport appImport1 = new ApplicationImport();
+        appImport1.setBusinessService("BS 1");
+        appImport1.importSummary = appImportParent;
+        appImport1.setFilename("File1");
+        appImport1.persistAndFlush();
+        ApplicationImport appImport2 = new ApplicationImport();
+        appImport2.setBusinessService("BS 2");
+        appImport2.importSummary = appImportParent;
+        appImport2.setFilename("File1");
+        appImport2.setTag1("tag 1");
+        appImport2.setTagType1("tag type 1");
+        appImport2.setValid(Boolean.FALSE);
+        appImport2.persistAndFlush();
+        ApplicationImport appImport3 = new ApplicationImport();
+        appImport3.setBusinessService("BS 3");
+        appImport3.importSummary = appImportParent;
+        appImport3.setFilename("File2");
+        appImport3.setValid(Boolean.FALSE);
+        appImport3.persistAndFlush();
     }
 }

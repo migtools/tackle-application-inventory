@@ -24,8 +24,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -53,11 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ImportServiceTest extends SecuredResourceTest {
-    @Inject
-    EntityManager entityManager;
 
-    @Inject
-    UserTransaction userTransaction;
 
     @InjectMock
     @RestClient
@@ -77,7 +71,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(1)
     protected void testImportServicePost() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
-        userTransaction.begin();
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
         tagType1.id = "1";
@@ -139,7 +132,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
         assertEquals(8, ApplicationImport.listAll().size());
-        userTransaction.commit();
+
 
         given()
                 .accept("application/hal+json")
@@ -151,7 +144,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'application-import'.size()", is(1));
 
-        userTransaction.begin();
+
 
         Response response2 = given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
@@ -167,7 +160,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(200, response2.getStatusCode());
         //check the correct number of application imports have been persisted
         assertEquals(16, ApplicationImport.listAll().size());
-        userTransaction.commit();
+
 
         given()
                 .accept("application/hal+json")
@@ -179,21 +172,76 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'application-import'.size()", is(1));
 
+
         ApplicationImport successful = ApplicationImport.find("isValid",true).firstResult();
         Application newOne = Application.find("name",successful.getApplicationName()).firstResult();
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        Application.deleteById(newOne.id);
-        userTransaction.commit();
+        given()
+                .accept(ContentType.JSON)
+                .pathParam("id", newOne.id)
+                .when()
+                .delete("/application/{id}")
+                .then()
+                .statusCode(204);
+
+        removeTestObjects();
+
 
     }
 
     @Test
     @Order(2)
     protected void testMapToApplicationRejected() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        userTransaction.begin();
+
+
+        List<ApplicationImport> appList = createDummyRejectedImports();
+
+
+        ImportSummary importSummary= ImportSummary.findAll().firstResult();
+        Long summaryId = importSummary.id;
+
+        Long id1 = appList.get(0).id;
+        Long id2 = appList.get(1).id;
+        Long id3 = appList.get(2).id;
+        Long id4 = appList.get(3).id;
+        Long id5 = appList.get(4).id;
+
+
+        ApplicationImport refusedImport = ApplicationImport.findById(id1);
+        assertEquals(Boolean.FALSE, refusedImport.getValid());
+        assertEquals(summaryId, refusedImport.importSummary.id);
+        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
+        assertEquals(Boolean.FALSE, refusedImport2.getValid());
+        assertEquals(summaryId, refusedImport2.importSummary.id);
+        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
+        assertEquals(Boolean.FALSE, refusedImport3.getValid());
+        assertEquals(summaryId, refusedImport3.importSummary.id);
+        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
+        assertEquals(Boolean.FALSE, refusedImport4.getValid());
+        assertEquals(summaryId, refusedImport4.importSummary.id);
+        ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
+        assertEquals(Boolean.FALSE, refusedImport5.getValid());
+        assertEquals(summaryId, refusedImport5.importSummary.id);
+
+        given()
+                .accept("application/hal+json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .body("_embedded.import-summary.size()", is(1),
+                "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
+                        "total_count", is(1));
+
+
+
+        removeTestObjects();
+
+    }
+
+    @Transactional
+    protected List<ApplicationImport> createDummyRejectedImports()
+    {
         ImportService svc = new ImportService();
         ImportSummary appImportParent = new ImportSummary();
         appImportParent.persistAndFlush();
@@ -303,85 +351,69 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessServices.add(businessService);
         svc.mapImportsToApplication(appList, tags, businessServices, appImportParent);
 
-
-        userTransaction.commit();
-
-        Long summaryId = appImportParent.id;
-
-
-
-        ApplicationImport refusedImport = ApplicationImport.findById(id1);
-        assertEquals(Boolean.FALSE, refusedImport.getValid());
-        assertEquals(summaryId, refusedImport.importSummary.id);
-        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
-        assertEquals(Boolean.FALSE, refusedImport2.getValid());
-        assertEquals(summaryId, refusedImport2.importSummary.id);
-        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
-        assertEquals(Boolean.FALSE, refusedImport3.getValid());
-        assertEquals(summaryId, refusedImport3.importSummary.id);
-        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
-        assertEquals(Boolean.FALSE, refusedImport4.getValid());
-        assertEquals(summaryId, refusedImport4.importSummary.id);
-        ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
-        assertEquals(Boolean.FALSE, refusedImport5.getValid());
-        assertEquals(summaryId, refusedImport5.importSummary.id);
-
-        given()
-                .accept("application/hal+json")
-                .when()
-                .get("/import-summary")
-                .then()
-                .statusCode(200)
-                .body("_embedded.import-summary.size()", is(1),
-                "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
-                        "total_count", is(1));
-
-
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
-
+        return appList;
     }
 
     @Test
     @Order(2)
     protected void testMultipartImport() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        userTransaction.begin();
-        ImportService svc = new ImportService();
+
         MultipartImportBody multipartImport = new MultipartImportBody();
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
         multipartImport.setFilename("testImport");
         multipartImport.setFile(importFile.toString());
 
-        javax.ws.rs.core.Response response = svc.importFile(multipartImport);
+        javax.ws.rs.core.Response response = importFileToSystem(multipartImport);
         assertEquals(javax.ws.rs.core.Response.Status.OK.getStatusCode(),response.getStatus());
 
+        removeTestObjects();
 
+    }
 
-
-
-        userTransaction.commit();
-
-
-
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
-
+    @Transactional
+    protected javax.ws.rs.core.Response importFileToSystem(MultipartImportBody importFile){
+        ImportService svc = new ImportService();
+        return svc.importFile(importFile);
     }
 
     @Test
     @Order(2)
     protected void testMapToApplicationMissingFields() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        userTransaction.begin();
+
+        List<ApplicationImport> appList = createMissingFieldsObjects();
+
+        ImportSummary importSummary= ImportSummary.findAll().firstResult();
+
+        Long id = appList.get(0).id;
+        Long id2 = appList.get(1).id;
+        Long id3 = appList.get(2).id;
+        Long id4 = appList.get(3).id;
+
+        ApplicationImport refusedImport1 = ApplicationImport.findById(id);
+        assertEquals(Boolean.TRUE, refusedImport1.getValid());;
+
+        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
+        assertEquals(Boolean.TRUE, refusedImport2.getValid());
+
+        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
+        assertEquals(Boolean.TRUE, refusedImport3.getValid());
+
+        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
+        assertEquals(Boolean.TRUE, refusedImport4.getValid());
+
+
+        removeTestObjects();
+
+    }
+
+    @Transactional
+    protected List<ApplicationImport> createMissingFieldsObjects()
+    {
         ImportService svc = new ImportService();
 
         ImportSummary appImportParent = new ImportSummary();
         appImportParent.persistAndFlush();
-        Long parentId = appImportParent.id;
 
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setApplicationName("Test App 1");
@@ -426,27 +458,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.name = "BS 2";
         businessServices.add(businessService);
         svc.mapImportsToApplication(appList, tags, businessServices, appImportParent);
-
-
-        userTransaction.commit();
-
-        ApplicationImport refusedImport1 = ApplicationImport.findById(id);
-        assertEquals(Boolean.TRUE, refusedImport1.getValid());;
-
-        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
-        assertEquals(Boolean.TRUE, refusedImport2.getValid());
-
-        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
-        assertEquals(Boolean.TRUE, refusedImport3.getValid());
-
-        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
-        assertEquals(Boolean.TRUE, refusedImport4.getValid());
-
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
-
+        return appList;
     }
 
     @Test
@@ -495,10 +507,8 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+
+        removeTestObjects();
     }
 
     @Test
@@ -588,10 +598,8 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(1,found.size());
 
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+
+        removeTestObjects();
 
     }
 
@@ -629,10 +637,8 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+
+        removeTestObjects();
 
     }
 
@@ -675,11 +681,32 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
 
+        removeTestObjects();
+
+    }
+
+    private void removeTestObjects()
+    {
+        List<ImportSummary> summaryList = ImportSummary.listAll();
+        summaryList.forEach(summary ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", summary.id)
+                        .when()
+                        .delete("/import-summary/{id}")
+                        .then()
+                        .statusCode(204));
+
+        List<ApplicationImport> importList = ApplicationImport.listAll();
+        importList.forEach(thisImport ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", thisImport.id)
+                        .when()
+                        .delete("/application-import/{id}")
+                        .then()
+                        .statusCode(204));
     }
 
 
