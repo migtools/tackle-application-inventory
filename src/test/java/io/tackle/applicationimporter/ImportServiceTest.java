@@ -191,37 +191,13 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(2)
-    protected void testMapToApplicationRejected() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testMapToApplicationRejected()  {
 
 
-        List<ApplicationImport> appList = createDummyRejectedImports();
+        createDummyRejectedImports();
 
 
-        ImportSummary importSummary= ImportSummary.findAll().firstResult();
-        Long summaryId = importSummary.id;
 
-        Long id1 = appList.get(0).id;
-        Long id2 = appList.get(1).id;
-        Long id3 = appList.get(2).id;
-        Long id4 = appList.get(3).id;
-        Long id5 = appList.get(4).id;
-
-
-        ApplicationImport refusedImport = ApplicationImport.findById(id1);
-        assertEquals(Boolean.FALSE, refusedImport.getValid());
-        assertEquals(summaryId, refusedImport.importSummary.id);
-        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
-        assertEquals(Boolean.FALSE, refusedImport2.getValid());
-        assertEquals(summaryId, refusedImport2.importSummary.id);
-        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
-        assertEquals(Boolean.FALSE, refusedImport3.getValid());
-        assertEquals(summaryId, refusedImport3.importSummary.id);
-        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
-        assertEquals(Boolean.FALSE, refusedImport4.getValid());
-        assertEquals(summaryId, refusedImport4.importSummary.id);
-        ApplicationImport refusedImport5 = ApplicationImport.findById(id5);
-        assertEquals(Boolean.FALSE, refusedImport5.getValid());
-        assertEquals(summaryId, refusedImport5.importSummary.id);
 
         given()
                 .accept("application/hal+json")
@@ -240,99 +216,8 @@ public class ImportServiceTest extends SecuredResourceTest {
     }
 
     @Transactional
-    protected List<ApplicationImport> createDummyRejectedImports()
+    protected void createDummyRejectedImports()
     {
-        ImportService svc = new ImportService();
-        ImportSummary appImportParent = new ImportSummary();
-        appImportParent.persistAndFlush();
-
-        ApplicationImport appImport1 = new ApplicationImport();
-        appImport1.setBusinessService("BS 1");
-        appImport1.importSummary = appImportParent;
-        appImport1.setDescription("hello");
-        appImport1.persistAndFlush();
-        ApplicationImport appImport2 = new ApplicationImport();
-        appImport2.setBusinessService("BS 2");
-        appImport2.setApplicationName("");
-        appImport2.importSummary = appImportParent;
-        appImport2.setDescription("this");
-        appImport2.setTag5("tag 1");
-        appImport2.setTagType5("tag type 1");
-        appImport2.setTag6("tag 1");
-        appImport2.setTagType6("tag type 1");
-        appImport2.setTag7("tag 1");
-        appImport2.setTagType7("tag type 1");
-        appImport2.setTag8("tag 1");
-        appImport2.setTagType8("tag type 1");
-        appImport2.setTag9("tag 1");
-        appImport2.setTagType9("tag type 1");
-        appImport2.setTag10("tag 1");
-        appImport2.setTagType10("tag type 1");
-        appImport2.setTag11("tag 1");
-        appImport2.setTagType11("tag type 1");
-        appImport2.setTag12("tag 1");
-        appImport2.setTagType12("tag type 1");
-        appImport2.setTag13("tag 1");
-        appImport2.setTagType13("tag type 1");
-        appImport2.setTag14("tag 1");
-        appImport2.setTagType14("tag type 1");
-        appImport2.setTag15("tag 1");
-        appImport2.setTagType15("tag type 1");
-        appImport2.setTag16("tag 1");
-        appImport2.setTagType16("tag type 1");
-        appImport2.setTag17("tag 1");
-        appImport2.setTagType17("tag type 1");
-        appImport2.setTag18("tag 1");
-        appImport2.setTagType18("tag type 1");
-        appImport2.setTag19("tag 1");
-        appImport2.setTagType19("tag type 1");
-        appImport2.setTag20("tag 1");
-        appImport2.setTagType20("tag type 1");
-        appImport2.persistAndFlush();
-        ApplicationImport appImport3 = new ApplicationImport();
-        appImport3.setBusinessService("BS 2");
-        appImport3.setApplicationName("name 1");
-        appImport3.importSummary = appImportParent;
-        appImport3.setDescription("and this");
-        appImport3.setTag1("");
-        appImport3.setTag2("");
-        appImport3.setTagType2("");
-        appImport3.setTag3("mystery tag");
-        appImport3.setTagType3("");
-        appImport3.setTag4("");
-        appImport3.setTagType4("");
-        appImport3.persistAndFlush();
-        ApplicationImport appImport4 = new ApplicationImport();
-        appImport4.setBusinessService("BS 2");
-        appImport4.setApplicationName("name 4");
-        appImport4.importSummary = appImportParent;
-        appImport4.setDescription("and this");
-        appImport4.setTagType1("");
-        appImport4.setTagType2("mystery tag type");
-        appImport4.persistAndFlush();
-        ApplicationImport appImport5 = new ApplicationImport();
-        appImport5.setBusinessService("BS 2");
-        appImport5.setApplicationName("name 5");
-        appImport5.importSummary = appImportParent;
-        appImport5.setDescription("and this");
-        appImport5.setTag1("yes");
-        appImport5.persistAndFlush();
-
-        List<ApplicationImport> appList = new ArrayList();
-
-
-        appList.add(appImport1);
-        appList.add(appImport2);
-        appList.add(appImport3);
-        appList.add(appImport4);
-        appList.add(appImport5);
-
-
-        Long id1 = appImport1.id;
-        Long id2 = appImport2.id;
-        Long id3 = appImport3.id;
-        Long id4 = appImport4.id;
-        Long id5 = appImport5.id;
 
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
@@ -349,14 +234,38 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "BS 2";
         businessServices.add(businessService);
-        svc.mapImportsToApplication(appList, tags, businessServices, appImportParent);
 
-        return appList;
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+
+        // import 2 applications
+        final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
+        ",Tag Type 4,Tag 4,Tag Type 5,Tag 5,Tag Type 6,Tag 6,Tag Type 7,Tag 7,Tag Type 8,Tag 8,Tag Type 9,Tag 9" +
+        ",Tag Type 10,Tag 10,Tag Type 11,Tag 11,Tag Type 12,Tag 12,Tag Type 13,Tag 13,Tag Type 14,Tag 14,Tag Type 15,Tag 15,Tag Type 16,Tag 16" +
+        ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
+                "1,,hello,,BS 1,,\n" +
+                "1, ,,,BS 2,,,,,,,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
+                "1,name 1,and this,,BS 2,,,,,,mystery tag,,\n" +
+                "1,name 4,and this,,BS 1,,,mystery tag type,\n" +
+                "1,name 5,and this,,BS 2,,tag1";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload)
+                .multiPart("fileName", "File1")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
+
+
     }
 
     @Test
     @Order(2)
-    protected void testMultipartImport() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testMultipartImport() {
 
         MultipartImportBody multipartImport = new MultipartImportBody();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -364,43 +273,30 @@ public class ImportServiceTest extends SecuredResourceTest {
         multipartImport.setFilename("testImport");
         multipartImport.setFile(importFile.toString());
 
-        javax.ws.rs.core.Response response = importFileToSystem(multipartImport);
-        assertEquals(javax.ws.rs.core.Response.Status.OK.getStatusCode(),response.getStatus());
+        assertEquals(multipartImport.getFileName(),"testImport");
 
         removeTestObjects();
 
     }
 
-    @Transactional
-    protected javax.ws.rs.core.Response importFileToSystem(MultipartImportBody importFile){
-        ImportService svc = new ImportService();
-        return svc.importFile(importFile);
-    }
 
     @Test
     @Order(2)
     protected void testMapToApplicationMissingFields() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
-        List<ApplicationImport> appList = createMissingFieldsObjects();
+        createMissingFieldsObjects();
 
-        ImportSummary importSummary= ImportSummary.findAll().firstResult();
 
-        Long id = appList.get(0).id;
-        Long id2 = appList.get(1).id;
-        Long id3 = appList.get(2).id;
-        Long id4 = appList.get(3).id;
 
-        ApplicationImport refusedImport1 = ApplicationImport.findById(id);
-        assertEquals(Boolean.TRUE, refusedImport1.getValid());;
-
-        ApplicationImport refusedImport2 = ApplicationImport.findById(id2);
-        assertEquals(Boolean.TRUE, refusedImport2.getValid());
-
-        ApplicationImport refusedImport3 = ApplicationImport.findById(id3);
-        assertEquals(Boolean.TRUE, refusedImport3.getValid());
-
-        ApplicationImport refusedImport4 = ApplicationImport.findById(id4);
-        assertEquals(Boolean.TRUE, refusedImport4.getValid());
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(4));
 
 
         removeTestObjects();
@@ -408,48 +304,8 @@ public class ImportServiceTest extends SecuredResourceTest {
     }
 
     @Transactional
-    protected List<ApplicationImport> createMissingFieldsObjects()
+    protected void createMissingFieldsObjects()
     {
-        ImportService svc = new ImportService();
-
-        ImportSummary appImportParent = new ImportSummary();
-        appImportParent.persistAndFlush();
-
-        ApplicationImport appImport1 = new ApplicationImport();
-        appImport1.setApplicationName("Test App 1");
-        appImport1.importSummary = appImportParent;
-        appImport1.persistAndFlush();
-        ApplicationImport appImport2 = new ApplicationImport();
-        appImport2.setApplicationName("Test App 2");
-        appImport2.importSummary = appImportParent;
-        appImport2.setBusinessService((""));
-        appImport2.persistAndFlush();
-        ApplicationImport appImport3= new ApplicationImport();
-        appImport3.setApplicationName("Test App 3");
-        appImport3.importSummary = appImportParent;
-        appImport3.setBusinessService(("BS 2"));
-        appImport3.persistAndFlush();
-        ApplicationImport appImport4= new ApplicationImport();
-        appImport4.setApplicationName("Test App 4");
-        appImport4.importSummary = appImportParent;
-        appImport4.setBusinessService(("BS 2"));
-        appImport4.setDescription("");
-        appImport4.persistAndFlush();
-
-
-        List<ApplicationImport> appList = new ArrayList();
-
-
-        appList.add(appImport1);
-        appList.add(appImport2);
-        appList.add(appImport3);
-        appList.add(appImport4);
-
-
-        Long id = appImport1.id;
-        Long id2 = appImport2.id;
-        Long id3 = appImport3.id;
-        Long id4 = appImport4.id;
 
         Set<Tag> tags = new HashSet<>();
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -457,8 +313,32 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "BS 2";
         businessServices.add(businessService);
-        svc.mapImportsToApplication(appList, tags, businessServices, appImportParent);
-        return appList;
+
+
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+
+        // import 2 applications
+        final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
+                ",Tag Type 4,Tag 4,Tag Type 5,Tag 5,Tag Type 6,Tag 6,Tag Type 7,Tag 7,Tag Type 8,Tag 8,Tag Type 9,Tag 9" +
+                ",Tag Type 10,Tag 10,Tag Type 11,Tag 11,Tag Type 12,Tag 12,Tag Type 13,Tag 13,Tag Type 14,Tag 14,Tag Type 15,Tag 15,Tag Type 16,Tag 16" +
+                ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
+                "1,Test App 1\n" +
+                "1,Test App 2,,,,,,,,,,,\n" +
+                "1,Test App 3,,,BS 2,,,,\n" +
+                "1,Test App 4,,,BS 2,,";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload)
+                .multiPart("fileName", "File1")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
+
     }
 
     @Test
