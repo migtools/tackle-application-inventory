@@ -7,6 +7,7 @@ import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
+import io.tackle.applicationimporter.ImportServiceTest;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
@@ -20,6 +21,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -64,7 +66,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     public static void init() {
 
         PATH = "/application-import";
-
+        MockitoAnnotations.openMocks(ApplicationImportTest.class);
     }
 
     @Test
