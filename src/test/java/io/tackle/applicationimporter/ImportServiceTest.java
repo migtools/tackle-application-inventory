@@ -23,6 +23,7 @@ import io.tackle.commons.tests.SecuredResourceTest;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
@@ -63,7 +64,9 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @BeforeAll
     public static void init() {
+
         PATH = "/file/upload";
+        MockitoAnnotations.openMocks(ImportServiceTest.class);
     }
 
 
