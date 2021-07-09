@@ -3,20 +3,32 @@ package io.tackle.applicationinventory.resources;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
+import io.restassured.RestAssured;
+import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
+import io.tackle.applicationinventory.services.BusinessServiceService;
+import io.tackle.applicationinventory.services.TagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.*;
+import javax.ws.rs.core.MediaType;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static javax.transaction.Transactional.TxType.REQUIRED;
@@ -38,6 +50,14 @@ import static org.hamcrest.Matchers.is;
 )
 public class ApplicationImportTest extends SecuredResourceTest {
 
+    @InjectMock
+    @RestClient
+    TagService mockTagService;
+
+    @InjectMock
+    @RestClient
+    BusinessServiceService mockBusinessServiceService;
+
 
 
     @BeforeAll
@@ -55,12 +75,13 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
                 .queryParam("filename","File1")
+                .queryParam("sort","-id")
                 .when()
                 .get(PATH)
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'.size()", is(1))
+                .body("_embedded.'application-import'.size()", is(2))
                 .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"))
                 .body("_embedded.'application-import'[0].'Tag Type 1'", is("tag type 1"));
 
@@ -72,7 +93,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("size()", is(2));
+                .body("size()", is(3));
 
         List<ImportSummary> summaryList = ImportSummary.listAll();
         summaryList.forEach(summary ->
@@ -98,27 +119,45 @@ public class ApplicationImportTest extends SecuredResourceTest {
     @Transactional
     protected void createTestData()
     {
-        ImportSummary appImportParent = new ImportSummary();
-        appImportParent.persistAndFlush();
+        Set<Tag> tags = new HashSet<>() ;
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
-        ApplicationImport appImport1 = new ApplicationImport();
-        appImport1.setBusinessService("BS 1");
-        appImport1.importSummary = appImportParent;
-        appImport1.setFilename("File1");
-        appImport1.persistAndFlush();
-        ApplicationImport appImport2 = new ApplicationImport();
-        appImport2.setBusinessService("BS 2");
-        appImport2.importSummary = appImportParent;
-        appImport2.setFilename("File1");
-        appImport2.setTag1("tag 1");
-        appImport2.setTagType1("tag type 1");
-        appImport2.setValid(Boolean.FALSE);
-        appImport2.persistAndFlush();
-        ApplicationImport appImport3 = new ApplicationImport();
-        appImport3.setBusinessService("BS 3");
-        appImport3.importSummary = appImportParent;
-        appImport3.setFilename("File2");
-        appImport3.setValid(Boolean.FALSE);
-        appImport3.persistAndFlush();
+
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "Food2Go";
+        businessServices.add(businessService);
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+
+        // import 2 applications
+        final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
+                "1,,,,BS 1,,\n" +
+                "1,,,,BS 2,tag type 1,tag1";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload)
+                .multiPart("fileName", "File1")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
+
+
+        // import 1 application
+        final String multipartPayload2 = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
+                "1,,,,BS 3,,";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload2)
+                .multiPart("fileName", "File2")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
     }
 }
