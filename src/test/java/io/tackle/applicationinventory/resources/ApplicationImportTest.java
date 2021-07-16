@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,13 +53,13 @@ import static org.hamcrest.Matchers.is;
 )
 public class ApplicationImportTest extends SecuredResourceTest {
 
-    @InjectMock
+ /**   @InjectMock
     @RestClient
     TagService mockTagService;
 
     @InjectMock
     @RestClient
-    BusinessServiceService mockBusinessServiceService;
+    BusinessServiceService mockBusinessServiceService;*/
 
 
 
@@ -66,7 +67,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     public static void init() {
 
         PATH = "/application-import";
-        MockitoAnnotations.openMocks(ApplicationImportTest.class);
+        //MockitoAnnotations.openMocks(ApplicationImportTest.class);
     }
 
     @Test
@@ -97,8 +98,15 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .log().body()
                 .body("size()", is(3));
 
-        List<ImportSummary> summaryList = ImportSummary.listAll();
-        summaryList.forEach(summary ->
+        //Remove test data before finishing
+        ImportSummary[] summaryList =
+                given()
+                        .accept("application/json")
+                        .when()
+                        .get("/import-summary")
+                        .as(ImportSummary[].class);
+
+        Arrays.asList(summaryList).forEach(summary ->
                 given()
                         .accept(ContentType.JSON)
                         .pathParam("id", summary.id)
@@ -107,8 +115,16 @@ public class ApplicationImportTest extends SecuredResourceTest {
                         .then()
                         .statusCode(204));
 
-        List<ApplicationImport> importList = ApplicationImport.listAll();
-        importList.forEach(thisImport ->
+
+        ApplicationImport[] importList =
+                given()
+                        .accept("application/json")
+                        .when()
+                        .get("/application-import")
+                        .as(ApplicationImport[].class);
+
+
+        Arrays.asList(importList).forEach(thisImport ->
                 given()
                         .accept(ContentType.JSON)
                         .pathParam("id", thisImport.id)
@@ -122,7 +138,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     protected void createTestData()
     {
         Set<Tag> tags = new HashSet<>() ;
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
 
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -130,7 +146,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "Food2Go";
         businessServices.add(businessService);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +

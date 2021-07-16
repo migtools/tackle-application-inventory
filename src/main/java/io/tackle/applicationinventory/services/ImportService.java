@@ -64,13 +64,21 @@ public class ImportService {
             parentRecord.importStatus = IN_PROGRESS_STATUS;
             parentRecord.persistAndFlush();
             Set<Tag> tags = tagService.getListOfTags();
+            System.out.println("TAGS:");
+            tags.forEach(tag -> {
+                System.out.println("tag: " + tag.name + ", tagType: " + tag.tagType.name);
+            });
             if (tags == null)
             {
                 String msg = "Unable to retrieve TagTypes from remote resource";
                 parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
-             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            System.out.println("BUSINESS SERVICES:");
+            businessServices.forEach(businessService -> {
+                System.out.println("businessService: " + businessService.name);
+            });
             if (businessServices == null)
             {
                 String msg = "Unable to retrieve BusinessServices from remote resource";

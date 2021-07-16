@@ -1,5 +1,6 @@
 package io.tackle.applicationimporter;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
@@ -17,6 +18,7 @@ import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.services.BusinessServiceService;
 import io.tackle.applicationinventory.services.ImportService;
 import io.tackle.applicationinventory.services.TagService;
+import io.tackle.applicationinventory.services.WiremockTagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
@@ -31,6 +33,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
@@ -50,23 +53,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
+@QuarkusTestResource(WiremockTagService.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ImportServiceTest extends SecuredResourceTest {
 
 
-    @InjectMock
-    @RestClient
-    TagService mockTagService;
+    //@InjectMock
+    //@RestClient
+    //TagService mockTagService;
 
-    @InjectMock
-    @RestClient
-    BusinessServiceService mockBusinessServiceService;
+    //@InjectMock
+    //@RestClient
+    //BusinessServiceService mockBusinessServiceService;
 
     @BeforeAll
     public static void init() {
 
         PATH = "/file/upload";
-        MockitoAnnotations.openMocks(ImportServiceTest.class);
+        //MockitoAnnotations.openMocks(ImportServiceTest.class);
     }
 
 
@@ -74,7 +78,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(1)
     protected void testImportServicePost() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
-        Set<Tag> tags = new HashSet<>() ;
+ /**       Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
         tagType1.id = "1";
         tagType1.name = "Operating System";
@@ -107,7 +111,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         tag3.name = "Tomcat";
         tag3.tagType = tagType4;
         tags.add(tag3);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);*/
 
 
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -115,7 +119,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "Food2Go";
         businessServices.add(businessService);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
@@ -134,7 +138,11 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(8, ApplicationImport.listAll().size());
+        //assertEquals(8, ApplicationImport.listAll().size());
+
+     //   WireMock.verify(postRequestedFor(urlEqualTo("/controls/tag"))
+     //           .withHeader("Content-Type", equalTo("application/json")));
+
 
 
         given()
@@ -162,10 +170,10 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(200, response2.getStatusCode());
         //check the correct number of application imports have been persisted
-        assertEquals(16, ApplicationImport.listAll().size());
+        //assertEquals(16, ApplicationImport.listAll().size());
 
 
-        given()
+        final String successfulimportSummaryApplicationName = String.valueOf(given()
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.TRUE)
                 .when()
@@ -173,15 +181,25 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'.size()", is(1));
+                .body("_embedded.'application-import'.size()", is(1))
+        .extract().path("_embedded.'application-import'[0].'Application Name'").toString());
+
+        final Long successfulimportApplicationId = Long.valueOf(given()
+                .accept("application/hal+json")
+                .queryParam("name", successfulimportSummaryApplicationName)
+                .when()
+                .get("/application")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.application.size()", is(1))
+                .extract().path("_embedded.application[0].id").toString());
 
 
-        ApplicationImport successful = ApplicationImport.find("isValid",true).firstResult();
-        Application newOne = Application.find("name",successful.getApplicationName()).firstResult();
 
         given()
                 .accept(ContentType.JSON)
-                .pathParam("id", newOne.id)
+                .pathParam("id", successfulimportApplicationId)
                 .when()
                 .delete("/application/{id}")
                 .then()
@@ -238,9 +256,9 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.name = "BS 2";
         businessServices.add(businessService);
 
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
@@ -314,13 +332,13 @@ public class ImportServiceTest extends SecuredResourceTest {
         Set<BusinessService> businessServices = new HashSet<>() ;
         BusinessService businessService = new BusinessService();
         businessService.id = "1";
-        businessService.name = "BS 2";
+        businessService.name = "BS 1";
         businessServices.add(businessService);
 
 
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
@@ -329,8 +347,8 @@ public class ImportServiceTest extends SecuredResourceTest {
                 ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
                 "1,Test App 1\n" +
                 "1,Test App 2,,,,,,,,,,,\n" +
-                "1,Test App 3,,,BS 2,,,,\n" +
-                "1,Test App 4,,,BS 2,,";
+                "1,Test App 3,,,BS 1,,,,\n" +
+                "1,Test App 4,,,BS 1,,";
         given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -358,7 +376,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         tag.name = "Unknown OS";
         tag.tagType = tagType1;
         tags.add(tag);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
 
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -371,7 +389,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService2.id = "2";
         businessService2.name = "Food2Go";
         businessServices.add(businessService2);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
@@ -407,7 +425,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         tag.name = "RHEL";
         tag.tagType = tagType1;
         tags.add(tag);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
 
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -415,7 +433,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "Food2Go";
         businessServices.add(businessService);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -453,26 +471,22 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
 
-        given()
+        Long summaryId = Long.valueOf(given()
                 .accept("application/json")
                 .when()
                 .get("/import-summary")
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("size()", is(1));
-
-        ImportSummary summary = ImportSummary.findAll().firstResult();
+                .body("size()", is(1))
+                .extract().path("[0].id").toString());
 
         Response r =
                 given()
                 .accept("text/csv")
                 .when()
-                .get("/csv-export?importSummaryId=" + summary.id);
-            /**    .then()
-                .statusCode(200)
-                .log().body();
-                .body("", is("Completed"));*/
+                .get("/csv-export?importSummaryId=" + summaryId);
+
 
 
         String csv = r.body().print();
@@ -491,7 +505,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     protected void testImportServiceNoTagsRetrieved() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
 
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
 
 
         Set<BusinessService> businessServices = new HashSet<>() ;
@@ -499,7 +513,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         businessService.id = "1";
         businessService.name = "Food2Go";
         businessServices.add(businessService);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -530,7 +544,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     protected void testImportServiceNoBSRetrieved() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
 
 
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
 
 
         Set<Tag> tags = new HashSet<>() ;
@@ -542,8 +556,8 @@ public class ImportServiceTest extends SecuredResourceTest {
         tag.name = "RHEL";
         tag.tagType = tagType1;
         tags.add(tag);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(null);
+        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(null);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -571,8 +585,14 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     private void removeTestObjects()
     {
-        List<ImportSummary> summaryList = ImportSummary.listAll();
-        summaryList.forEach(summary ->
+        ImportSummary[] summaryList =
+                given()
+                        .accept("application/json")
+                        .when()
+                        .get("/import-summary")
+                        .as(ImportSummary[].class);
+
+        Arrays.asList(summaryList).forEach(summary ->
                 given()
                         .accept(ContentType.JSON)
                         .pathParam("id", summary.id)
@@ -581,8 +601,16 @@ public class ImportServiceTest extends SecuredResourceTest {
                         .then()
                         .statusCode(204));
 
-        List<ApplicationImport> importList = ApplicationImport.listAll();
-        importList.forEach(thisImport ->
+
+        ApplicationImport[] importList =
+                given()
+                .accept("application/json")
+                .when()
+                .get("/application-import")
+                .as(ApplicationImport[].class);
+
+
+        Arrays.asList(importList).forEach(thisImport ->
                 given()
                         .accept(ContentType.JSON)
                         .pathParam("id", thisImport.id)

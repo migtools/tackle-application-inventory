@@ -2,6 +2,8 @@ package io.tackle.applicationinventory.services;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 import io.tackle.applicationinventory.Tag;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -11,12 +13,14 @@ import java.util.Set;
 
 
 
-@RegisterRestClient()
+@RegisterRestClient(baseUri = "http://tackle-controls:8080")
 @AccessToken
 @ApplicationScoped
 public interface TagService {
 
     @GET
+    @Path("/controls/tag")
+    @QueryParam("page=0&size=1000")
     Set<Tag> getListOfTags();
 }
 
