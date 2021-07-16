@@ -1,31 +1,20 @@
 package io.tackle.applicationimporter;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.MultipartImportBody;
-import io.tackle.applicationinventory.Tag;
-import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
-import io.tackle.applicationinventory.services.BusinessServiceService;
-import io.tackle.applicationinventory.services.ImportService;
-import io.tackle.applicationinventory.services.TagService;
 import io.tackle.applicationinventory.services.WiremockTagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
@@ -33,7 +22,6 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
@@ -58,68 +46,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ImportServiceTest extends SecuredResourceTest {
 
 
-    //@InjectMock
-    //@RestClient
-    //TagService mockTagService;
-
-    //@InjectMock
-    //@RestClient
-    //BusinessServiceService mockBusinessServiceService;
-
     @BeforeAll
     public static void init() {
 
         PATH = "/file/upload";
-        //MockitoAnnotations.openMocks(ImportServiceTest.class);
     }
 
 
     @Test
     @Order(1)
-    protected void testImportServicePost() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServicePost() {
 
- /**       Set<Tag> tags = new HashSet<>() ;
-        Tag.TagType tagType1 = new Tag.TagType();
-        tagType1.id = "1";
-        tagType1.name = "Operating System";
-        Tag tag = new Tag();
-        tag.id = "1";
-        tag.name = "RHEL 8";
-        tag.tagType = tagType1;
-        tags.add(tag);
-        Tag.TagType tagType2 = new Tag.TagType();
-        tagType2.id = "2";
-        tagType2.name = "Database";
-        Tag tag1 = new Tag();
-        tag1.id = "2";
-        tag1.name = "Oracle";
-        tag1.tagType = tagType2;
-        tags.add(tag1);
-        Tag.TagType tagType3 = new Tag.TagType();
-        tagType3.id = "3";
-        tagType3.name = "Language";
-        Tag tag2 = new Tag();
-        tag2.id = "3";
-        tag2.name = "Java EE";
-        tag2.tagType = tagType3;
-        tags.add(tag2);
-        Tag.TagType tagType4 = new Tag.TagType();
-        tagType4.id = "4";
-        tagType4.name = "Runtime";
-        Tag tag3 = new Tag();
-        tag3.id = "3";
-        tag3.name = "Tomcat";
-        tag3.tagType = tagType4;
-        tags.add(tag3);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);*/
-
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "Food2Go";
-        businessServices.add(businessService);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
@@ -137,11 +74,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .statusCode(200).extract().response();
 
         assertEquals(200, response.getStatusCode());
-        //check the correct number of application imports have been persisted
-        //assertEquals(8, ApplicationImport.listAll().size());
-
-     //   WireMock.verify(postRequestedFor(urlEqualTo("/controls/tag"))
-     //           .withHeader("Content-Type", equalTo("application/json")));
 
 
 
@@ -169,8 +101,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .statusCode(200).extract().response();
 
         assertEquals(200, response2.getStatusCode());
-        //check the correct number of application imports have been persisted
-        //assertEquals(16, ApplicationImport.listAll().size());
 
 
         final String successfulimportSummaryApplicationName = String.valueOf(given()
@@ -240,26 +170,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     protected void createDummyRejectedImports()
     {
 
-        Set<Tag> tags = new HashSet<>() ;
-        Tag.TagType tagType1 = new Tag.TagType();
-        tagType1.id = "1";
-        tagType1.name = "Unknown tag type";
-        Tag tag = new Tag();
-        tag.id = "1";
-        tag.name = "Unknown OS";
-        tag.tagType = tagType1;
-        tags.add(tag);
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "BS 2";
-        businessServices.add(businessService);
-
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
-
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
         ",Tag Type 4,Tag 4,Tag Type 5,Tag 5,Tag Type 6,Tag 6,Tag Type 7,Tag 7,Tag Type 8,Tag 8,Tag Type 9,Tag 9" +
@@ -303,7 +213,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(2)
-    protected void testMapToApplicationMissingFields() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testMapToApplicationMissingFields() {
 
         createMissingFieldsObjects();
 
@@ -327,18 +237,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Transactional
     protected void createMissingFieldsObjects()
     {
-
-        Set<Tag> tags = new HashSet<>();
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "BS 1";
-        businessServices.add(businessService);
-
-
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
@@ -364,32 +262,10 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(3)
-    protected void testImportServiceNoMatchingTag() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServiceNoMatchingTag() {
 
 
-        Set<Tag> tags = new HashSet<>() ;
-        Tag.TagType tagType1 = new Tag.TagType();
-        tagType1.id = "1";
-        tagType1.name = "Unknown tag type";
-        Tag tag = new Tag();
-        tag.id = "1";
-        tag.name = "Unknown OS";
-        tag.tagType = tagType1;
-        tags.add(tag);
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
 
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "Foot2Go";
-        businessServices.add(businessService);
-
-        BusinessService businessService2 = new BusinessService();
-        businessService2.id = "2";
-        businessService2.name = "Food2Go";
-        businessServices.add(businessService2);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("sample_application_import.csv").getFile());
@@ -414,26 +290,8 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(4)
-    protected void testImportServiceDuplicatesInFile() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServiceDuplicatesInFile() {
 
-        Set<Tag> tags = new HashSet<>() ;
-        Tag.TagType tagType1 = new Tag.TagType();
-        tagType1.id = "1";
-        tagType1.name = "Operating System";
-        Tag tag = new Tag();
-        tag.id = "1";
-        tag.name = "RHEL";
-        tag.tagType = tagType1;
-        tags.add(tag);
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "Food2Go";
-        businessServices.add(businessService);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -502,18 +360,9 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(5)
-    protected void testImportServiceNoTagsRetrieved() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServiceNoTagsRetrieved() {
 
 
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
-
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "Food2Go";
-        businessServices.add(businessService);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -541,23 +390,8 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     @Test
     @Order(5)
-    protected void testImportServiceNoBSRetrieved() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServiceNoBSRetrieved() {
 
-
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(null);
-
-
-        Set<Tag> tags = new HashSet<>() ;
-        Tag.TagType tagType1 = new Tag.TagType();
-        tagType1.id = "1";
-        tagType1.name = "Operating System";
-        Tag tag = new Tag();
-        tag.id = "1";
-        tag.name = "RHEL";
-        tag.tagType = tagType1;
-        tags.add(tag);
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(null);
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());

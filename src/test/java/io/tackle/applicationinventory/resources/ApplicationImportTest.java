@@ -3,38 +3,21 @@ package io.tackle.applicationinventory.resources;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
-import io.tackle.applicationimporter.ImportServiceTest;
-import io.tackle.applicationinventory.BusinessService;
-import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
-import io.tackle.applicationinventory.services.BusinessServiceService;
-import io.tackle.applicationinventory.services.TagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
-
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static io.restassured.RestAssured.given;
-import static javax.transaction.Transactional.TxType.REQUIRED;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
@@ -53,21 +36,10 @@ import static org.hamcrest.Matchers.is;
 )
 public class ApplicationImportTest extends SecuredResourceTest {
 
- /**   @InjectMock
-    @RestClient
-    TagService mockTagService;
-
-    @InjectMock
-    @RestClient
-    BusinessServiceService mockBusinessServiceService;*/
-
-
-
-    @BeforeAll
+     @BeforeAll
     public static void init() {
 
         PATH = "/application-import";
-        //MockitoAnnotations.openMocks(ApplicationImportTest.class);
     }
 
     @Test
@@ -137,16 +109,6 @@ public class ApplicationImportTest extends SecuredResourceTest {
     @Transactional
     protected void createTestData()
     {
-        Set<Tag> tags = new HashSet<>() ;
-        //Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
-
-
-        Set<BusinessService> businessServices = new HashSet<>() ;
-        BusinessService businessService = new BusinessService();
-        businessService.id = "1";
-        businessService.name = "Food2Go";
-        businessServices.add(businessService);
-        //Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
