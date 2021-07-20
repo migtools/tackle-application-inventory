@@ -1,5 +1,6 @@
 package io.tackle.applicationimporter;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
@@ -176,7 +178,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         ",Tag Type 10,Tag 10,Tag Type 11,Tag 11,Tag Type 12,Tag 12,Tag Type 13,Tag 13,Tag Type 14,Tag 14,Tag Type 15,Tag 15,Tag Type 16,Tag 16" +
         ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
                 "1,,hello,,BS 1,,\n" +
-                "1, ,,,BS 2,,,,,,,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
+                "1,  ,,,BS 2,,,,,,,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
                 "1,name 1,and this,,BS 2,,,,,,mystery tag,,\n" +
                 "1,name 4,and this,,BS 1,,,mystery tag type,\n" +
                 "1,name 5,and this,,BS 2,,tag1";
@@ -263,8 +265,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Test
     @Order(3)
     protected void testImportServiceNoMatchingTag() {
-
-
 
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -362,7 +362,10 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(5)
     protected void testImportServiceNoTagsRetrieved() {
 
-
+        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("")));
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -373,7 +376,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("file",importFile)
-                .multiPart("fileName","sample_application_import.csv")
+                .multiPart("fileName","duplicate_application_import.csv")
                 .when().post(PATH)
                 .then()
                 .log().all()
@@ -392,6 +395,26 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(5)
     protected void testImportServiceNoBSRetrieved() {
 
+        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                "[\n" +
+                                        "      {\n" +
+                                        "        \"id\": 1,\n" +
+                                        "        \"name\": \"RHEL 8\",\n" +
+                                        "        \"tagType\": {\n" +
+                                        "          \"id\": 1,\n" +
+                                        "          \"name\": \"Operating System\"\n" +
+                                        "        }\n" +
+                                        "      }]")));
+
+
+        WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("")));
+
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
@@ -402,13 +425,23 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("file",importFile)
-                .multiPart("fileName","sample_application_import.csv")
+                .multiPart("fileName","duplicate_application_import.csv")
                 .when().post(PATH)
                 .then()
                 .log().all()
                 .statusCode(200).extract().response();
 
         assertEquals(200, response.getStatusCode());
+
+        given()
+                .accept("application/json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("[0].'errorMessage'", is("Unable to retrieve BusinessServices from remote resource"));
+
 
 
 
