@@ -43,7 +43,7 @@ public class ApplicationImportTest extends SecuredResourceTest {
     }
 
     @Test
-    public void testFilterByIsValid() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
+    public void testFilterByIsValid()  {
 
         createTestData();
         given()
