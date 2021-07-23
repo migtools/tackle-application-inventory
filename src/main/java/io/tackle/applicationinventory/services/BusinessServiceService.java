@@ -20,6 +20,5 @@ public interface BusinessServiceService {
 
     @GET
     @Path("/controls/business-service")
-    @QueryParam("page=0&size=1000")
-    Set<BusinessService> getListOfBusinessServices();
+    Set<BusinessService> getListOfBusinessServices(@QueryParam("page") int page, @QueryParam("size") int size);
 }

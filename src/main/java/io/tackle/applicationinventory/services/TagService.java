@@ -20,8 +20,7 @@ public interface TagService {
 
     @GET
     @Path("/controls/tag")
-    @QueryParam("page=0&size=1000")
-    Set<Tag> getListOfTags();
+    Set<Tag> getListOfTags(@QueryParam("page") int page, @QueryParam("size") int size);
 }
 
 
