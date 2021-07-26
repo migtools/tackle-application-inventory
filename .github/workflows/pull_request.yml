@@ -18,7 +18,7 @@ jobs:
         distribution: 'adopt'
         java-package: jdk
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -39,7 +39,7 @@ jobs:
         distribution: 'adopt'
         java-package: jdk
     - name: Cache Maven packages
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v2.1.6
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -59,14 +59,14 @@ jobs:
           distribution: 'adopt'
           java-package: jdk
       - name: Cache Maven packages
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Generate jacoco report
         run: mvn -U verify -Pjacoco --file pom.xml
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2.0.1
         with:
           file: ./target/site/jacoco-ut/jacoco.xml
           name: codecov
@@ -84,7 +84,7 @@ jobs:
           distribution: 'adopt'
           java-package: jdk
       - name: Cache Maven packages
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -104,7 +104,7 @@ jobs:
           distribution: 'adopt'
           java-package: jdk
       - name: Cache Maven packages
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
