@@ -51,7 +51,7 @@ public class Issue268Test extends SecuredResourceTest {
 
     @Test
     @Order(4)
-    protected void testImportServiceDuplicatesInFile() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    protected void testImportServiceLongCSVColumnValues() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("long_characters_columns.csv").getFile());
 
@@ -60,7 +60,7 @@ public class Issue268Test extends SecuredResourceTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("file", importFile)
-                .multiPart("fileName", "desc_comments_char_limit_rows.csv")
+                .multiPart("fileName", "long_characters_columns.csv")
                 .when().post(PATH)
                 .then()
                 .log().all()
