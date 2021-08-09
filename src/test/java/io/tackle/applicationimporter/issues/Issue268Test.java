@@ -3,22 +3,28 @@ package io.tackle.applicationimporter.issues;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
+import io.tackle.applicationinventory.services.BusinessServiceService;
+import io.tackle.applicationinventory.services.TagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -44,14 +50,24 @@ public class Issue268Test extends SecuredResourceTest {
     @Inject
     UserTransaction userTransaction;
 
+    @InjectMock
+    @RestClient
+    TagService mockTagService;
+
+    @InjectMock
+    @RestClient
+    BusinessServiceService mockBusinessServiceService;
+
     @BeforeAll
     public static void init() {
         PATH = "/file/upload";
     }
 
     @Test
-    @Order(4)
     protected void testImportServiceLongCSVColumnValues() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(Collections.emptySet());
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(Collections.emptySet());
+
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("long_characters_columns.csv").getFile());
 
