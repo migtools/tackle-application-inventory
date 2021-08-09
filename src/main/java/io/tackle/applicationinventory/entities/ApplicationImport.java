@@ -7,62 +7,157 @@ import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "application_import")
 public class ApplicationImport extends AbstractEntity {
+    public static final int APP_NAME_MAX_LENGTH = 120;
+
     private String recordType1;
+
+    @Size(max = APP_NAME_MAX_LENGTH)
     private String applicationName;
+
+    @Size(max = 250)
     private String description;
+
+    @Size(max = 250)
     private String comments;
+
+    @Size(max = 120)
     private String businessService;
+
+    @Size(max = 40)
     private String tagType1;
+
+    @Size(max = 40)
     private String tag1;
+
+    @Size(max = 40)
     private String tagType2;
+
+    @Size(max = 40)
     private String tag2;
+
+    @Size(max = 40)
     private String tagType3;
+
+    @Size(max = 40)
     private String tag3;
+
+    @Size(max = 40)
     private String tagType4;
+
+    @Size(max = 40)
     private String tag4;
+
+    @Size(max = 40)
     private String tagType5;
+
+    @Size(max = 40)
     private String tag5;
+
+    @Size(max = 40)
     private String tagType6;
+
+    @Size(max = 40)
     private String tag6;
+
+    @Size(max = 40)
     private String tagType7;
+
+    @Size(max = 40)
     private String tag7;
+
+    @Size(max = 40)
     private String tagType8;
+
+    @Size(max = 40)
     private String tag8;
+
+    @Size(max = 40)
     private String tagType9;
+
+    @Size(max = 40)
     private String tag9;
+
+    @Size(max = 40)
     private String tagType10;
+
+    @Size(max = 40)
     private String tag10;
+
+    @Size(max = 40)
     private String tagType11;
+
+    @Size(max = 40)
     private String tag11;
+
+    @Size(max = 40)
     private String tagType12;
+
+    @Size(max = 40)
     private String tag12;
+
+    @Size(max = 40)
     private String tagType13;
+
+    @Size(max = 40)
     private String tag13;
+
+    @Size(max = 40)
     private String tagType14;
+
+    @Size(max = 40)
     private String tag14;
+
+    @Size(max = 40)
     private String tagType15;
+
+    @Size(max = 40)
     private String tag15;
+
+    @Size(max = 40)
     private String tagType16;
+
+    @Size(max = 40)
     private String tag16;
+
+    @Size(max = 40)
     private String tagType17;
+
+    @Size(max = 40)
     private String tag17;
+
+    @Size(max = 40)
     private String tagType18;
+
+    @Size(max = 40)
     private String tag18;
+
+    @Size(max = 40)
     private String tagType19;
+
+    @Size(max = 40)
     private String tag19;
+
+    @Size(max = 40)
     private String tagType20;
+
+    @Size(max = 40)
     private String tag20;
+
     private String errorMessage;
+
     @Filterable(check = CheckType.EQUAL)
     public Boolean isValid = true;
+
     @Filterable
     public String filename;
 
     private String status;
+
     @ManyToOne(optional = false)
     @JsonIgnore
     @Filterable(filterName = "importSummary.id")
