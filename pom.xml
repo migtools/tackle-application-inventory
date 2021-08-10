@@ -29,6 +29,8 @@
     <quarkus.package.type>jar</quarkus.package.type>
     <keycloak.version>12.0.3</keycloak.version>
     <jgrapht.version>1.5.1</jgrapht.version>
+
+    <plugin.prettier.goal>write</plugin.prettier.goal>
   </properties>
 
   <repositories>
@@ -228,6 +230,23 @@
             <maven.home>${maven.home}</maven.home>
             <keycloak.version>${keycloak.version}</keycloak.version>
           </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.hubspot.maven.plugins</groupId>
+        <artifactId>prettier-maven-plugin</artifactId>
+        <version>0.14</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>${plugin.prettier.goal}</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <printWidth>90</printWidth>
+          <tabWidth>4</tabWidth>
         </configuration>
       </plugin>
     </plugins>
