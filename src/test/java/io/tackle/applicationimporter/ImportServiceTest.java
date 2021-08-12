@@ -212,7 +212,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     }
 
 
-    // THIS CAUSES FAILURE
     @Test
     @Order(2)
     protected void testMapToApplicationMissingFields() {
@@ -261,7 +260,6 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     }
 
-    // THIS CAUSES FAILURE
     @Test
     @Order(3)
     protected void testImportServiceNoMatchingTag() {
@@ -288,7 +286,6 @@ public class ImportServiceTest extends SecuredResourceTest {
         removeTestObjects(Collections.singletonList("OrderHub"));
     }
 
-    // THIS CAUSES FAILURE
     @Test
     @Order(4)
     protected void testImportServiceDuplicatesInFile() {
@@ -359,7 +356,6 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     }
 
-    // THIS CAUSES FAILURE
     @Test
     @Order(5)
     protected void testImportServiceNoTagsRetrieved() {
@@ -387,13 +383,12 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(200, response.getStatusCode());
 
 
+
+
         removeTestObjects(Collections.emptyList());
-
-
 
     }
 
-    // THIS CAUSES FAILURE
     @Test
     @Order(5)
     protected void testImportServiceNoBSRetrieved() {
