@@ -13,7 +13,6 @@ import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Arrays;
 
@@ -106,7 +105,6 @@ public class ApplicationImportTest extends SecuredResourceTest {
                         .statusCode(204));
     }
 
-    @Transactional
     protected void createTestData()
     {
 
