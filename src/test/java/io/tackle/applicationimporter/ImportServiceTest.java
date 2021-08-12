@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
@@ -181,6 +182,109 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         ApplicationImport successful = ApplicationImport.find("isValid",true).firstResult();
         Application newOne = Application.find("name",successful.getApplicationName()).firstResult();
+
+        userTransaction.begin();
+        ApplicationImport.deleteAll();
+        ImportSummary.deleteAll();
+        Application.deleteById(newOne.id);
+        userTransaction.commit();
+
+    }
+
+
+    @Test
+    @Order(1)
+    protected void testImportServiceCaseInsensitiveColumnHeaders() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+
+        userTransaction.begin();
+        Set<Tag> tags = new HashSet<>() ;
+        Tag.TagType tagType1 = new Tag.TagType();
+        tagType1.id = "1";
+        tagType1.name = "Operating System";
+        Tag tag = new Tag();
+        tag.id = "1";
+        tag.name = "RHEL 8";
+        tag.tagType = tagType1;
+        tags.add(tag);
+        Tag.TagType tagType2 = new Tag.TagType();
+        tagType2.id = "2";
+        tagType2.name = "Database";
+        Tag tag1 = new Tag();
+        tag1.id = "2";
+        tag1.name = "Oracle";
+        tag1.tagType = tagType2;
+        tags.add(tag1);
+        Tag.TagType tagType3 = new Tag.TagType();
+        tagType3.id = "3";
+        tagType3.name = "Language";
+        Tag tag2 = new Tag();
+        tag2.id = "3";
+        tag2.name = "Java EE";
+        tag2.tagType = tagType3;
+        tags.add(tag2);
+        Tag.TagType tagType4 = new Tag.TagType();
+        tagType4.id = "4";
+        tagType4.name = "Runtime";
+        Tag tag3 = new Tag();
+        tag3.id = "3";
+        tag3.name = "Tomcat";
+        tag3.tagType = tagType4;
+        tags.add(tag3);
+        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+
+
+        Set<BusinessService> businessServices = new HashSet<>() ;
+        BusinessService businessService = new BusinessService();
+        businessService.id = "1";
+        businessService.name = "Food2Go";
+        businessServices.add(businessService);
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(businessServices);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("mixed_case_column_headers.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","mixed_case_column_headers.csv")
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+        //check the correct number of application imports have been persisted
+        assertEquals(7, ApplicationImport.listAll().size());
+        userTransaction.commit();
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1));
+
+
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1));
+
+        ApplicationImport successful = ApplicationImport.find("isValid",true).firstResult();
+        Application newOne = Application.find("name",successful.getApplicationName()).firstResult();
+        assertTrue(newOne.tags.contains("2"));
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
