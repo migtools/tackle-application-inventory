@@ -38,12 +38,12 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         java-package: jdk
-    - name: Cache Maven packages
-      uses: actions/cache@v2.1.6
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+#    - name: Cache Maven packages
+#      uses: actions/cache@v2.1.6
+#      with:
+#        path: ~/.m2
+#        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#        restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn -U -B verify -Pnative -Dquarkus-profile=test --file pom.xml
 
@@ -58,12 +58,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           java-package: jdk
-      - name: Cache Maven packages
-        uses: actions/cache@v2.1.6
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+#      - name: Cache Maven packages
+#        uses: actions/cache@v2.1.6
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
       - name: Generate jacoco report
         run: mvn -U verify -Pjacoco --file pom.xml
       - uses: codecov/codecov-action@v2.0.2
@@ -83,12 +83,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           java-package: jdk
-      - name: Cache Maven packages
-        uses: actions/cache@v2.1.6
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+#      - name: Cache Maven packages
+#        uses: actions/cache@v2.1.6
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
         run: mvn -U -B test --file pom.xml -Dtest=ApplicationsDependencyTest -Ddependencies.test.applications=1000
 
@@ -103,11 +103,11 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           java-package: jdk
-      - name: Cache Maven packages
-        uses: actions/cache@v2.1.6
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+#      - name: Cache Maven packages
+#        uses: actions/cache@v2.1.6
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
         run: mvn -U -B test -Dquarkus.test.profile.tags=flyway --file pom.xml
