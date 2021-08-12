@@ -16,7 +16,6 @@ import javax.persistence.EntityManager;
 import javax.transaction.*;
 
 import static io.restassured.RestAssured.given;
-import static javax.transaction.Transactional.TxType.REQUIRED;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
