@@ -17,12 +17,12 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         java-package: jdk
-    - name: Cache Maven packages
-      uses: actions/cache@v2.1.6
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2  
+#    - name: Cache Maven packages
+#      uses: actions/cache@v2.1.6
+#      with:
+#        path: ~/.m2
+#        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#        restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn -U -B test --file pom.xml
 
@@ -43,7 +43,7 @@ jobs:
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2  
+        restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn -U -B verify -Pnative -Dquarkus-profile=test --file pom.xml
 
@@ -94,7 +94,7 @@ jobs:
 
   flyway-migration-test:
     runs-on: ubuntu-latest
-  
+
     steps:
       - uses: actions/checkout@v2.3.4
       - name: Set up JDK 11
