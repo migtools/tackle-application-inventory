@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.resources;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
@@ -8,6 +9,7 @@ import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
+import io.tackle.applicationinventory.services.WiremockTagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import javax.ws.rs.core.MediaType;
 import java.util.Arrays;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
@@ -33,6 +36,7 @@ import static org.hamcrest.Matchers.is;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
+@QuarkusTestResource(WiremockTagService.class)
 public class ApplicationImportTest extends SecuredResourceTest {
 
      @BeforeAll
@@ -43,6 +47,14 @@ public class ApplicationImportTest extends SecuredResourceTest {
 
     @Test
     public void testFilterByIsValid()  {
+        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[]")));
+        WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[]")));
 
         createTestData();
         given()
