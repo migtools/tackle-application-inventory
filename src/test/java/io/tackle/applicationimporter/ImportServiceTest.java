@@ -143,24 +143,24 @@ public class ImportServiceTest extends SecuredResourceTest {
         removeTestObjects(Collections.emptyList());
     }
 
-    @Test
-    @Order(2)
-    protected void testMapToApplicationRejected() {
-        createDummyRejectedImports();
-
-        given()
-                .accept("application/hal+json")
-                .when()
-                .get("/import-summary")
-                .then()
-                .statusCode(200)
-                .body("_embedded.import-summary.size()", is(1),
-                        "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
-                        "total_count", is(1));
-
-
-        removeTestObjects(Collections.emptyList());
-    }
+//    @Test
+//    @Order(2)
+//    protected void testMapToApplicationRejected() {
+//        createDummyRejectedImports();
+//
+//        given()
+//                .accept("application/hal+json")
+//                .when()
+//                .get("/import-summary")
+//                .then()
+//                .statusCode(200)
+//                .body("_embedded.import-summary.size()", is(1),
+//                        "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
+//                        "total_count", is(1));
+//
+//
+//        removeTestObjects(Collections.emptyList());
+//    }
 
     protected void createDummyRejectedImports() {
         // import 2 applications
