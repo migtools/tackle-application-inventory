@@ -63,14 +63,14 @@ public class ImportService {
             parentRecord.filename = data.getFileName();
             parentRecord.importStatus = IN_PROGRESS_STATUS;
             parentRecord.persistAndFlush();
-            Set<Tag> tags = tagService.getListOfTags();
+            Set<Tag> tags = tagService.getListOfTags(0, 1000);
             if (tags == null)
             {
                 String msg = "Unable to retrieve TagTypes from remote resource";
                 parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
-             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices(0, 1000);
             if (businessServices == null)
             {
                 String msg = "Unable to retrieve BusinessServices from remote resource";

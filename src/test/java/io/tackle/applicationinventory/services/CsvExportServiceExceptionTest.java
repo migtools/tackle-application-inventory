@@ -1,23 +1,37 @@
-package io.tackle.applicationinventory.resources;
+package io.tackle.applicationinventory.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Default;
+import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doThrow;
+
 
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
@@ -33,41 +47,56 @@ import static org.hamcrest.Matchers.is;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationImportTest extends SecuredResourceTest {
+public class CsvExportServiceExceptionTest extends SecuredResourceTest {
 
-     @BeforeAll
-    public static void init() {
-
-        PATH = "/application-import";
-    }
 
     @Test
-    public void testFilterByIsValid()  {
+    public void testCsvExportExceptionTest()  {
 
-        createTestData();
-        given()
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","duplicate_application_names.csv")
+                .when().post("/file/upload")
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+        Long summaryId = Long.valueOf(given()
                 .accept("application/hal+json")
-                .queryParam("isValid", Boolean.FALSE)
-                .queryParam("filename","File1")
-                .queryParam("sort","-id")
                 .when()
-                .get(PATH)
+                .get("/import-summary")
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'.size()", is(2))
-                .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"))
-                .body("_embedded.'application-import'[0].'Tag Type 1'", is("tag type 1"));
+                .extract().path("_embedded.'import-summary'[0].id").toString());
 
-        given()
-                .accept("application/json")
-                .queryParam("isValid", Boolean.FALSE)
-                .when()
-                .get(PATH)
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("size()", is(3));
+
+        RuntimeException exception = null;
+        try{
+            ObjectWriter objectWriter = Mockito.mock(ObjectWriter.class);
+            doThrow(JsonProcessingException.class).when(objectWriter).writeValueAsString(List.class);
+            CsvExportService csvExportService = new CsvExportService();
+            csvExportService.getCsvExportForImportSummaryId(summaryId);
+        }
+        catch(RuntimeException jpe)
+        {
+            exception = jpe;
+        }
+        catch(JsonProcessingException thrown)
+        {
+
+        }
+
+        assert(exception.getCause().toString().contains("JsonProcessingException"));
 
         //Remove test data before finishing
         ImportSummary[] summaryList =
@@ -103,39 +132,6 @@ public class ApplicationImportTest extends SecuredResourceTest {
                         .delete("/application-import/{id}")
                         .then()
                         .statusCode(204));
-    }
 
-    protected void createTestData()
-    {
-
-        // import 2 applications
-        final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
-                "1,,,,BS 1,,\n" +
-                "1,,,,BS 2,tag type 1,tag1";
-        given()
-                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaType.MULTIPART_FORM_DATA)
-                .multiPart("file", multipartPayload)
-                .multiPart("fileName", "File1")
-                .when()
-                .post("/file/upload")
-                .then()
-                .statusCode(200);
-
-
-        // import 1 application
-        final String multipartPayload2 = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
-                "1,,,,BS 3,,";
-        given()
-                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaType.MULTIPART_FORM_DATA)
-                .multiPart("file", multipartPayload2)
-                .multiPart("fileName", "File2")
-                .when()
-                .post("/file/upload")
-                .then()
-                .statusCode(200);
     }
 }
