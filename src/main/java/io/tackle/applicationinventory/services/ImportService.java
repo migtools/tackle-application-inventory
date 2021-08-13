@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.services;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -136,6 +137,8 @@ public class ImportService {
 
     private MappingIterator<ApplicationImport> decode(String inputFileContent) throws IOException{
         CsvMapper mapper = new CsvMapper();
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES);
 
         CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
         String columnSeparator = ",";
