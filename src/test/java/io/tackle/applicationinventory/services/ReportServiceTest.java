@@ -81,7 +81,7 @@ class ReportServiceTest extends ReportTestUtil {
     }
 
     @Test
-    public void give_ThousandsOfApplicationsAndDependencies_when_getAdoptionPlan_then_resultIsTheExpectedAndTimeIsLowerThanTimeoutValue() throws Exception {
+    public void give_ThousandsOfApplicationsAndDependencies_when_getAdoptionPlan_then_resultIsTheExpectedAndTimeIsLowerThanTimeoutValue() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
         List<Long> appList = new ArrayList<>();
         transaction.begin();
         transaction.setTransactionTimeout(200);
@@ -162,7 +162,7 @@ class ReportServiceTest extends ReportTestUtil {
     }
 
     @Test
-    public void given_SeveralApplicationsWithReviewButOneWithout_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws Exception {
+    public void given_SeveralApplicationsWithReviewButOneWithout_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
         List<Long> applicationList = new ArrayList<>();
 
         transaction.begin();
@@ -198,7 +198,7 @@ class ReportServiceTest extends ReportTestUtil {
     }
 
     @Test
-    public void given_SeveralApplicationsWithReviewButOneParentWithoutReview_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws Exception {
+    public void given_SeveralApplicationsWithReviewButOneParentWithoutReview_when_AdoptionPlan_then_ItDoesNotCrashAndThatAppIsNotIncluded() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         transaction.begin();
         Application application15 = Application.find("name", "App15").firstResult();
         application15.review.delete();
