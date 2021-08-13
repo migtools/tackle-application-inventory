@@ -331,97 +331,97 @@ public class ImportServiceTest extends SecuredResourceTest {
         removeTestObjects(Collections.emptyList());
     }
 
-//    @Test
-//    @Order(5)
-//    protected void testImportServiceNoTagsRetrieved() {
-//
-//        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
-//                .willReturn(aResponse()
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody("")));
-//
-//        ClassLoader classLoader = getClass().getClassLoader();
-//        File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
-//
-//
-//        Response response = given()
-//                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-//                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                .accept(MediaType.MULTIPART_FORM_DATA)
-//                .multiPart("file",importFile)
-//                .multiPart("fileName","duplicate_application_import.csv")
-//                .when().post(PATH)
-//                .then()
-//                .log().all()
-//                .statusCode(200).extract().response();
-//
-//        assertEquals(200, response.getStatusCode());
-//
-//
-//
-//
-//        removeTestObjects(Collections.emptyList());
-//
-//    }
-//
-//    @Test
-//    @Order(5)
-//    protected void testImportServiceNoBSRetrieved() {
-//
-//        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
-//                .willReturn(aResponse()
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(
-//                                "[\n" +
-//                                        "      {\n" +
-//                                        "        \"id\": 1,\n" +
-//                                        "        \"name\": \"RHEL 8\",\n" +
-//                                        "        \"tagType\": {\n" +
-//                                        "          \"id\": 1,\n" +
-//                                        "          \"name\": \"Operating System\"\n" +
-//                                        "        }\n" +
-//                                        "      }]")));
-//
-//
-//        WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
-//                .willReturn(aResponse()
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody("")));
-//
-//
-//        ClassLoader classLoader = getClass().getClassLoader();
-//        File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
-//
-//
-//        Response response = given()
-//                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-//                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                .accept(MediaType.MULTIPART_FORM_DATA)
-//                .multiPart("file",importFile)
-//                .multiPart("fileName","duplicate_application_import.csv")
-//                .when().post(PATH)
-//                .then()
-//                .log().all()
-//                .statusCode(200).extract().response();
-//
-//        assertEquals(200, response.getStatusCode());
-//
-//        given()
-//                .accept("application/json")
-//                .when()
-//                .get("/import-summary")
-//                .then()
-//                .statusCode(200)
-//                .log().body()
-//                .body("[0].'errorMessage'", is("Unable to retrieve BusinessServices from remote resource"));
-//
-//
-//
-//
-//
-//        removeTestObjects(Collections.emptyList());
-//
-//    }
+    @Test
+    @Order(5)
+    protected void testImportServiceNoTagsRetrieved() {
+
+        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("")));
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","duplicate_application_import.csv")
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+
+
+
+        removeTestObjects(Collections.emptyList());
+
+    }
+
+    @Test
+    @Order(5)
+    protected void testImportServiceNoBSRetrieved() {
+
+        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                "[\n" +
+                                        "      {\n" +
+                                        "        \"id\": 1,\n" +
+                                        "        \"name\": \"RHEL 8\",\n" +
+                                        "        \"tagType\": {\n" +
+                                        "          \"id\": 1,\n" +
+                                        "          \"name\": \"Operating System\"\n" +
+                                        "        }\n" +
+                                        "      }]")));
+
+
+        WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("")));
+
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","duplicate_application_import.csv")
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+        given()
+                .accept("application/json")
+                .when()
+                .get("/import-summary")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("[0].'errorMessage'", is("Unable to retrieve BusinessServices from remote resource"));
+
+
+
+
+
+        removeTestObjects(Collections.emptyList());
+
+    }
 
     private void removeTestObjects(List<String> appNamesToDelete) {
         ImportSummary[] summaryList =
