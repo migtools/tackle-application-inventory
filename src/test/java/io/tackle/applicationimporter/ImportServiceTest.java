@@ -15,9 +15,9 @@ import io.tackle.applicationinventory.services.WiremockTagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.*;
 
-import javax.transaction.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.*;
@@ -138,7 +138,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(204);
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
 
     }
@@ -268,11 +268,10 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
     }
 
-    @Transactional
     protected void createDummyRejectedImports()
     {
 
@@ -312,7 +311,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         assertEquals(multipartImport.getFileName(),"testImport");
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
     }
 
@@ -336,11 +335,10 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .body("_embedded.'application-import'.size()", is(4));
 
 
-        removeTestObjects();
+        removeTestObjects(Arrays.asList("Test App 1", "Test App 2", "Test App 3", "Test App 4"));
 
     }
 
-    @Transactional
     protected void createMissingFieldsObjects()
     {
 
@@ -389,7 +387,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         assertEquals(200, response.getStatusCode());
 
 
-        removeTestObjects();
+        removeTestObjects(Collections.singletonList("OrderHub"));
     }
 
     @Test
@@ -458,7 +456,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
     }
 
@@ -491,7 +489,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
     }
 
@@ -550,11 +548,11 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
-        removeTestObjects();
+        removeTestObjects(Collections.emptyList());
 
     }
 
-    private void removeTestObjects()
+    private void removeTestObjects(List<String> appNamesToDelete)
     {
         ImportSummary[] summaryList =
                 given()
@@ -589,6 +587,29 @@ public class ImportServiceTest extends SecuredResourceTest {
                         .delete("/application-import/{id}")
                         .then()
                         .statusCode(204));
+
+        for (String appName : appNamesToDelete) {
+            long firstApplicationId = Long.parseLong(given()
+                    .queryParam("name", appName)
+                    .accept(ContentType.JSON)
+                    .when()
+                    .get("/application")
+                    .then()
+                    .statusCode(200)
+                    .body("size()", Is.is(1))
+                    .extract()
+                    .path("[0].id")
+                    .toString());
+
+            given()
+                    .accept(ContentType.JSON)
+                    .pathParam("id", firstApplicationId)
+                    .when()
+                    .delete("/application/{id}")
+                    .then()
+                    .statusCode(204);
+        }
+
     }
 
 
