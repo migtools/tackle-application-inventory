@@ -11,7 +11,6 @@ import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
@@ -85,14 +84,13 @@ public class ImportService {
             //make a list of all the duplicate app names
             List<ApplicationImport> importListMinusDuplicates = importList;
             List<ApplicationImport> duplicateAppNames = importList.stream().filter(importApp ->
-
-                !discreteAppNames.add(minimiseWhitespace(importApp.getApplicationName()))).collect(Collectors.toList());
+                    !discreteAppNames.add(importApp.getApplicationName())).collect(Collectors.toList());
             if( !duplicateAppNames.isEmpty())
             {
                 //find all the imported apps with a duplicate name and set appropriate error message
                 duplicateAppNames.forEach(app -> {
                     importList.stream().filter(importApp ->
-                            minimiseWhitespace(app.getApplicationName()).equals(minimiseWhitespace(importApp.getApplicationName()))).collect(Collectors.toList())
+                            app.getApplicationName().equals(importApp.getApplicationName())).collect(Collectors.toList())
                             .forEach(duplicateApp -> {
                                         importListMinusDuplicates.remove(duplicateApp);
                                         duplicateApp.setErrorMessage("Duplicate Application Name within file: " + duplicateApp.getApplicationName());
@@ -170,14 +168,6 @@ public class ImportService {
     {
         importFile.setValid(Boolean.FALSE);
         importFile.flush();
-    }
-
-    public static String minimiseWhitespace(String input)
-    {
-        StringBuffer whitespaceMinimized = new StringBuffer();
-        String [] array = StringUtils.split(input);
-        Arrays.asList(array).forEach(name -> whitespaceMinimized.append(name).append(" "));
-        return whitespaceMinimized.toString().strip();
     }
 
 

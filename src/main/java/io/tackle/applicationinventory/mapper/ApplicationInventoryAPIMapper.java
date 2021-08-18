@@ -4,12 +4,14 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
-import io.tackle.applicationinventory.services.ImportService;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -22,9 +24,9 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     @Override
     public Response map(ApplicationImport importApp, Long parentId)
     {
+        //importApp.setParentId(parentId);
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
-
 
         if (importApp.getApplicationName() == null || importApp.getApplicationName().strip().isEmpty()) {
             importApp.setErrorMessage("Application Name is mandatory");
@@ -47,16 +49,15 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
         if (importApp.getDescription() != null && !importApp.getDescription().isEmpty()) {
             newApp.description = importApp.getDescription();
         }
-        String whitespaceMinimized = ImportService.minimiseWhitespace(importApp.getApplicationName());
 
         // check for duplicates on table
-        long count = Application.count("name",whitespaceMinimized);
+        long count = Application.count("name",importApp.getApplicationName());
         if(count>0)
         {
             importApp.setErrorMessage("Duplicate ApplicationName in table: " + importApp.getApplicationName());
             return Response.serverError().build();
         }
-        newApp.name = whitespaceMinimized;
+        newApp.name = importApp.getApplicationName();
         String currentTag = "";
         String currentTagType = "";
         try{
