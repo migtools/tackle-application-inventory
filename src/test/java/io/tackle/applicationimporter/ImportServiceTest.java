@@ -317,10 +317,10 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport2.setTag2("tag 1");
         appImport2.setTagType2("tag type 1");
         appImport2.setTag3("tag 1");
-        appImport2.setTagType5("tag type 1");
-        appImport2.setTag3("tag 1");
-        appImport2.setTagType4("tag type 1");
+        appImport2.setTagType3("tag type 1");
         appImport2.setTag4("tag 1");
+        appImport2.setTagType4("tag type 1");
+        appImport2.setTag5("tag 1");
         appImport2.setTagType5("tag type 1");
         appImport2.setTag6("tag 1");
         appImport2.setTagType6("tag type 1");
@@ -391,10 +391,10 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport6.setTag2(null);
         appImport6.setTagType2(null);
         appImport6.setTag3(null);
-        appImport6.setTagType5(null);
-        appImport6.setTag3(null);
-        appImport6.setTagType4(null);
+        appImport6.setTagType3(null);
         appImport6.setTag4(null);
+        appImport6.setTagType4(null);
+        appImport6.setTag5(null);
         appImport6.setTagType5(null);
         appImport6.setTag6(null);
         appImport6.setTagType6(null);
@@ -426,6 +426,10 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport6.setTagType19(null);
         appImport6.setTag20(null);
         appImport6.setTagType20(null);
+        appImport6.setFilename(null);
+        appImport6.setErrorMessage(null);
+        appImport6.setRecordType1(null);
+        appImport6.setComments(null);
 
         List<ApplicationImport> appList = new ArrayList();
 
