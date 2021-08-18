@@ -312,7 +312,15 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport2.setApplicationName("");
         appImport2.importSummary = appImportParent;
         appImport2.setDescription("this");
-        appImport2.setTag5("tag 1");
+        appImport2.setTag1("tag 1");
+        appImport2.setTagType1("tag type 1");
+        appImport2.setTag2("tag 1");
+        appImport2.setTagType2("tag type 1");
+        appImport2.setTag3("tag 1");
+        appImport2.setTagType5("tag type 1");
+        appImport2.setTag3("tag 1");
+        appImport2.setTagType4("tag type 1");
+        appImport2.setTag4("tag 1");
         appImport2.setTagType5("tag type 1");
         appImport2.setTag6("tag 1");
         appImport2.setTagType6("tag type 1");
@@ -373,6 +381,51 @@ public class ImportServiceTest extends SecuredResourceTest {
         appImport5.setDescription("and this");
         appImport5.setTag1("yes");
         appImport5.persistAndFlush();
+        ApplicationImport appImport6 = new ApplicationImport();
+        appImport6.setBusinessService(null);
+        appImport6.setApplicationName(null);
+        appImport6.importSummary = appImportParent;
+        appImport6.setDescription(null);
+        appImport6.setTag1(null);
+        appImport6.setTagType1(null);
+        appImport6.setTag2(null);
+        appImport6.setTagType2(null);
+        appImport6.setTag3(null);
+        appImport6.setTagType5(null);
+        appImport6.setTag3(null);
+        appImport6.setTagType4(null);
+        appImport6.setTag4(null);
+        appImport6.setTagType5(null);
+        appImport6.setTag6(null);
+        appImport6.setTagType6(null);
+        appImport6.setTag7(null);
+        appImport6.setTagType7(null);
+        appImport6.setTag8(null);
+        appImport6.setTagType8(null);
+        appImport6.setTag9(null);
+        appImport6.setTagType9(null);
+        appImport6.setTag10(null);
+        appImport6.setTagType10(null);
+        appImport6.setTag11(null);
+        appImport6.setTagType11(null);
+        appImport6.setTag12(null);
+        appImport6.setTagType12(null);
+        appImport6.setTag13(null);
+        appImport6.setTagType13(null);
+        appImport6.setTag14(null);
+        appImport6.setTagType14(null);
+        appImport6.setTag15(null);
+        appImport6.setTagType15(null);
+        appImport6.setTag16(null);
+        appImport6.setTagType16(null);
+        appImport6.setTag17(null);
+        appImport6.setTagType17(null);
+        appImport6.setTag18(null);
+        appImport6.setTagType18(null);
+        appImport6.setTag19(null);
+        appImport6.setTagType19(null);
+        appImport6.setTag20(null);
+        appImport6.setTagType20(null);
 
         List<ApplicationImport> appList = new ArrayList();
 
@@ -382,6 +435,7 @@ public class ImportServiceTest extends SecuredResourceTest {
         appList.add(appImport3);
         appList.add(appImport4);
         appList.add(appImport5);
+        appList.add(appImport6);
 
 
         Long id1 = appImport1.id;
@@ -389,6 +443,8 @@ public class ImportServiceTest extends SecuredResourceTest {
         Long id3 = appImport3.id;
         Long id4 = appImport4.id;
         Long id5 = appImport5.id;
+        Long id6 = appImport6.id;
+
 
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
