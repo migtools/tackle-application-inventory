@@ -137,6 +137,7 @@ public class ApplicationTest extends SecuredResourceTest {
                 .get(PATH)
                 .then()
                 .statusCode(200)
+                .log().all()
                 .body("_embedded.application.size()", is(4),
                         "_embedded.application.id", containsInRelativeOrder(6, 3, 2, 1),
                         "_embedded.application[0].review", is(emptyOrNullString()),

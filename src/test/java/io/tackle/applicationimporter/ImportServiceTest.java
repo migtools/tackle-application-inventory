@@ -519,6 +519,13 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         removeTestObjects(Collections.emptyList());
 
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/application")
+                .then()
+                .statusCode(200)
+                .log().all();
     }
 
     private void removeTestObjects(List<String> appNamesToDelete)
