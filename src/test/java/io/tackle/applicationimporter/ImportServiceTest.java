@@ -143,78 +143,6 @@ public class ImportServiceTest extends SecuredResourceTest {
 
     }
 
-
-    @Test
-    @Order(1)
-    protected void testImportServiceCaseInsensitiveColumnHeaders() {
-
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        File importFile = new File(classLoader.getResource("mixed_case_column_headers.csv").getFile());
-
-
-        Response response = given()
-                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .accept(MediaType.MULTIPART_FORM_DATA)
-                .multiPart("file",importFile)
-                .multiPart("fileName","mixed_case_column_headers.csv")
-                .when().post(PATH)
-                .then()
-                .log().all()
-                .statusCode(200).extract().response();
-
-        assertEquals(200, response.getStatusCode());
-
-
-        given()
-                .accept("application/hal+json")
-                .queryParam("isValid", Boolean.TRUE)
-                .when()
-                .get("/application-import")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.'application-import'.size()", is(1));
-
-
-
-        given()
-                .accept("application/hal+json")
-                .queryParam("isValid", Boolean.FALSE)
-                .when()
-                .get("/application-import")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.'application-import'.size()", is(6));
-
-        final String successfulimportSummaryApplicationName = String.valueOf(given()
-                .accept("application/hal+json")
-                .queryParam("isValid", Boolean.TRUE)
-                .when()
-                .get("/application-import")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.'application-import'.size()", is(1))
-                .extract().path("_embedded.'application-import'[0].'Application Name'").toString());
-
-        final String successfulimportApplicationName = String.valueOf(given()
-                .accept("application/hal+json")
-                .queryParam("name", successfulimportSummaryApplicationName)
-                .when()
-                .get("/application")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.application.size()", is(1))
-                .extract().path("_embedded.application[0].name").toString());
-
-        removeTestObjects(Arrays.asList(successfulimportApplicationName));
-
-    }
-
     @Test
     @Order(2)
     protected void testMapToApplicationRejected()  {
@@ -518,6 +446,77 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
         removeTestObjects(Collections.emptyList());
+
+    }
+
+    @Test
+    @Order(6)
+    protected void testImportServiceCaseInsensitiveColumnHeaders() {
+
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("mixed_case_column_headers.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","mixed_case_column_headers.csv")
+                .when().post(PATH)
+                .then()
+                .log().all()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1));
+
+
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.FALSE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(6));
+
+        final String successfulimportSummaryApplicationName = String.valueOf(given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.'application-import'.size()", is(1))
+                .extract().path("_embedded.'application-import'[0].'Application Name'").toString());
+
+        final String successfulimportApplicationName = String.valueOf(given()
+                .accept("application/hal+json")
+                .queryParam("name", successfulimportSummaryApplicationName)
+                .when()
+                .get("/application")
+                .then()
+                .statusCode(200)
+                .log().body()
+                .body("_embedded.application.size()", is(1))
+                .extract().path("_embedded.application[0].name").toString());
+
+        removeTestObjects(Arrays.asList(successfulimportApplicationName));
 
     }
 
