@@ -1,5 +1,7 @@
 package io.tackle.applicationinventory.resources;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
@@ -11,11 +13,15 @@ import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import javax.ws.rs.core.MediaType;
 import java.util.Arrays;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
@@ -35,10 +41,49 @@ import static org.hamcrest.Matchers.is;
 )
 public class ApplicationImportTest extends SecuredResourceTest {
 
-     @BeforeAll
-    public static void init() {
+    private static StubMapping tagStubMapping;
+    private static StubMapping businessServiceStubMapping;
 
+    @BeforeAll
+    public static void init() {
         PATH = "/application-import";
+        tagStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                "[\n" +
+                                        "      {\n" +
+                                        "        \"id\": 1,\n" +
+                                        "        \"name\": \"tag1\",\n" +
+                                        "        \"tagType\": {\n" +
+                                        "          \"id\": 1,\n" +
+                                        "          \"name\": \"tag type 1\"\n" +
+                                        "        }\n" +
+                                        "      }]")));
+
+
+        businessServiceStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(                                "[\n" +
+                                "      {\n" +
+                                "        \"id\": 1,\n" +
+                                "        \"name\": \"BS 2\"\n" +
+                                "      }," +
+                                "      {\n" +
+                                "        \"id\": 2,\n" +
+                                "        \"name\": \"BS 1\"\n" +
+                                "      }," +
+                                "      {\n" +
+                                "        \"id\": 3,\n" +
+                                "        \"name\": \"BS 3\"\n" +
+                                "      }]")));
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        WireMock.removeStub(tagStubMapping);
+        WireMock.removeStub(businessServiceStubMapping);
     }
 
     @Test
@@ -107,7 +152,6 @@ public class ApplicationImportTest extends SecuredResourceTest {
 
     protected void createTestData()
     {
-
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
                 "1,,,,BS 1,,\n" +

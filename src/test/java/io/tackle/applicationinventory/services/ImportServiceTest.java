@@ -1,6 +1,7 @@
-package io.tackle.applicationimporter;
+package io.tackle.applicationinventory.services;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
@@ -11,23 +12,29 @@ import io.restassured.response.Response;
 import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
-import io.tackle.applicationinventory.services.WiremockTagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
@@ -44,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-@QuarkusTestResource(WiremockTagService.class)
+@QuarkusTestResource(WireMockControlsServices.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ImportServiceTest extends SecuredResourceTest {
 
@@ -473,7 +480,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(9)
     protected void testImportServiceNoBSRetrieved() {
 
-        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+        final StubMapping tagStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
@@ -487,16 +494,13 @@ public class ImportServiceTest extends SecuredResourceTest {
                                         "        }\n" +
                                         "      }]")));
 
-
-        WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+        final StubMapping businessServiceStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody("")));
 
-
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("duplicate_application_names.csv").getFile());
-
 
         Response response = given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
@@ -520,12 +524,9 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("[0].'errorMessage'", is("Unable to retrieve BusinessServices from remote resource"));
 
-
-
-
-
         removeTestObjects(Collections.emptyList());
-
+        WireMock.removeStub(tagStubMapping);
+        WireMock.removeStub(businessServiceStubMapping);
     }
 
 

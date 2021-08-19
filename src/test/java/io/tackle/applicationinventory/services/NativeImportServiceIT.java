@@ -1,7 +1,6 @@
-package io.tackle.applicationinventory.resources;
+package io.tackle.applicationinventory.services;
 
 import io.quarkus.test.junit.NativeImageTest;
-import io.tackle.applicationimporter.ImportServiceTest;
 
 @NativeImageTest
 public class NativeImportServiceIT extends ImportServiceTest {

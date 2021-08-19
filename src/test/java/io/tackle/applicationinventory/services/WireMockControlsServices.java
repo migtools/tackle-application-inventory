@@ -1,16 +1,17 @@
 package io.tackle.applicationinventory.services;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
-public class WiremockTagService implements QuarkusTestResourceLifecycleManager {
+public class WireMockControlsServices implements QuarkusTestResourceLifecycleManager {
 
     private WireMockServer wireMockServer;
 
