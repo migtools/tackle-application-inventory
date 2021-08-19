@@ -11,9 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import java.util.Set;
 
-
-
-@RegisterRestClient(baseUri = "http://tackle-controls:8080")
+@RegisterRestClient
 @AccessToken
 @ApplicationScoped
 public interface BusinessServiceService {

@@ -11,9 +11,7 @@ import io.quarkus.oidc.token.propagation.AccessToken;
 
 import java.util.Set;
 
-
-
-@RegisterRestClient(baseUri = "http://tackle-controls:8080")
+@RegisterRestClient
 @AccessToken
 @ApplicationScoped
 public interface TagService {
