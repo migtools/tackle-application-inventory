@@ -62,7 +62,6 @@ public class ApplicationImport extends AbstractEntity {
     @Filterable
     public String filename;
 
-    private String status;
     @ManyToOne(optional = false)
     @JsonIgnore
     @Filterable(filterName = "importSummary.id")
@@ -501,13 +500,6 @@ public class ApplicationImport extends AbstractEntity {
         this.filename = filename;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
 }
 

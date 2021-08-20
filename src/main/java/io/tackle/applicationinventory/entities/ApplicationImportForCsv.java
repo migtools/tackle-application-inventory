@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-@JsonIgnoreProperties({ "createUser", "updateUser", "errorMessage", "valid", "isValid", "filename", "status", "id"})
+@JsonIgnoreProperties({ "createUser", "updateUser", "errorMessage", "valid", "isValid", "filename", "id"})
 public abstract class ApplicationImportForCsv {
     @JsonProperty("Record Type 1")
     private String recordType1;
