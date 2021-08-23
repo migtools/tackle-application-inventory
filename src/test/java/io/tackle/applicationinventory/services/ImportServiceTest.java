@@ -438,7 +438,7 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Order(8)
     protected void testImportServiceNoTagsRetrieved() {
 
-        WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+        final StubMapping tagStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody("")));
@@ -469,11 +469,8 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .log().body()
                 .body("[0].'errorMessage'", is("Unable to retrieve TagTypes from remote resource"));
 
-
-
-
         removeTestObjects(Collections.emptyList());
-
+        WireMock.removeStub(tagStubMapping);
     }
 
     @Test
