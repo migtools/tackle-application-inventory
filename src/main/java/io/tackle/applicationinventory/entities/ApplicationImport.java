@@ -6,7 +6,9 @@ import io.tackle.commons.annotations.CheckType;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -155,8 +157,6 @@ public class ApplicationImport extends AbstractEntity {
 
     @Filterable
     public String filename;
-
-    private String status;
 
     @ManyToOne(optional = false)
     @JsonIgnore
@@ -596,13 +596,6 @@ public class ApplicationImport extends AbstractEntity {
         this.filename = filename;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
 }
 

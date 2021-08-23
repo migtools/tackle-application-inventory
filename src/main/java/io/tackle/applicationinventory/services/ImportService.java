@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.services;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -68,14 +69,14 @@ public class ImportService {
             parentRecord.filename = data.getFileName();
             parentRecord.importStatus = IN_PROGRESS_STATUS;
             parentRecord.persistAndFlush();
-            Set<Tag> tags = tagService.getListOfTags();
+            Set<Tag> tags = tagService.getListOfTags(0, 1000);
             if (tags == null)
             {
                 String msg = "Unable to retrieve TagTypes from remote resource";
                 parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
-             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices(0, 1000);
             if (businessServices == null)
             {
                 String msg = "Unable to retrieve BusinessServices from remote resource";
@@ -155,6 +156,8 @@ public class ImportService {
 
     private MappingIterator<ApplicationImport> decode(String inputFileContent) throws IOException{
         CsvMapper mapper = new CsvMapper();
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES);
 
         CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
         String columnSeparator = ",";

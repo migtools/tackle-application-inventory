@@ -1,4 +1,4 @@
-package io.tackle.applicationimporter.issues;
+package io.tackle.applicationinventory.services.issues;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
@@ -16,11 +16,20 @@ import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.*;
+import org.hamcrest.core.Is;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
-import javax.transaction.*;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.Arrays;
@@ -65,8 +74,8 @@ public class Issue268Test extends SecuredResourceTest {
 
     @Test
     protected void testImportServiceLongCSVColumnValues() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(Collections.emptySet());
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(Collections.emptySet());
+        Mockito.when(mockTagService.getListOfTags(0, 1000)).thenReturn(Collections.emptySet());
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices(0, 1000)).thenReturn(Collections.emptySet());
 
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("long_characters_columns.csv").getFile());
@@ -123,6 +132,27 @@ public class Issue268Test extends SecuredResourceTest {
         assertEquals(1, (int) Arrays.stream(csvFields).filter("Import-app-9"::equals).count());
         assertEquals(1, Arrays.stream(csvFields).filter(f -> f.startsWith("\"Very-long-app-name-name-")).count());
 
+        // Clean test data to not alter other tests execution
+        // Remove the successfully imported 'Import-app-8' application
+        final long importApp8Id = Long.parseLong(given()
+                .queryParam("name", "Import-app-8")
+                .accept(ContentType.JSON)
+                .when()
+                .get("/application")
+                .then()
+                .statusCode(200)
+                .body("size()", Is.is(1))
+                .extract()
+                .path("[0].id")
+                .toString());
+
+        given()
+                .accept(ContentType.JSON)
+                .pathParam("id", importApp8Id)
+                .when()
+                .delete("/application/{id}")
+                .then()
+                .statusCode(204);
 
         userTransaction.begin();
         ApplicationImport.deleteAll();
