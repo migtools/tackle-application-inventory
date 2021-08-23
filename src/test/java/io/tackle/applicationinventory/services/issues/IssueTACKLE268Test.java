@@ -3,37 +3,19 @@ package io.tackle.applicationinventory.services.issues;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import io.tackle.applicationinventory.entities.ApplicationImport;
-import io.tackle.applicationinventory.entities.ImportSummary;
-import io.tackle.applicationinventory.services.BusinessServiceService;
-import io.tackle.applicationinventory.services.TagService;
+import io.tackle.applicationinventory.services.WireMockControlsServices;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -53,19 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class Issue268Test extends SecuredResourceTest {
-
-    @Inject
-    UserTransaction userTransaction;
-
-    @InjectMock
-    @RestClient
-    TagService mockTagService;
-
-    @InjectMock
-    @RestClient
-    BusinessServiceService mockBusinessServiceService;
+@QuarkusTestResource(WireMockControlsServices.class)
+// https://issues.redhat.com/browse/TACKLE-268
+public class IssueTACKLE268Test extends SecuredResourceTest {
 
     @BeforeAll
     public static void init() {
@@ -73,14 +45,11 @@ public class Issue268Test extends SecuredResourceTest {
     }
 
     @Test
-    protected void testImportServiceLongCSVColumnValues() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
-        Mockito.when(mockTagService.getListOfTags(0, 1000)).thenReturn(Collections.emptySet());
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices(0, 1000)).thenReturn(Collections.emptySet());
-
+    protected void testImportServiceLongCSVColumnValues() {
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("long_characters_columns.csv").getFile());
 
-        Response response = given()
+        given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .accept(MediaType.MULTIPART_FORM_DATA)
@@ -88,42 +57,27 @@ public class Issue268Test extends SecuredResourceTest {
                 .multiPart("fileName", "long_characters_columns.csv")
                 .when().post(PATH)
                 .then()
-                .log().all()
-                .statusCode(200).extract().response();
+                .statusCode(200);
 
-        assertEquals(200, response.getStatusCode());
-
-        given()
+        final long importSummaryId = Long.parseLong(given()
                 .accept("application/hal+json")
                 .when()
                 .get("/import-summary")
                 .then()
                 .statusCode(200)
-                .log().body()
-                .body("_embedded.'import-summary'[0].'importStatus'", is("Completed"));
+                .body("_embedded.import-summary.size()", is(1),
+                        "_embedded.import-summary[0].importStatus", is("Completed"),
+                        "_embedded.import-summary[0].validCount", is(1),
+                        "_embedded.import-summary[0].invalidCount", is(2))
+                .extract().path("_embedded.import-summary[0].id").toString());
 
-        given()
-                .accept("application/json")
+        final String csv = given()
+                .accept("text/csv")
+                .queryParam("importSummaryId", importSummaryId)
                 .when()
-                .get("/import-summary")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("size()", is(1),
-                        "[0].'importStatus'", is("Completed"),
-                        "[0].'validCount'", is(1),
-                        "[0].'invalidCount'", is(2)
-                );
-
-        ImportSummary summary = ImportSummary.findAll().firstResult();
-
-        Response r =
-                given()
-                        .accept("text/csv")
-                        .when()
-                        .get("/csv-export?importSummaryId=" + summary.id);
-
-        String csv = r.body().print();
+                .get("/csv-export")
+                .body()
+                .print();
         String[] csvFields = csv.split(",");
 
         int numberOfRows = (int) Arrays.stream(csvFields).filter("\n"::equals).count();
@@ -141,7 +95,7 @@ public class Issue268Test extends SecuredResourceTest {
                 .get("/application")
                 .then()
                 .statusCode(200)
-                .body("size()", Is.is(1))
+                .body("size()", is(1))
                 .extract()
                 .path("[0].id")
                 .toString());
@@ -154,11 +108,13 @@ public class Issue268Test extends SecuredResourceTest {
                 .then()
                 .statusCode(204);
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+        // Remove the import summary record (on cascade also the ApplicationImport entities will be deleted)
+        given()
+                .accept(ContentType.JSON)
+                .pathParam("id", importSummaryId)
+                .when()
+                .delete("/import-summary/{id}")
+                .then()
+                .statusCode(204);
     }
-
 }
-
