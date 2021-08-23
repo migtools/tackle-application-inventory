@@ -12,6 +12,7 @@ import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.transaction.UserTransaction;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -52,6 +54,9 @@ public class ImportService {
     @Inject
     @RestClient
     BusinessServiceService businessServiceService;
+
+    @Inject
+    Validator validator;
 
     @POST
     @Path("/upload")
@@ -121,14 +126,28 @@ public class ImportService {
     private List<ApplicationImport> writeFile(String content, String filename, ImportSummary parentObject) throws IOException {
 
         MappingIterator<ApplicationImport> iter = decode(content);
-        List<ApplicationImport> importList = new ArrayList();
+        List<ApplicationImport> importList = new ArrayList<>();
         while (iter.hasNext())
         {
             ApplicationImport importedApplication = iter.next();
-            importedApplication.setFilename(filename);
-            importedApplication.importSummary = parentObject;
-            importList.add(importedApplication);
-            importedApplication.persistAndFlush();
+
+            ApplicationImport appToPersist;
+            if (validator.validate(importedApplication).isEmpty()) {
+                appToPersist = importedApplication;
+
+                importList.add(appToPersist);
+            } else {
+                String truncatedAppName = StringUtils.truncate(importedApplication.getApplicationName().trim(), ApplicationImport.APP_NAME_MAX_LENGTH);;
+
+                appToPersist = new ApplicationImport();
+                appToPersist.setApplicationName(truncatedAppName);
+                appToPersist.setValid(false);
+                appToPersist.setErrorMessage("Max length error: one or more column's max length were exceeded");
+            }
+
+            appToPersist.setFilename(filename);
+            appToPersist.importSummary = parentObject;
+            appToPersist.persistAndFlush();
         }
         return importList;
     }
