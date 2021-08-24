@@ -167,7 +167,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .body("_embedded.import-summary.size()", is(1),
-                "_embedded.import-summary.invalidCount", containsInRelativeOrder(5),
+                "_embedded.import-summary.invalidCount", containsInRelativeOrder(6),
                         "total_count", is(1));
 
 
@@ -185,10 +185,11 @@ public class ImportServiceTest extends SecuredResourceTest {
         ",Tag Type 10,Tag 10,Tag Type 11,Tag 11,Tag Type 12,Tag 12,Tag Type 13,Tag 13,Tag Type 14,Tag 14,Tag Type 15,Tag 15,Tag Type 16,Tag 16" +
         ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
                 "1,,hello,,BS 1,,\n" +
-                "1,  ,,,BS 2,,,,,,,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
+                "1,  ,,,BS 2,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
                 "1,name 1,and this,,BS 2,,,,,,mystery tag,,\n" +
                 "1,name 4,and this,,BS 1,,,mystery tag type,\n" +
-                "1,name 5,and this,,BS 2,,tag1";
+                "1,name 5,and this,,BS 2,,tag1\n" +
+                ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
         given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -324,7 +325,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'[0].'errorMessage'", is("Duplicate Application Name within file: OrderHub"));
+                .body("_embedded.'application-import'[0].'errorMessage'", is("Duplicate Application Name within file: Order Hub"));
 
         given()
                 .accept("application/hal+json")
@@ -471,6 +472,7 @@ public class ImportServiceTest extends SecuredResourceTest {
 
         removeTestObjects(Collections.emptyList());
         WireMock.removeStub(tagStubMapping);
+      
     }
 
     @Test
