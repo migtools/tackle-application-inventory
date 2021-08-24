@@ -15,7 +15,7 @@ on:
       - ".github/ISSUE_TEMPLATE/**"
 
 jobs:
-  ks8:
+  k8s:
     runs-on: ubuntu-latest
     strategy:
       matrix:
