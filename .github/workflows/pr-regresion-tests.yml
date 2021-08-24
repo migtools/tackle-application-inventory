@@ -1,4 +1,4 @@
-name: Regresion tests
+name: Regression tests
 
 on:
   push:
