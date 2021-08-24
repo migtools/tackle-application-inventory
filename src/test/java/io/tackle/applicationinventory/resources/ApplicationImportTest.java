@@ -1,22 +1,28 @@
 package io.tackle.applicationinventory.resources;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import io.restassured.config.EncoderConfig;
+import io.restassured.http.ContentType;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import javax.ws.rs.core.MediaType;
+import java.util.Arrays;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.*;
-
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.restassured.RestAssured.given;
-import static javax.transaction.Transactional.TxType.REQUIRED;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
@@ -34,60 +40,67 @@ import static org.hamcrest.Matchers.is;
         }
 )
 public class ApplicationImportTest extends SecuredResourceTest {
-    @Inject
-    EntityManager entityManager;
 
-    @Inject
-    UserTransaction userTransaction;
-
+    private static StubMapping tagStubMapping;
+    private static StubMapping businessServiceStubMapping;
 
     @BeforeAll
     public static void init() {
-
         PATH = "/application-import";
+        tagStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/tag"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                                "[\n" +
+                                        "      {\n" +
+                                        "        \"id\": 1,\n" +
+                                        "        \"name\": \"tag1\",\n" +
+                                        "        \"tagType\": {\n" +
+                                        "          \"id\": 1,\n" +
+                                        "          \"name\": \"tag type 1\"\n" +
+                                        "        }\n" +
+                                        "      }]")));
 
+
+        businessServiceStubMapping = WireMock.stubFor(get(urlPathEqualTo("/controls/business-service"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(                                "[\n" +
+                                "      {\n" +
+                                "        \"id\": 1,\n" +
+                                "        \"name\": \"BS 2\"\n" +
+                                "      }," +
+                                "      {\n" +
+                                "        \"id\": 2,\n" +
+                                "        \"name\": \"BS 1\"\n" +
+                                "      }," +
+                                "      {\n" +
+                                "        \"id\": 3,\n" +
+                                "        \"name\": \"BS 3\"\n" +
+                                "      }]")));
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        WireMock.removeStub(tagStubMapping);
+        WireMock.removeStub(businessServiceStubMapping);
     }
 
     @Test
-    public void testFilterByIsValid() throws HeuristicRollbackException, SystemException, HeuristicMixedException, RollbackException, NotSupportedException {
+    public void testFilterByIsValid()  {
 
-        userTransaction.begin();
-
-        ImportSummary appImportParent = new ImportSummary();
-        appImportParent.persistAndFlush();
-
-        ApplicationImport appImport1 = new ApplicationImport();
-        appImport1.setBusinessService("BS 1");
-        appImport1.importSummary = appImportParent;
-        appImport1.setFilename("File1");
-        appImport1.persistAndFlush();
-        ApplicationImport appImport2 = new ApplicationImport();
-        appImport2.setBusinessService("BS 2");
-        appImport2.importSummary = appImportParent;
-        appImport2.setFilename("File1");
-        appImport2.setTag1("tag 1");
-        appImport2.setTagType1("tag type 1");
-        appImport2.setValid(Boolean.FALSE);
-        appImport2.persistAndFlush();
-        ApplicationImport appImport3 = new ApplicationImport();
-        appImport3.setBusinessService("BS 3");
-        appImport3.importSummary = appImportParent;
-        appImport3.setFilename("File2");
-        appImport3.setValid(Boolean.FALSE);
-        appImport3.persistAndFlush();
-
-        userTransaction.commit();
-
+        createTestData();
         given()
                 .accept("application/hal+json")
                 .queryParam("isValid", Boolean.FALSE)
                 .queryParam("filename","File1")
+                .queryParam("sort","-id")
                 .when()
                 .get(PATH)
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("_embedded.'application-import'.size()", is(1))
+                .body("_embedded.'application-import'.size()", is(2))
                 .body("_embedded.'application-import'[0].'Business Service'", is("BS 2"))
                 .body("_embedded.'application-import'[0].'Tag Type 1'", is("tag type 1"));
 
@@ -99,11 +112,74 @@ public class ApplicationImportTest extends SecuredResourceTest {
                 .then()
                 .statusCode(200)
                 .log().body()
-                .body("size()", is(2));
+                .body("size()", is(3));
 
-        userTransaction.begin();
-        ApplicationImport.deleteAll();
-        ImportSummary.deleteAll();
-        userTransaction.commit();
+        //Remove test data before finishing
+        ImportSummary[] summaryList =
+                given()
+                        .accept("application/json")
+                        .when()
+                        .get("/import-summary")
+                        .as(ImportSummary[].class);
+
+        Arrays.asList(summaryList).forEach(summary ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", summary.id)
+                        .when()
+                        .delete("/import-summary/{id}")
+                        .then()
+                        .statusCode(204));
+
+
+        ApplicationImport[] importList =
+                given()
+                        .accept("application/json")
+                        .when()
+                        .get("/application-import")
+                        .as(ApplicationImport[].class);
+
+
+        Arrays.asList(importList).forEach(thisImport ->
+                given()
+                        .accept(ContentType.JSON)
+                        .pathParam("id", thisImport.id)
+                        .when()
+                        .delete("/application-import/{id}")
+                        .then()
+                        .statusCode(204));
+    }
+
+    protected void createTestData()
+    {
+        // import 2 applications
+        final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
+                "1,,,,BS 1,,\n" +
+                "1,,,,BS 2,tag type 1,tag1";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload)
+                .multiPart("fileName", "File1")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
+
+
+        // import 1 application
+        final String multipartPayload2 = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +
+                "1,,,,BS 3,,";
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file", multipartPayload2)
+                .multiPart("fileName", "File2")
+                .when()
+                .post("/file/upload")
+                .then()
+                .statusCode(200);
     }
 }

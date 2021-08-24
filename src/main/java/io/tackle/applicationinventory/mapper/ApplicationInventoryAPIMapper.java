@@ -24,7 +24,6 @@ public class ApplicationInventoryAPIMapper extends ApplicationMapper{
     @Override
     public Response map(ApplicationImport importApp, Long parentId)
     {
-        //importApp.setParentId(parentId);
         Application newApp = new Application();
         Set<String> tags = new HashSet<>();
 

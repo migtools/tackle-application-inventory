@@ -75,10 +75,10 @@ public class IssueTACKLE282Test extends SecuredResourceTest {
         final Set<Tag> tags = new HashSet<>() ;
         tags.add(tagOracle);
         tags.add(tagDB2);
-        Mockito.when(mockTagService.getListOfTags()).thenReturn(tags);
+        Mockito.when(mockTagService.getListOfTags(0, 1000)).thenReturn(tags);
 
         // setup mockito for BusinessService
-        Mockito.when(mockBusinessServiceService.getListOfBusinessServices()).thenReturn(Collections.emptySet());
+        Mockito.when(mockBusinessServiceService.getListOfBusinessServices(0, 1000)).thenReturn(Collections.emptySet());
 
         // import 2 applications
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1\n" +

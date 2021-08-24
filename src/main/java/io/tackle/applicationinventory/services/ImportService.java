@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.services;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -11,6 +12,7 @@ import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
@@ -19,6 +21,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.transaction.UserTransaction;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -52,6 +55,9 @@ public class ImportService {
     @RestClient
     BusinessServiceService businessServiceService;
 
+    @Inject
+    Validator validator;
+
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -63,14 +69,14 @@ public class ImportService {
             parentRecord.filename = data.getFileName();
             parentRecord.importStatus = IN_PROGRESS_STATUS;
             parentRecord.persistAndFlush();
-            Set<Tag> tags = tagService.getListOfTags();
+            Set<Tag> tags = tagService.getListOfTags(0, 1000);
             if (tags == null)
             {
                 String msg = "Unable to retrieve TagTypes from remote resource";
                 parentRecord.errorMessage = msg;
                 throw new Exception(msg);
             }
-             Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices();
+            Set<BusinessService> businessServices =businessServiceService.getListOfBusinessServices(0, 1000);
             if (businessServices == null)
             {
                 String msg = "Unable to retrieve BusinessServices from remote resource";
@@ -120,14 +126,28 @@ public class ImportService {
     private List<ApplicationImport> writeFile(String content, String filename, ImportSummary parentObject) throws IOException {
 
         MappingIterator<ApplicationImport> iter = decode(content);
-        List<ApplicationImport> importList = new ArrayList();
+        List<ApplicationImport> importList = new ArrayList<>();
         while (iter.hasNext())
         {
             ApplicationImport importedApplication = iter.next();
-            importedApplication.setFilename(filename);
-            importedApplication.importSummary = parentObject;
-            importList.add(importedApplication);
-            importedApplication.persistAndFlush();
+
+            ApplicationImport appToPersist;
+            if (validator.validate(importedApplication).isEmpty()) {
+                appToPersist = importedApplication;
+
+                importList.add(appToPersist);
+            } else {
+                String truncatedAppName = StringUtils.truncate(importedApplication.getApplicationName().trim(), ApplicationImport.APP_NAME_MAX_LENGTH);;
+
+                appToPersist = new ApplicationImport();
+                appToPersist.setApplicationName(truncatedAppName);
+                appToPersist.setValid(false);
+                appToPersist.setErrorMessage("Max length error: one or more column's max length were exceeded");
+            }
+
+            appToPersist.setFilename(filename);
+            appToPersist.importSummary = parentObject;
+            appToPersist.persistAndFlush();
         }
         return importList;
     }
@@ -136,6 +156,8 @@ public class ImportService {
 
     private MappingIterator<ApplicationImport> decode(String inputFileContent) throws IOException{
         CsvMapper mapper = new CsvMapper();
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES);
 
         CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
         String columnSeparator = ",";
