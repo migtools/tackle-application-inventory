@@ -226,40 +226,7 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         assertNull(appImport1.getTag20());
         assertNull(appImport1.getTagType20());
 
-        //Remove test data before finishing
-        ImportSummary[] summaryList =
-                given()
-                        .accept("application/json")
-                        .when()
-                        .get("/import-summary")
-                        .as(ImportSummary[].class);
-
-        Arrays.asList(summaryList).forEach(summary ->
-                given()
-                        .accept(ContentType.JSON)
-                        .pathParam("id", summary.id)
-                        .when()
-                        .delete("/import-summary/{id}")
-                        .then()
-                        .statusCode(204));
-
-
-        ApplicationImport[] importList =
-                given()
-                        .accept("application/json")
-                        .when()
-                        .get("/application-import")
-                        .as(ApplicationImport[].class);
-
-
-        Arrays.asList(importList).forEach(thisImport ->
-                given()
-                        .accept(ContentType.JSON)
-                        .pathParam("id", thisImport.id)
-                        .when()
-                        .delete("/application-import/{id}")
-                        .then()
-                        .statusCode(204));
+   
 
 
     }
