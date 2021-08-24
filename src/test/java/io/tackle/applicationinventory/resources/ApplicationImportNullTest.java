@@ -21,6 +21,7 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 @QuarkusTest
@@ -178,6 +179,52 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
 
         ApplicationInventoryAPIMapper apiMapper = new ApplicationInventoryAPIMapper(tags, businessServices);
         apiMapper.map(appImport1, appImportParent.id);
+
+        assertNull(appImport1.getRecordType1());
+        assertNull(appImport1.getComments());
+        assertNull(appImport1.getBusinessService());
+        assertNull(appImport1.getApplicationName());
+        assertNull(appImport1.getDescription());
+        assertNull(appImport1.getTag1());
+        assertNull(appImport1.getTagType1());
+        assertNull(appImport1.getTag2());
+        assertNull(appImport1.getTagType2());
+        assertNull(appImport1.getTag3());
+        assertNull(appImport1.getTagType3());
+        assertNull(appImport1.getTag4());
+        assertNull(appImport1.getTagType4());
+        assertNull(appImport1.getTag5());
+        assertNull(appImport1.getTagType5());
+        assertNull(appImport1.getTag6());
+        assertNull(appImport1.getTagType6());
+        assertNull(appImport1.getTag7());
+        assertNull(appImport1.getTagType7());
+        assertNull(appImport1.getTag8());
+        assertNull(appImport1.getTagType8());
+        assertNull(appImport1.getTag9());
+        assertNull(appImport1.getTagType9());
+        assertNull(appImport1.getTag10());
+        assertNull(appImport1.getTagType10());
+        assertNull(appImport1.getTag11());
+        assertNull(appImport1.getTagType11());
+        assertNull(appImport1.getTag12());
+        assertNull(appImport1.getTagType12());
+        assertNull(appImport1.getTag13());
+        assertNull(appImport1.getTagType13());
+        assertNull(appImport1.getTag14());
+        assertNull(appImport1.getTagType14());
+        assertNull(appImport1.getTag15());
+        assertNull(appImport1.getTagType15());
+        assertNull(appImport1.getTag16());
+        assertNull(appImport1.getTagType16());
+        assertNull(appImport1.getTag17());
+        assertNull(appImport1.getTagType17());
+        assertNull(appImport1.getTag18());
+        assertNull(appImport1.getTagType18());
+        assertNull(appImport1.getTag19());
+        assertNull(appImport1.getTagType19());
+        assertNull(appImport1.getTag20());
+        assertNull(appImport1.getTagType20());
 
         //Remove test data before finishing
         ImportSummary[] summaryList =
