@@ -111,3 +111,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CYPRESS_user: tackle
           CYPRESS_pass: password
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: integration-tests-screenshots
+          path: cypress/screenshots
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: integration-tests-videos
+          path: cypress/videos
