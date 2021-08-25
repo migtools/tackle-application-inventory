@@ -116,8 +116,3 @@ jobs:
         with:
           name: integration-tests-screenshots
           path: tackle-ui-tests/cypress/screenshots
-      # - uses: actions/upload-artifact@v1
-      #   if: always()
-      #   with:
-      #     name: integration-tests-videos
-      #     path: tackle-ui-tests/cypress/videos
