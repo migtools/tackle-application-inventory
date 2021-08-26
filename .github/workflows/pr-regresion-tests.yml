@@ -116,4 +116,3 @@ jobs:
         with:
           name: integration-tests-screenshots
           path: tackle-ui-tests/cypress/screenshots
-
