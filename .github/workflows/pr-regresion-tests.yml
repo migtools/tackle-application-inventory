@@ -2,6 +2,8 @@ name: Regression tests
 
 on:
   push:
+    branches-ignore:
+      - 'dependabot/**'
     paths-ignore:
       - ".gitignore"
       - "LICENSE"
