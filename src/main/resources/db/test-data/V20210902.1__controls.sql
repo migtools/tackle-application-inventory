@@ -14,6 +14,6 @@ INSERT INTO stakeholder_group (id, name, description, createUser, createTime, up
 INSERT INTO stakeholder_group (id, name, description, createUser, createTime, updateUser, updateTime, deleted) VALUES (nextval('hibernate_sequence'), 'Engineers', 'Engineers Group', '<pre-filled>', CURRENT_TIMESTAMP, '<pre-filled>', CURRENT_TIMESTAMP, false);
 INSERT INTO stakeholder_group (id, name, description, createUser, createTime, updateUser, updateTime, deleted) VALUES (nextval('hibernate_sequence'), 'Marketing', 'Marketing Group', '<pre-filled>', CURRENT_TIMESTAMP, '<pre-filled>', CURRENT_TIMESTAMP, false);
 
--- INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (62, 4);
--- INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (52, 5);
--- INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (53, 5);
+INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (61, 59);
+INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (61, 60);
+INSERT INTO stakeholdergroup_stakeholders (group_id, stakeholder_id) VALUES (62, 60);
