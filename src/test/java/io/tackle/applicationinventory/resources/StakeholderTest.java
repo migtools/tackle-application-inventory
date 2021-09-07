@@ -3,7 +3,6 @@ package io.tackle.applicationinventory.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.DisabledOnNativeImage;
@@ -129,8 +128,6 @@ public class StakeholderTest extends SecuredResourceTest {
                         .registerModule(new Jdk8Module())
                         .registerModule(new JavaTimeModule())
                         /*.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)*/));
-
-        List<PanacheEntityBase> list = Stakeholder.findAll().list();
 
         given()
                 .accept("application/json")
