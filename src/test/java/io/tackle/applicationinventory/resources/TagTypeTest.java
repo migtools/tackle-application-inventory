@@ -1,6 +1,5 @@
 package io.tackle.applicationinventory.resources;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.DisabledOnNativeImage;
@@ -230,7 +229,6 @@ public class TagTypeTest extends SecuredResourceTest {
     @Test
     // https://github.com/konveyor/tackle-controls/issues/119
     public void testSortByTagCountWithDeletedTags() {
-        List<PanacheEntityBase> list = TagType.findAll().list();
         // initial situation based on data inserted from Flyway scripts
         given()
                 .accept("application/hal+json")
