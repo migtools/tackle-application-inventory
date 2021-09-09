@@ -6,9 +6,8 @@ import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.enterprise.inject.spi.CDI;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tag")
@@ -23,6 +22,14 @@ public class Tag extends AbstractEntity {
 
     public Long getId() {
         return this.id;
+    }
+
+    @PreRemove
+    private void preRemove() {
+        EntityManager em = CDI.current().select(EntityManager.class).get();
+        Query query = em.createNativeQuery("delete from Application_tags where tag = ?1");
+        query.setParameter(1, this.id.toString());
+        query.executeUpdate();
     }
 
 }
