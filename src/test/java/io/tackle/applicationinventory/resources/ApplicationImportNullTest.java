@@ -160,6 +160,8 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         appImport1.setErrorMessage(null);
         appImport1.setRecordType1(null);
         appImport1.setComments(null);
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
 
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();

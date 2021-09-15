@@ -150,6 +150,10 @@ public class ApplicationImport extends AbstractEntity {
     @Size(max = 40)
     private String tag20;
 
+    private String dependency;
+
+    private String dependencyDirection;
+
     private String errorMessage;
 
     @Filterable(check = CheckType.EQUAL)
@@ -594,6 +598,26 @@ public class ApplicationImport extends AbstractEntity {
 
     public void setFilename(String filename) {
         this.filename = filename != null ? filename.trim() : null;
+    }
+
+
+
+    public String getDependency() {
+        return dependency;
+    }
+
+    @JsonSetter("Dependency")
+    public void setDependency(String dependency) {
+        this.dependency = dependency != null ? dependency.trim() : null;
+    }
+
+    public String getDependencyDirection() {
+        return dependencyDirection;
+    }
+
+    @JsonSetter("Dependency Direction")
+    public void setDependencyDirection(String dependencyDirection) {
+        this.dependencyDirection = dependencyDirection != null ? dependencyDirection.trim() : null;
     }
 
 
