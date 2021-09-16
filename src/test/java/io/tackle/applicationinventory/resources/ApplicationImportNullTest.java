@@ -8,6 +8,7 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
+import io.tackle.applicationinventory.mapper.ApplicationDependencyAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
@@ -232,4 +233,46 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
 
 
     }
+
+    @Test
+    @Transactional
+    protected void testNullDependency() {
+        ImportSummary appImportParent = new ImportSummary();
+        appImportParent.persistAndFlush();
+
+        ApplicationImport appImport1 = new ApplicationImport();
+        appImport1.setBusinessService(null);
+        appImport1.setApplicationName("Online Investments service");
+        appImport1.importSummary = appImportParent;
+        appImport1.setRecordType1("2");
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
+
+        ApplicationDependencyAPIMapper apiMapper = new ApplicationDependencyAPIMapper();
+        apiMapper.map(appImport1, appImportParent.id);
+
+        assertNull(appImport1.getDependency());
+
+        ImportSummary appImportParent2 = new ImportSummary();
+        appImportParent2.persistAndFlush();
+
+        ApplicationImport appImport2 = new ApplicationImport();
+        appImport2.setBusinessService(null);
+        appImport2.setApplicationName(null);
+        appImport2.importSummary = appImportParent;
+        appImport1.setRecordType1("2");
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
+
+        apiMapper.map(appImport2, appImportParent2.id);
+
+        assertNull(appImport1.getDependency());
+
+
+
+
+
+
+    }
+
 }

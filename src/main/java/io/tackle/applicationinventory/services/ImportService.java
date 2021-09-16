@@ -216,7 +216,7 @@ public class ImportService {
 
     public void mapImportsToDependency(List<ApplicationImport> importList,ImportSummary parentRecord)
     {
-        ApplicationMapper mapper = new ApplicationDependencyAPIMapper(null, null);
+        ApplicationMapper mapper = new ApplicationDependencyAPIMapper();
         importList.forEach(importedApplication -> {
             Response response = mapper.map(importedApplication, parentRecord.id);
             if (response.getStatus() != Response.Status.OK.getStatusCode())

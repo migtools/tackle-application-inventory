@@ -575,7 +575,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .when().post(PATH)
                 .then()
                 .log().all()
-                .statusCode(500).extract().response();
+                .statusCode(200).extract().response();
 
 
 
