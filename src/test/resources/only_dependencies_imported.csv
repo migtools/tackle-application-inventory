@@ -2,4 +2,3 @@ Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,
 2,OrderHub,,,,,,,,,,,,,NORTHBOUND
 2,,,,,,,,,,,,,OrderHubDependency,NORTHBOUND
 2,OrderHub,,,,,,,,,,,,OrderHubDependency,NORTHBOUND
-2,OrderHub,,,,,,,,,,,,OrderHub,NORTHBOUND
