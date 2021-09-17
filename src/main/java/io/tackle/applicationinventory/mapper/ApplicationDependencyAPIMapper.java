@@ -56,12 +56,12 @@ public class ApplicationDependencyAPIMapper extends ApplicationMapper {
 
         ApplicationsDependency dependency = new ApplicationsDependency();
 
-        if (importApp.getDependencyDirection().equals(FROM_DIRECTION))
+        if (importApp.getDependencyDirection().equalsIgnoreCase(FROM_DIRECTION))
         {
             dependency.from = application;
             dependency.to = applicationDependency;
         }
-        else if (importApp.getDependencyDirection().equals(TO_DIRECTION))
+        else if (importApp.getDependencyDirection().equalsIgnoreCase(TO_DIRECTION))
         {
             dependency.from = applicationDependency;
             dependency.to = application;
