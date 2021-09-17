@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class ApplicationDependencyAPIMapper extends ApplicationMapper {
 
-    private static final String FROM_DIRECTION = "FROM";
-    private static final String TO_DIRECTION = "TO";
+    private static final String FROM_DIRECTION = "SOUTHBOUND";
+    private static final String TO_DIRECTION = "NORTHBOUND";
 
     public ApplicationDependencyAPIMapper() {
         super(null, null);

@@ -591,18 +591,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .body("_embedded.'application-import'.size()", is(5));
 
 
-
-     /**  given()
-                .accept("application/hal+json")
-                .queryParam("isValid", Boolean.FALSE)
-                .when()
-                .get("/application-import")
-                .then()
-                .statusCode(200)
-                .log().body()
-                .body("_embedded.'application-import'.size()", is(6)); */
-
-
         removeTestObjects(Arrays.asList("OrderHub","OrderHubDependency","OrderHubDependency2"));
 
     }
