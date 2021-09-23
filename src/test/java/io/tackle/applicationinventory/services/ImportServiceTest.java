@@ -557,8 +557,11 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .when()
                 .get("/application-import")
                 .then()
+                .log().body()
                 .statusCode(200)
                 .body("_embedded.'application-import'.size()", is(5));
+
+
 
         File importFile2 = new File(classLoader.getResource("only_dependencies_imported.csv").getFile());
 

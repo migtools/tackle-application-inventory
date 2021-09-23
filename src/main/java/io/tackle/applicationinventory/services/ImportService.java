@@ -61,6 +61,9 @@ public class ImportService {
     @Inject
     Validator validator;
 
+    @Inject
+    ApplicationDependencyAPIMapper dependencyMapper;
+
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -215,9 +218,9 @@ public class ImportService {
 
     public void mapImportsToDependency(List<ApplicationImport> importList,ImportSummary parentRecord)
     {
-        ApplicationMapper mapper = new ApplicationDependencyAPIMapper();
+
         importList.forEach(importedApplication -> {
-            Response response = mapper.map(importedApplication, parentRecord.id);
+            Response response = dependencyMapper.map(importedApplication, parentRecord.id);
             if (response.getStatus() != Response.Status.OK.getStatusCode())
             {
                 markFailedImportAsInvalid(importedApplication);

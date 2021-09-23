@@ -3,18 +3,16 @@ package io.tackle.applicationinventory.mapper;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
-import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.core.Response;
 
 import java.util.Set;
 
-import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
-
+@ApplicationScoped
 public class ApplicationDependencyAPIMapper extends ApplicationMapper {
 
     @Inject
@@ -28,7 +26,6 @@ public class ApplicationDependencyAPIMapper extends ApplicationMapper {
     }
 
     @Override
-    @Transactional(REQUIRES_NEW)
     public Response map(ApplicationImport importApp, Long parentId)
     {
         Application application = null;
@@ -99,18 +96,11 @@ public class ApplicationDependencyAPIMapper extends ApplicationMapper {
         if (constraintViolations.size() > 0)
         {
             importApp.setErrorMessage(constraintViolations.iterator().next().getMessage());
-            System.out.println(constraintViolations.iterator().next().getMessage());
             return Response.serverError().build();
         }
 
-        try {
-            dependency.persistAndFlush();
-        }
-        catch(ApplicationsInventoryException aie)
-        {
-            importApp.setErrorMessage("Dependency cycle would be created");
-            return Response.serverError().build();
-        }
+        dependency.persistAndFlush();
+
         System.out.println("Success for application: " + dependency.from + ", dependency: " + dependency.to);
         return Response.ok().build();
     }
