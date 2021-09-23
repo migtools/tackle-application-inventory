@@ -534,7 +534,6 @@ public class ImportServiceTest extends SecuredResourceTest {
     @Test
     @Order(10)
     protected void testImportDependencies() {
-
         ClassLoader classLoader = getClass().getClassLoader();
         File importFile = new File(classLoader.getResource("dependency_import.csv").getFile());
 
@@ -547,7 +546,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .multiPart("fileName","dependency_import.csv")
                 .when().post(PATH)
                 .then()
-                .log().all()
                 .statusCode(200).extract().response();
 
         assertEquals(200, response.getStatusCode());
@@ -560,7 +558,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .get("/application-import")
                 .then()
                 .statusCode(200)
-                .log().body()
                 .body("_embedded.'application-import'.size()", is(5));
 
         File importFile2 = new File(classLoader.getResource("only_dependencies_imported.csv").getFile());
@@ -574,10 +571,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .multiPart("fileName","only_dependencies_imported.csv")
                 .when().post(PATH)
                 .then()
-                .log().all()
                 .statusCode(200).extract().response();
-
-
 
 
         given()
@@ -587,7 +581,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                 .get("/application-import")
                 .then()
                 .statusCode(200)
-                .log().body()
                 .body("_embedded.'application-import'.size()", is(5));
 
 
@@ -633,10 +626,7 @@ public class ImportServiceTest extends SecuredResourceTest {
                         .then()
                         .statusCode(204));
 
-        System.out.println("Deleting applications:");
-
         for (String appName : appNamesToDelete) {
-            System.out.println("appName: " + appName);
             long firstApplicationId = Long.parseLong(given()
                     .queryParam("name", appName)
                     .accept(ContentType.JSON)
@@ -644,7 +634,6 @@ public class ImportServiceTest extends SecuredResourceTest {
                     .get("/application")
                     .then()
                     .statusCode(200)
-                    .log().body()
                     .extract()
                     .path("[0].id")
                     .toString());

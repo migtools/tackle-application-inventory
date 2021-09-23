@@ -128,12 +128,11 @@ public class ImportService {
                     !anImportRow.getRecordType1().equals(APPLICATION_IMPORT_TYPE)
                     && !anImportRow.getRecordType1().equals(DEPENDENCY_IMPORT_TYPE)).collect(Collectors.toList());
 
-            if(!noTypeImports.isEmpty()) {
-                noTypeImports.forEach(noTypeImport -> {
-                    noTypeImport.setErrorMessage("Invalid Record Type");
-                    markFailedImportAsInvalid(noTypeImport);
-                });
-            }
+            noTypeImports.forEach(noTypeImport -> {
+                noTypeImport.setErrorMessage("Invalid Record Type");
+                markFailedImportAsInvalid(noTypeImport);
+            });
+
             parentRecord.importStatus = COMPLETED_STATUS;
             parentRecord.flush();
 

@@ -2,6 +2,7 @@ package io.tackle.applicationinventory.entities;
 
 import io.quarkus.panache.common.Sort;
 import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
+import io.tackle.applicationinventory.validator.ApplicationsDependencyNoCycle;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 )
 @SQLDelete(sql = "UPDATE applications_dependency SET deleted = true WHERE id = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted = false")
+@ApplicationsDependencyNoCycle
 public class ApplicationsDependency extends AbstractEntity {
     @ManyToOne
     // in this bean, since the 'uniqueConstraints' has been specified,

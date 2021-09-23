@@ -228,10 +228,6 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         assertNull(appImport1.getTagType19());
         assertNull(appImport1.getTag20());
         assertNull(appImport1.getTagType20());
-
-   
-
-
     }
 
     @Test
@@ -267,12 +263,6 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         apiMapper.map(appImport2, appImportParent2.id);
 
         assertNull(appImport1.getDependency());
-
-
-
-
-
-
     }
 
 }
