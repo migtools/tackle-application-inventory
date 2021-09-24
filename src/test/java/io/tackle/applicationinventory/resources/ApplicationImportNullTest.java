@@ -262,7 +262,21 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
 
         apiMapper.map(appImport2, appImportParent2.id);
 
-        assertNull(appImport1.getDependency());
+        assertNull(appImport2.getDependency());
+
+        ImportSummary appImportParent3 = new ImportSummary();
+        appImportParent3.persistAndFlush();
+
+        ApplicationImport appImport3 = new ApplicationImport();
+        appImport3.setApplicationName("Online Investments service");
+        appImport3.importSummary = appImportParent;
+        appImport3.setRecordType1("2");
+        appImport3.setDependency("Home Banking BU");
+        appImport3.setDependencyDirection(null);
+
+        apiMapper.map(appImport3, appImportParent3.id);
+
+        assertNull(appImport3.getDependencyDirection());
     }
 
 }
