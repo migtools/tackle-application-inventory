@@ -2,7 +2,6 @@ package io.tackle.applicationinventory.entities;
 
 import io.quarkus.panache.common.Sort;
 import io.tackle.applicationinventory.exceptions.ApplicationsInventoryException;
-import io.tackle.applicationinventory.validator.ApplicationsDependencyNoCycle;
 import io.tackle.commons.annotations.Filterable;
 import io.tackle.commons.entities.AbstractEntity;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -30,7 +29,6 @@ import java.util.stream.Stream;
 )
 @SQLDelete(sql = "UPDATE applications_dependency SET deleted = true WHERE id = ?", check = ResultCheckStyle.COUNT)
 @Where(clause = "deleted = false")
-@ApplicationsDependencyNoCycle
 public class ApplicationsDependency extends AbstractEntity {
     @ManyToOne
     // in this bean, since the 'uniqueConstraints' has been specified,
@@ -51,6 +49,10 @@ public class ApplicationsDependency extends AbstractEntity {
     @PrePersist
     @PreUpdate
     public void preChangesCheck() {
+        validate(from, to);
+    }
+
+    public static void validate(Application from, Application to) throws ApplicationsInventoryException {
         // validate input data
         if (from == null || to == null) throw new ApplicationsInventoryException("Not valid application reference provided", Response.Status.BAD_REQUEST);
         // "self-loop" for dependencies is not allowed
