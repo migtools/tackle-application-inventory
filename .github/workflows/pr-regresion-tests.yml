@@ -128,6 +128,8 @@ jobs:
           start: npx echo "Starting Minikube Cypress tests"
           config: pageLoadTimeout=100000,retries=2,video=false
           browser: chrome
+          spec: |
+            **/*.test.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CYPRESS_user: tackle
