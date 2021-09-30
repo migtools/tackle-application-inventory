@@ -51,7 +51,7 @@ jobs:
     needs: [ native-image ]
     strategy:
       matrix:
-        tier: [ @tier1, @tier2, @tier3 ]
+        tier: [ "@tier1", "@tier2", "@tier3" ]
     steps:
       - name: Download container image
         uses: actions/download-artifact@v2
