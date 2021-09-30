@@ -97,6 +97,10 @@ public abstract class ApplicationImportForCsv {
     private String tagType20;
     @JsonProperty("Tag 20")
     private String tag20;
+    @JsonProperty("Dependency")
+    private String dependency;
+    @JsonProperty("Dependency Direction")
+    private String dependencyDirection;
 }
 
 

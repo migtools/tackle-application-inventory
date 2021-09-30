@@ -8,6 +8,7 @@ import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
+import io.tackle.applicationinventory.mapper.ApplicationDependencyAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
@@ -160,6 +161,8 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         appImport1.setErrorMessage(null);
         appImport1.setRecordType1(null);
         appImport1.setComments(null);
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
 
         Set<Tag> tags = new HashSet<>() ;
         Tag.TagType tagType1 = new Tag.TagType();
@@ -225,9 +228,55 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         assertNull(appImport1.getTagType19());
         assertNull(appImport1.getTag20());
         assertNull(appImport1.getTagType20());
-
-   
-
-
     }
+
+    @Test
+    @Transactional
+    protected void testNullDependency() {
+        ImportSummary appImportParent = new ImportSummary();
+        appImportParent.persistAndFlush();
+
+        ApplicationImport appImport1 = new ApplicationImport();
+        appImport1.setBusinessService(null);
+        appImport1.setApplicationName("Online Investments service");
+        appImport1.importSummary = appImportParent;
+        appImport1.setRecordType1("2");
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
+
+        ApplicationDependencyAPIMapper apiMapper = new ApplicationDependencyAPIMapper();
+        apiMapper.map(appImport1, appImportParent.id);
+
+        assertNull(appImport1.getDependency());
+
+        ImportSummary appImportParent2 = new ImportSummary();
+        appImportParent2.persistAndFlush();
+
+        ApplicationImport appImport2 = new ApplicationImport();
+        appImport2.setBusinessService(null);
+        appImport2.setApplicationName(null);
+        appImport2.importSummary = appImportParent;
+        appImport1.setRecordType1("2");
+        appImport1.setDependency(null);
+        appImport1.setDependencyDirection(null);
+
+        apiMapper.map(appImport2, appImportParent2.id);
+
+        assertNull(appImport2.getDependency());
+
+        ImportSummary appImportParent3 = new ImportSummary();
+        appImportParent3.persistAndFlush();
+
+        ApplicationImport appImport3 = new ApplicationImport();
+        appImport3.setApplicationName("Online Investments service");
+        appImport3.importSummary = appImportParent;
+        appImport3.setRecordType1("2");
+        appImport3.setDependency("Home Banking BU");
+        appImport3.setDependencyDirection(null);
+
+        apiMapper.map(appImport3, appImportParent3.id);
+
+        assertNull(appImport3.getDependencyDirection());
+    }
+
 }

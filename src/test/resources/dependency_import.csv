@@ -1,0 +1,10 @@
+Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3,Tag Type 4,Tag 4,Dependency,Dependency Direction
+1,OrderHub,"Create, amend and cancel food orders",,Food2Go,Operating System,RHEL 8,Database,Oracle,Language,Java EE,Runtime,Tomcat
+1,OrderHubDependency,"Dependent on OrderHub",,Food2Go,Operating System,RHEL 8,Database,Oracle,Language,Java EE,Runtime,Tomcat
+1,OrderHubDependency2,"OrderHub Dependent on this",,Food2Go,Operating System,RHEL 8,Database,Oracle,Language,Java EE,Runtime,Tomcat
+2,OrderHub,,,,,,,,,,,,OrderHubDependency,SOUTHBOUND
+2,OrderHub,,,,,,,,,,,,OrderHubDependency2,NORTHBOUND
+2,OrderHubDependency,,,,,,,,,,,,OrderHubDependency2,SOUTHBOUND
+2,OrderHub,,,,,,,,,,,,OrderHubDependency2,TO
+2,OrderHub,,,,,,,,,,,,OrderHub,NORTHBOUND
+2,Home Banking BU,,,,,,,,,,,,Online Investments service,SOUTHBOUND
