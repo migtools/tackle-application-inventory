@@ -1,6 +1,7 @@
 package io.tackle.applicationinventory.resources;
 
 import io.tackle.applicationinventory.dto.BulkReviewDto;
+import io.tackle.applicationinventory.dto.utils.EntityToDTO;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.BulkCopyReview;
 import io.tackle.applicationinventory.entities.BulkCopyReviewDetails;
@@ -31,17 +32,17 @@ public class ReviewBulkCopyResource {
 
     @POST
     public BulkReviewDto createBulkCopyReview(
-            @NotNull @Valid BulkReviewDto bulkReview
+            @NotNull @Valid BulkReviewDto bulkReviewInput
     ) throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         transaction.begin();
 
         // Find source review
-        Long sourceReviewId = bulkReview.getSourceReview();
+        Long sourceReviewId = bulkReviewInput.getSourceReview();
         Review sourceReview = Review.<Review>findByIdOptional(sourceReviewId)
                 .orElseThrow(() -> new BadRequestException("Source review not valid"));
 
         // Find target applications
-        List<Application> applicationsTarget = bulkReview.getTargetApplications().stream()
+        List<Application> applicationsTarget = bulkReviewInput.getTargetApplications().stream()
                 .map(appId -> Application.<Application>findById(appId))
                 .collect(Collectors.toList());
         if (applicationsTarget.stream().anyMatch(Objects::isNull)) {
@@ -49,31 +50,28 @@ public class ReviewBulkCopyResource {
         }
 
         // Prepare JPA object to be persisted
-        BulkCopyReview bulkCopyReview = new BulkCopyReview();
+        BulkCopyReview bulkCopyReviewOutput = new BulkCopyReview();
 
-        bulkCopyReview.sourceReview = sourceReview;
-        bulkCopyReview.details = applicationsTarget.stream()
+        bulkCopyReviewOutput.sourceReview = sourceReview;
+        bulkCopyReviewOutput.targetApplications = applicationsTarget.stream()
                 .map(application -> {
                     BulkCopyReviewDetails detail = new BulkCopyReviewDetails();
-                    detail.bulkCopyReview = bulkCopyReview;
+                    detail.bulkCopyReview = bulkCopyReviewOutput;
                     detail.application = application;
 
                     return detail;
                 })
                 .collect(Collectors.toSet());
-        bulkCopyReview.completed = false;
+        bulkCopyReviewOutput.completed = false;
 
-        bulkCopyReview.persist();
+        bulkCopyReviewOutput.persist();
         transaction.commit();
 
         // Fire bus event
-        eventBus.send(BulkCopyReviewService.BUS_EVENT, bulkCopyReview.id);
+        eventBus.send(BulkCopyReviewService.BUS_EVENT, bulkCopyReviewOutput.id);
 
         // Generate response
-        bulkReview.setId(bulkCopyReview.id);
-        bulkReview.setCompleted(bulkCopyReview.completed);
-
-        return bulkReview;
+        return EntityToDTO.toDTO(bulkCopyReviewOutput);
     }
 
     @GET
@@ -83,16 +81,7 @@ public class ReviewBulkCopyResource {
                 .<BulkCopyReview>findByIdOptional(id)
                 .orElseThrow(NotFoundException::new);
 
-        BulkReviewDto result = new BulkReviewDto();
-        result.setId(entity.id);
-        result.setSourceReview(entity.sourceReview.id);
-        result.setTargetApplications(entity.details
-                .stream()
-                .map(f -> f.application.id).collect(Collectors.toList())
-        );
-        result.setCompleted(entity.completed);
-
-        return result;
+        return EntityToDTO.toDTO(entity);
     }
 
 }

@@ -20,7 +20,7 @@ public class BulkCopyReview extends AbstractEntity {
     public Review sourceReview;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "bulkCopyReview")
-    public Set<BulkCopyReviewDetails> details = new HashSet<>();
+    public Set<BulkCopyReviewDetails> targetApplications = new HashSet<>();
 
     public boolean completed = false;
 }

@@ -1,6 +1,5 @@
 package io.tackle.applicationinventory.services;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.common.annotation.Blocking;
 import io.tackle.applicationinventory.entities.Application;
@@ -22,7 +21,7 @@ public class BulkCopyReviewService {
         BulkCopyReview bulk = BulkCopyReview.findById(bulkId);
 
         // Copy review to all apps
-        bulk.details.forEach(detail -> {
+        bulk.targetApplications.forEach(detail -> {
             // Delete previous review if exists
             Review.find("application.id", detail.application.id)
                     .<Review>firstResultOptional()
