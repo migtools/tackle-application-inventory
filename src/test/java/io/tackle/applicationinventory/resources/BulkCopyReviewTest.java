@@ -11,7 +11,6 @@ import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -41,6 +40,88 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
     @BeforeAll
     public static void init() {
         PATH = "/review/bulk";
+    }
+
+    public void deleteApplication(Application... applications) {
+        // Clean data
+        Arrays.asList(applications)
+                .forEach(app -> {
+                    given()
+                            .contentType(ContentType.JSON)
+                            .accept(ContentType.JSON)
+                            .when()
+                            .delete("/application/" + app.id)
+                            .then()
+                            .statusCode(204);
+                });
+    }
+
+    @Test
+    public void createBulkCopyWithNonExistingSource() {
+        BulkReviewDto bulkCopy = new BulkReviewDto();
+        bulkCopy.setSourceReview(Long.MAX_VALUE); // Non existing source
+        bulkCopy.setTargetApplications(Arrays.asList(1L, 2L, 3L)); // Whether or not the app's id exists is irrelevant since the Source is invalid.
+
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(bulkCopy)
+                .when()
+                .post(PATH)
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    public void createBulkCopyWithNonExistingTargetApps() {
+        // Create app1
+        Application app1 = new Application();
+        app1.name = "app1";
+
+        app1 = given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(app1)
+                .when()
+                .post("/application")
+                .then()
+                .statusCode(201)
+                .extract().body().as(Application.class);
+
+        // Create review (source) for app1
+        Review review1 = new Review();
+        review1.workPriority = 1;
+        review1.businessCriticality = 1;
+        review1.effortEstimate = "low";
+        review1.proposedAction = "rehost";
+        review1.application = app1;
+
+        review1 = given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(review1)
+                .when()
+                .post("/review")
+                .then()
+                .statusCode(201)
+                .extract().body().as(Review.class);
+
+        // Create bulk copy using valid source but non existing targets
+        BulkReviewDto bulkCopy = new BulkReviewDto();
+        bulkCopy.setSourceReview(review1.id);
+        bulkCopy.setTargetApplications(Arrays.asList(Long.MAX_VALUE - 1, Long.MAX_VALUE)); // Non existing apps (target)
+
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(bulkCopy)
+                .when()
+                .post("/review/bulk")
+                .then()
+                .statusCode(400);
+
+        // Clean data
+        deleteApplication(app1);
     }
 
     @Test
@@ -159,7 +240,7 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .get("/review/bulk/" + bulkCopyToWatch1.getId())
+                .get(PATH + "/" + bulkCopyToWatch1.getId())
                 .then()
                 .statusCode(200)
                 .extract().body().as(BulkReviewDto.class)
@@ -218,7 +299,7 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
-                .get("/review/bulk/" + bulkCopyToWatch2.getId())
+                .get(PATH + "/" + bulkCopyToWatch2.getId())
                 .then()
                 .statusCode(200)
                 .extract().body().as(BulkReviewDto.class)
@@ -256,16 +337,7 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 );
 
         // Clean data
-        Arrays.asList(app1, app2, app3, app4)
-                .forEach(app -> {
-                    given()
-                            .contentType(ContentType.JSON)
-                            .accept(ContentType.JSON)
-                            .when()
-                            .delete("/application/" + app.id)
-                            .then()
-                            .statusCode(204);
-                });
+        deleteApplication(app1, app2, app3, app4);
     }
 
 }

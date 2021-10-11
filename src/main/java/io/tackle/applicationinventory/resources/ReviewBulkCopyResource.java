@@ -30,6 +30,14 @@ public class ReviewBulkCopyResource {
     @Inject
     EventBus eventBus;
 
+    private void handleSimpleRollback(UserTransaction transaction) {
+        try {
+            transaction.rollback();
+        } catch (SystemException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     @POST
     public BulkReviewDto createBulkCopyReview(
             @NotNull @Valid BulkReviewDto bulkReviewInput
@@ -39,13 +47,17 @@ public class ReviewBulkCopyResource {
         // Find source review
         Long sourceReviewId = bulkReviewInput.getSourceReview();
         Review sourceReview = Review.<Review>findByIdOptional(sourceReviewId)
-                .orElseThrow(() -> new BadRequestException("Source review not valid"));
+                .orElseThrow(() -> {
+                    handleSimpleRollback(transaction);
+                    return new BadRequestException("Source review not valid");
+                });
 
         // Find target applications
         List<Application> applicationsTarget = bulkReviewInput.getTargetApplications().stream()
                 .map(appId -> Application.<Application>findById(appId))
                 .collect(Collectors.toList());
         if (applicationsTarget.stream().anyMatch(Objects::isNull)) {
+            handleSimpleRollback(transaction);
             throw new BadRequestException("One or more target applications is not valid");
         }
 
