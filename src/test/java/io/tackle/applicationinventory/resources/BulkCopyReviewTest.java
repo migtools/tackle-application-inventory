@@ -22,7 +22,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-@Disabled
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
         initArgs = {
@@ -255,6 +254,18 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                         "review.effortEstimate", is("high"),
                         "review.proposedAction", is("replatform")
                 );
+
+        // Clean data
+        Arrays.asList(app1, app2, app3, app4)
+                .forEach(app -> {
+                    given()
+                            .contentType(ContentType.JSON)
+                            .accept(ContentType.JSON)
+                            .when()
+                            .delete("/application/" + app.id)
+                            .then()
+                            .statusCode(204);
+                });
     }
 
 }
