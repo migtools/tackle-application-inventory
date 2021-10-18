@@ -256,10 +256,11 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("id", is(notNullValue()),
                         "review", is(notNullValue()),
-                        "review.workPriority", is(1),
-                        "review.businessCriticality", is(1),
-                        "review.effortEstimate", is("low"),
-                        "review.proposedAction", is("rehost")
+                        "review.workPriority", is(review1.workPriority),
+                        "review.businessCriticality", is(review1.businessCriticality),
+                        "review.effortEstimate", is(review1.effortEstimate),
+                        "review.proposedAction", is(review1.proposedAction),
+                        "review.copiedFromReviewId", is(review1.id.intValue())
                 );
 
         given()
@@ -271,10 +272,11 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("id", is(notNullValue()),
                         "review", is(notNullValue()),
-                        "review.workPriority", is(1),
-                        "review.businessCriticality", is(1),
-                        "review.effortEstimate", is("low"),
-                        "review.proposedAction", is("rehost")
+                        "review.workPriority", is(review1.workPriority),
+                        "review.businessCriticality", is(review1.businessCriticality),
+                        "review.effortEstimate", is(review1.effortEstimate),
+                        "review.proposedAction", is(review1.proposedAction),
+                        "review.copiedFromReviewId", is(review1.id.intValue())
                 );
 
         // TestPhase2: Copy review from app2 to app3 and app4
@@ -315,10 +317,11 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("id", is(notNullValue()),
                         "review", is(notNullValue()),
-                        "review.workPriority", is(2),
-                        "review.businessCriticality", is(2),
-                        "review.effortEstimate", is("high"),
-                        "review.proposedAction", is("replatform")
+                        "review.workPriority", is(review2.workPriority),
+                        "review.businessCriticality", is(review2.businessCriticality),
+                        "review.effortEstimate", is(review2.effortEstimate),
+                        "review.proposedAction", is(review2.proposedAction),
+                        "review.copiedFromReviewId", is(review2.id.intValue())
                 );
 
         given()
@@ -330,10 +333,11 @@ public class BulkCopyReviewTest extends SecuredResourceTest {
                 .statusCode(200)
                 .body("id", is(notNullValue()),
                         "review", is(notNullValue()),
-                        "review.workPriority", is(2),
-                        "review.businessCriticality", is(2),
-                        "review.effortEstimate", is("high"),
-                        "review.proposedAction", is("replatform")
+                        "review.workPriority", is(review2.workPriority),
+                        "review.businessCriticality", is(review2.businessCriticality),
+                        "review.effortEstimate", is(review2.effortEstimate),
+                        "review.proposedAction", is(review2.proposedAction),
+                        "review.copiedFromReviewId", is(review2.id.intValue())
                 );
 
         // Clean data

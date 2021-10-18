@@ -32,3 +32,8 @@ alter table if exists bulk_copy_review_details
     add constraint fk_bulk_copy_review_details_application
     foreign key (application_id)
     references application;
+
+-- Add audit data
+
+alter table if exists review
+    add column copiedFromReviewId int8;

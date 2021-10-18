@@ -22,36 +22,32 @@ public class BulkCopyReviewService {
 
         // Copy review to all apps
         bulk.targetApplications.forEach(detail -> {
-            // Delete previous review if exists
-            Review.find("application.id", detail.application.id)
-                    .<Review>firstResultOptional()
-                    .ifPresent(oldReview -> {
-                        oldReview.delete();
-                        oldReview.flush(); // Needed for updating the indexes
-                    });
+            Application application = Application.findById(detail.application.id);
 
-            // Create new Review
-            Application targetApplication = Application.findById(detail.application.id);
-
-            Review newReview = createReviewFromSourceAndTarget(bulk.sourceReview, targetApplication);
-            newReview.persist();
+            Review oldReview = Review.find("application.id", detail.application.id).firstResult();
+            if (oldReview != null) {
+                oldReview = copyReviewFromSourceToTarget(bulk.sourceReview, oldReview);
+                oldReview.persist();
+            } else {
+                Review newReview = copyReviewFromSourceToTarget(bulk.sourceReview, new Review());
+                newReview.application = application;
+                newReview.persist();
+            }
         });
 
         bulk.completed = true;
         bulk.persist();
     }
 
-    private Review createReviewFromSourceAndTarget(Review source, Application target) {
-        Review result = new Review();
+    private Review copyReviewFromSourceToTarget(Review source, Review target) {
+        target.proposedAction = source.proposedAction;
+        target.effortEstimate = source.effortEstimate;
+        target.businessCriticality = source.businessCriticality;
+        target.workPriority = source.workPriority;
+        target.comments = source.comments;
 
-        result.proposedAction = source.proposedAction;
-        result.effortEstimate = source.effortEstimate;
-        result.businessCriticality = source.businessCriticality;
-        result.workPriority = source.workPriority;
-        result.comments = source.comments;
-
-        result.application = target;
-        return result;
+        target.copiedFromReviewId = source.id;
+        return target;
     }
 
 }
