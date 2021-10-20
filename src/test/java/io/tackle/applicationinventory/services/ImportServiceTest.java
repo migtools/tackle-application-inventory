@@ -10,6 +10,7 @@ import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.tackle.applicationinventory.MultipartImportBody;
+import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
@@ -183,13 +184,13 @@ public class ImportServiceTest extends SecuredResourceTest {
         final String multipartPayload = "Record Type 1,Application Name,Description,Comments,Business Service,Tag Type 1,Tag 1,Tag Type 2,Tag 2,Tag Type 3,Tag 3" +
         ",Tag Type 4,Tag 4,Tag Type 5,Tag 5,Tag Type 6,Tag 6,Tag Type 7,Tag 7,Tag Type 8,Tag 8,Tag Type 9,Tag 9" +
         ",Tag Type 10,Tag 10,Tag Type 11,Tag 11,Tag Type 12,Tag 12,Tag Type 13,Tag 13,Tag Type 14,Tag 14,Tag Type 15,Tag 15,Tag Type 16,Tag 16" +
-        ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20\n" +
+        ",Tag Type 17,Tag 17,Tag Type 18,Tag 18,Tag Type 19,Tag 19,Tag Type 20,Tag 20,Dependency,Dependency Direction\n" +
                 "1,,hello,,BS 1,,\n" +
                 "1,  ,,,BS 2,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1,tag type 1,tag 1\n" +
                 "1,name 1,and this,,BS 2,,,,,,mystery tag,,\n" +
                 "1,name 4,and this,,BS 1,,,mystery tag type,\n" +
                 "1,name 5,and this,,BS 2,,tag1\n" +
-                ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
+                ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
         given()
                 .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -530,6 +531,68 @@ public class ImportServiceTest extends SecuredResourceTest {
 
 
 
+    @Test
+    @Order(10)
+    protected void testImportDependencies() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File importFile = new File(classLoader.getResource("dependency_import.csv").getFile());
+
+
+        Response response = given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile)
+                .multiPart("fileName","dependency_import.csv")
+                .when().post(PATH)
+                .then()
+                .statusCode(200).extract().response();
+
+        assertEquals(200, response.getStatusCode());
+
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("_embedded.'application-import'.size()", is(5));
+
+
+
+        File importFile2 = new File(classLoader.getResource("only_dependencies_imported.csv").getFile());
+
+
+        given()
+                .config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .accept(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("file",importFile2)
+                .multiPart("fileName","only_dependencies_imported.csv")
+                .when().post(PATH)
+                .then()
+                .statusCode(200).extract().response();
+
+
+        given()
+                .accept("application/hal+json")
+                .queryParam("isValid", Boolean.TRUE)
+                .when()
+                .get("/application-import")
+                .then()
+                .statusCode(200)
+                .body("_embedded.'application-import'.size()", is(5));
+
+
+        removeTestObjects(Arrays.asList("OrderHub","OrderHubDependency","OrderHubDependency2"));
+
+    }
+
+
+
     private void removeTestObjects(List<String> appNamesToDelete)
     {
         ImportSummary[] summaryList =
@@ -574,18 +637,20 @@ public class ImportServiceTest extends SecuredResourceTest {
                     .get("/application")
                     .then()
                     .statusCode(200)
-                    .body("size()", Is.is(1))
                     .extract()
                     .path("[0].id")
                     .toString());
 
-            given()
-                    .accept(ContentType.JSON)
-                    .pathParam("id", firstApplicationId)
-                    .when()
-                    .delete("/application/{id}")
-                    .then()
-                    .statusCode(204);
+
+
+                    given()
+                            .accept(ContentType.JSON)
+                            .pathParam("id", firstApplicationId)
+                            .when()
+                            .delete("/application/{id}")
+                            .then()
+                            .statusCode(204);
+
         }
 
     }
