@@ -17,11 +17,7 @@ import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
 import io.tackle.commons.tests.SecuredResourceTest;
 import org.hamcrest.core.Is;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -38,6 +34,7 @@ import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
         initArgs = {
