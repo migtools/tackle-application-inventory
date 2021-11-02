@@ -4,11 +4,10 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import io.tackle.applicationinventory.AbstractBaseTest;
+import io.tackle.applicationinventory.AbstractBase1Test;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ import static org.hamcrest.Matchers.is;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationTest extends AbstractBaseTest {
+public class ApplicationTest extends AbstractBase1Test {
 
     @BeforeAll
     public static void init() {

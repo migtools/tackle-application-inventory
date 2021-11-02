@@ -7,9 +7,7 @@ import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import io.tackle.applicationinventory.AbstractBaseTest;
-import io.tackle.applicationinventory.BusinessService;
+import io.tackle.applicationinventory.AbstractBase1Test;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
@@ -18,7 +16,6 @@ import io.tackle.applicationinventory.services.BusinessServiceService;
 import io.tackle.applicationinventory.services.TagService;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -49,7 +46,7 @@ import static org.hamcrest.core.Is.is;
         }
 )
 // https://issues.redhat.com/browse/TACKLE-282
-public class IssueTACKLE282Test extends AbstractBaseTest {
+public class IssueTACKLE282Test extends AbstractBase1Test {
 
     @InjectMock
     @RestClient

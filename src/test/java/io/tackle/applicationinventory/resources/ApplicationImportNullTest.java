@@ -4,7 +4,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import io.tackle.applicationinventory.AbstractBaseTest;
+import io.tackle.applicationinventory.AbstractBase1Test;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
@@ -13,7 +13,6 @@ import io.tackle.applicationinventory.mapper.ApplicationDependencyAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.Test;
 
 import javax.transaction.Transactional;
@@ -40,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationImportNullTest extends AbstractBaseTest {
+public class ApplicationImportNullTest extends AbstractBase1Test {
 
     @Test
     @Transactional
