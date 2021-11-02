@@ -1714,7 +1714,7 @@
     } ],
     "disableableCredentialTypes" : [ "password" ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "admin" ],
+    "realmRoles" : [ "architect" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
