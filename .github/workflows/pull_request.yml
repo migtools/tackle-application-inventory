@@ -24,7 +24,7 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
-      run: mvn -U -B test --file pom.xml -Dtest=IssueTACKLE268Test
+      run: mvn -U -B test --file pom.xml
 
   integration-native-test:
 
