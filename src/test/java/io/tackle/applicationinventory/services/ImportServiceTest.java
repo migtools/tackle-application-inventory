@@ -9,6 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.tackle.applicationinventory.AbstractBaseTest;
 import io.tackle.applicationinventory.MultipartImportBody;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationImport;
@@ -54,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 @QuarkusTestResource(WireMockControlsServices.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ImportServiceTest extends SecuredResourceTest {
+public class ImportServiceTest extends AbstractBaseTest {
 
 
     @BeforeAll

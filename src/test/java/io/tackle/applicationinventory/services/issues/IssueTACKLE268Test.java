@@ -6,6 +6,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.AbstractBaseTest;
 import io.tackle.applicationinventory.services.WireMockControlsServices;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 @QuarkusTestResource(WireMockControlsServices.class)
 // https://issues.redhat.com/browse/TACKLE-268
-public class IssueTACKLE268Test extends SecuredResourceTest {
+public class IssueTACKLE268Test extends AbstractBaseTest {
 
     @BeforeAll
     public static void init() {

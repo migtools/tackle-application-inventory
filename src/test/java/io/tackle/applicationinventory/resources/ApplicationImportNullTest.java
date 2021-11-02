@@ -4,6 +4,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.AbstractBaseTest;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationImportNullTest extends SecuredResourceTest {
+public class ApplicationImportNullTest extends AbstractBaseTest {
 
     @Test
     @Transactional

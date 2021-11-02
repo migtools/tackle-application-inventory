@@ -1,5 +1,6 @@
 package io.tackle.applicationinventory.services;
 
+import io.tackle.applicationinventory.AbstractBaseTest;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
 import io.tackle.applicationinventory.entities.Review;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import javax.transaction.Transactional;
 import java.util.List;
 
-public abstract class ReportTestUtil extends SecuredResourceTest {
+public abstract class ReportTestUtil extends AbstractBaseTest {
     @BeforeEach
     @Transactional
     public void insertDataForTests() {

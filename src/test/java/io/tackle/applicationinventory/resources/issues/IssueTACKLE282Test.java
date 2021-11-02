@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.tackle.applicationinventory.AbstractBaseTest;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.Application;
@@ -48,7 +49,7 @@ import static org.hamcrest.core.Is.is;
         }
 )
 // https://issues.redhat.com/browse/TACKLE-282
-public class IssueTACKLE282Test extends SecuredResourceTest {
+public class IssueTACKLE282Test extends AbstractBaseTest {
 
     @InjectMock
     @RestClient
