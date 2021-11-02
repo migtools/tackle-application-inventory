@@ -76,8 +76,9 @@ public class IssueTACKLE268Test extends SecuredResourceTest {
                 .queryParam("importSummaryId", importSummaryId)
                 .when()
                 .get("/csv-export")
-                .body()
-                .print();
+                .then()
+                .statusCode(200)
+                .extract().body().asString();
         String[] csvFields = csv.split(",");
 
         int numberOfRows = (int) Arrays.stream(csvFields).filter("\n"::equals).count();
