@@ -13,7 +13,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.oauth2;
 
-public class AbstractBase2Test {
+public abstract class AbstractBase2Test {
 
     private static final String KEYCLOAK_SERVER_URL = System.getProperty("quarkus.oidc.auth-server-url", "http://localhost:8180/auth");
     protected static String PATH = "";

@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.oauth2;
 
-public class AbstractBase1Test {
+public abstract class AbstractBase1Test {
 
     private static final String KEYCLOAK_SERVER_URL = System.getProperty("quarkus.oidc.auth-server-url", "http://localhost:8180/auth");
     protected static String PATH = "";
