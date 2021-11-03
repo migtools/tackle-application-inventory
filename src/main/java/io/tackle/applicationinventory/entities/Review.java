@@ -26,4 +26,8 @@ public class Review extends AbstractEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JsonIgnoreProperties(value = {"review"}, allowSetters = true)
     public Application application;
+
+    // No foreign keys associated to this field since foreign keys might
+    // complicate DELETE operations.
+    public Long copiedFromReviewId;
 }

@@ -49,6 +49,10 @@ public class ApplicationsDependency extends AbstractEntity {
     @PrePersist
     @PreUpdate
     public void preChangesCheck() {
+        validate(from, to);
+    }
+
+    public static void validate(Application from, Application to) throws ApplicationsInventoryException {
         // validate input data
         if (from == null || to == null) throw new ApplicationsInventoryException("Not valid application reference provided", Response.Status.BAD_REQUEST);
         // "self-loop" for dependencies is not allowed
