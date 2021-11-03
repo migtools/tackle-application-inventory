@@ -24,6 +24,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+
 @QuarkusTest
 @QuarkusTestResource(value = PostgreSQLDatabaseTestResource.class,
         initArgs = {
@@ -43,11 +44,7 @@ public class ApplicationImportNullTest extends AbstractBase1Test {
     @Test
     @Transactional
     public void testNullApplicationName() {
-        // Assert previous state
-        long initialNumberOfImportSummaries = ImportSummary.count();
-        long initialNumberOfApplicationImport = ApplicationImport.count();
 
-        // Execute tests
         ImportSummary importSummary = new ImportSummary();
         importSummary.persistAndFlush();
 
@@ -96,7 +93,7 @@ public class ApplicationImportNullTest extends AbstractBase1Test {
                         .get("/application-import")
                         .as(ApplicationImport[].class);
 
-        // Clean data
+
         Arrays.asList(importList).forEach(thisImport ->
                 given()
                         .accept(ContentType.JSON)
@@ -106,22 +103,15 @@ public class ApplicationImportNullTest extends AbstractBase1Test {
                         .then()
                         .statusCode(204));
 
-        importSummary.delete();
-        assertEquals(initialNumberOfImportSummaries, ImportSummary.count());
-        assertEquals(initialNumberOfApplicationImport, ApplicationImport.count());
+
     }
 
     @Test
     @Transactional
     protected void testNullTagTypes() {
-        // Assert previous state
-        long initialNumberOfImportSummaries = ImportSummary.count();
-        long initialNumberOfApplicationImport = ApplicationImport.count();
-
-        // Execute tests
         ImportSummary appImportParent = new ImportSummary();
         appImportParent.persistAndFlush();
-        
+
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setBusinessService(null);
         appImport1.setApplicationName(null);
@@ -238,22 +228,11 @@ public class ApplicationImportNullTest extends AbstractBase1Test {
         assertNull(appImport1.getTagType19());
         assertNull(appImport1.getTag20());
         assertNull(appImport1.getTagType20());
-
-        // Clean data
-        appImportParent.delete();
-
-        assertEquals(initialNumberOfImportSummaries, ImportSummary.count());
-        assertEquals(initialNumberOfApplicationImport, ApplicationImport.count());
     }
 
     @Test
     @Transactional
     protected void testNullDependency() {
-        // Assert previous state
-        long initialNumberOfImportSummaries = ImportSummary.count();
-        long initialNumberOfApplicationImport = ApplicationImport.count();
-
-        // Execute tests
         ImportSummary appImportParent = new ImportSummary();
         appImportParent.persistAndFlush();
 
@@ -298,14 +277,6 @@ public class ApplicationImportNullTest extends AbstractBase1Test {
         apiMapper.map(appImport3, appImportParent3.id);
 
         assertNull(appImport3.getDependencyDirection());
-
-        // Clean data
-        appImportParent.delete();
-        appImportParent2.delete();
-        appImportParent3.delete();
-
-        assertEquals(initialNumberOfImportSummaries, ImportSummary.count());
-        assertEquals(initialNumberOfApplicationImport, ApplicationImport.count());
     }
 
 }
