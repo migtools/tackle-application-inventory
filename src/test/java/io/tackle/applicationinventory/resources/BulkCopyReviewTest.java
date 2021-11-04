@@ -4,12 +4,12 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.dto.BulkReviewDto;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.Review;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.notNullValue;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class BulkCopyReviewTest extends SecuredResourceTest {
+public class BulkCopyReviewTest extends AbstractBaseFreshDbBeforeEachTest {
 
     @BeforeAll
     public static void init() {

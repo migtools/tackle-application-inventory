@@ -4,6 +4,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.BusinessService;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.ApplicationImport;
@@ -12,7 +13,6 @@ import io.tackle.applicationinventory.mapper.ApplicationDependencyAPIMapper;
 import io.tackle.applicationinventory.mapper.ApplicationInventoryAPIMapper;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.Test;
 
 import javax.transaction.Transactional;
@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ApplicationImportNullTest extends SecuredResourceTest {
+public class ApplicationImportNullTest extends AbstractBaseFreshDbBeforeEachTest {
 
     @Test
     @Transactional
@@ -121,7 +121,7 @@ public class ApplicationImportNullTest extends SecuredResourceTest {
         // Execute tests
         ImportSummary appImportParent = new ImportSummary();
         appImportParent.persistAndFlush();
-        
+
         ApplicationImport appImport1 = new ApplicationImport();
         appImport1.setBusinessService(null);
         appImport1.setApplicationName(null);

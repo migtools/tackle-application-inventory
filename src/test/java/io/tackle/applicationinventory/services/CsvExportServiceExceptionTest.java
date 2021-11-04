@@ -5,22 +5,18 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
-import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 
 import java.io.File;
@@ -47,7 +43,7 @@ import static org.mockito.Mockito.doThrow;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class CsvExportServiceExceptionTest extends SecuredResourceTest {
+public class CsvExportServiceExceptionTest extends AbstractBaseFreshDbBeforeEachTest {
 
 
     @Test

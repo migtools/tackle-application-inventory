@@ -5,11 +5,11 @@ import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeAllTest;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
 import io.tackle.commons.testcontainers.PostgreSQLDatabaseTestResource;
-import io.tackle.commons.tests.SecuredResourceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // The test order numbering approach is kind of BASIC C64 line numbering approach:
 // incrementing by 10 between tests to let some room for further later tests additions
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ApplicationsDependencyTest extends SecuredResourceTest {
+public class ApplicationsDependencyTest extends AbstractBaseFreshDbBeforeAllTest {
 
     private static final Application TEST_APPLICATION = new Application();
     // 1000 applications has been reported as a kind of worst case scenario
