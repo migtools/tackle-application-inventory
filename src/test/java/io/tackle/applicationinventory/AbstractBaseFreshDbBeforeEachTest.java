@@ -17,7 +17,11 @@ import java.util.regex.Matcher;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.oauth2;
 
-public abstract class AbstractBase1Test {
+/**
+ * Each test class that inherit this class will clean the DB in the phase @BeforeEach.
+ * E.g. If the inherited test class has 5 methods with the annotation @Test then the DB will be cleaned before the execution of each @Test method (5 times in this case)
+ */
+public abstract class AbstractBaseFreshDbBeforeEachTest {
 
     private static final String KEYCLOAK_SERVER_URL = System.getProperty("quarkus.oidc.auth-server-url", "http://localhost:8180/auth");
     protected static String PATH = "";
@@ -43,7 +47,7 @@ public abstract class AbstractBase1Test {
      * the "better safe than sorry" approach with security is the winning one.
      */
     @Test
-    public void testUnauthorized(){
+    public void testUnauthorized() {
         given().auth().oauth2("")
                 .accept("application/hal+json")
                 .queryParam("sort", "id")

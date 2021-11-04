@@ -9,7 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.tackle.applicationinventory.AbstractBase1Test;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.entities.ApplicationImport;
 import io.tackle.applicationinventory.entities.ImportSummary;
 import io.tackle.commons.testcontainers.KeycloakTestResource;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.doThrow;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class CsvExportServiceExceptionTest extends AbstractBase1Test {
+public class CsvExportServiceExceptionTest extends AbstractBaseFreshDbBeforeEachTest {
 
 
     @Test

@@ -13,7 +13,11 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.oauth2;
 
-public abstract class AbstractBase2Test {
+/**
+ * Each test class that inherit this class will clean the DB in the phase @BeforeAll.
+ * E.g. If the inherited test class has 5 methods with the annotation @Test then the DB will be cleaned just once (@BeforeAll)
+ */
+public abstract class AbstractBaseFreshDbBeforeAllTest {
 
     private static final String KEYCLOAK_SERVER_URL = System.getProperty("quarkus.oidc.auth-server-url", "http://localhost:8180/auth");
     protected static String PATH = "";
@@ -49,7 +53,7 @@ public abstract class AbstractBase2Test {
      * the "better safe than sorry" approach with security is the winning one.
      */
     @Test
-    public void testUnauthorized(){
+    public void testUnauthorized() {
         given().auth().oauth2("")
                 .accept("application/hal+json")
                 .queryParam("sort", "id")

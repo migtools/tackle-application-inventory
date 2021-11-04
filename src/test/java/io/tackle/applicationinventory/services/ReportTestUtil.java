@@ -1,6 +1,6 @@
 package io.tackle.applicationinventory.services;
 
-import io.tackle.applicationinventory.AbstractBase1Test;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
 import io.tackle.applicationinventory.entities.Review;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import javax.transaction.Transactional;
 import java.util.List;
 
-public abstract class ReportTestUtil extends AbstractBase1Test {
+public abstract class ReportTestUtil extends AbstractBaseFreshDbBeforeEachTest {
     @BeforeEach
     @Transactional
     public void insertDataForTests() {

@@ -5,7 +5,7 @@ import io.quarkus.test.common.ResourceArg;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.tackle.applicationinventory.AbstractBase1Test;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
 import io.tackle.applicationinventory.entities.Review;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                 @ResourceArg(name = KeycloakTestResource.REALM_NAME, value = "quarkus")
         }
 )
-public class ServicesParameterizedTest extends AbstractBase1Test {
+public class ServicesParameterizedTest extends AbstractBaseFreshDbBeforeEachTest {
 
     // the 'name' output seems not to work with Quarkus
     @DisplayName("testListEndpoints")

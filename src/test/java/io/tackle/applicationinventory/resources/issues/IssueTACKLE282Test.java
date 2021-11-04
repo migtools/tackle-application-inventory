@@ -7,7 +7,7 @@ import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
-import io.tackle.applicationinventory.AbstractBase1Test;
+import io.tackle.applicationinventory.AbstractBaseFreshDbBeforeEachTest;
 import io.tackle.applicationinventory.Tag;
 import io.tackle.applicationinventory.entities.Application;
 import io.tackle.applicationinventory.entities.ApplicationsDependency;
@@ -46,7 +46,7 @@ import static org.hamcrest.core.Is.is;
         }
 )
 // https://issues.redhat.com/browse/TACKLE-282
-public class IssueTACKLE282Test extends AbstractBase1Test {
+public class IssueTACKLE282Test extends AbstractBaseFreshDbBeforeEachTest {
 
     @InjectMock
     @RestClient
