@@ -37,4 +37,3 @@ alter table if exists bulk_copy_review_details
 
 alter table if exists review
     add column copiedFromReviewId int8;
-
