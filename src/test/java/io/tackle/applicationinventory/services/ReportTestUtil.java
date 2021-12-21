@@ -37,7 +37,7 @@ public abstract class ReportTestUtil extends SecuredResourceTest {
     }
 
     @Transactional
-    private void createDependency(int from, int to) {
+    public void createDependency(int from, int to) {
         ApplicationsDependency dependency = new ApplicationsDependency();
         dependency.from = (Application) Application.find("name", "App" + from).firstResultOptional().orElseThrow();
         dependency.to = (Application) Application.find("name", "App" + to).firstResultOptional().orElseThrow();
@@ -45,7 +45,7 @@ public abstract class ReportTestUtil extends SecuredResourceTest {
     }
 
     @Transactional
-    private static void createApplication(int i) {
+    public static void createApplication(int i) {
         Application app = new Application();
         app.name = "App" + i;
         app.businessService = "";

@@ -80,7 +80,7 @@ public class ReportService {
     }
 
     @Transactional
-    private AdoptionPlanAppDto buildAdoptionPlanAppDto(List<Long> applicationIds, EdgeReversedGraph<Application, DefaultEdge> graph, Application application) {
+    protected AdoptionPlanAppDto buildAdoptionPlanAppDto(List<Long> applicationIds, EdgeReversedGraph<Application, DefaultEdge> graph, Application application) {
         if (application.review == null) return null;
 
         AdoptionPlanAppDto planAppDto = new AdoptionPlanAppDto();
