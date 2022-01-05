@@ -52,9 +52,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.tackle</groupId>
+      <groupId>com.github.konveyor.tackle-commons-rest</groupId>
       <artifactId>commons-rest</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -143,9 +143,9 @@
       <version>${jgrapht.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.tackle</groupId>
+      <groupId>com.github.konveyor.tackle-commons-rest</groupId>
       <artifactId>commons-rest-test</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
