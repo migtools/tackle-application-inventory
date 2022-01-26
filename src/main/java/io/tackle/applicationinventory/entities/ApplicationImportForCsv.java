@@ -17,6 +17,10 @@ public abstract class ApplicationImportForCsv {
     private String comments;
     @JsonProperty("Business Service")
     private String businessService;
+    @JsonProperty("Dependency")
+    private String dependency;
+    @JsonProperty("Dependency Direction")
+    private String dependencyDirection;
     @JsonProperty("Tag Type 1")
     private String tagType1;
     @JsonProperty("Tag 1")
@@ -97,10 +101,6 @@ public abstract class ApplicationImportForCsv {
     private String tagType20;
     @JsonProperty("Tag 20")
     private String tag20;
-    @JsonProperty("Dependency")
-    private String dependency;
-    @JsonProperty("Dependency Direction")
-    private String dependencyDirection;
 }
 
 
