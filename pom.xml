@@ -30,7 +30,7 @@
   <inceptionYear>2021</inceptionYear>
 
   <properties>
-    <compiler-plugin.version>3.8.1</compiler-plugin.version>
+    <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <docker-plugin.version>0.28.0</docker-plugin.version>
     <jkube.version>1.0.2</jkube.version>
     <jkube.generator.quarkus.nativeImage>true</jkube.generator.quarkus.nativeImage>
